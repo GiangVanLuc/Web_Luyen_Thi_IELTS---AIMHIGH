@@ -1,55 +1,54 @@
 package vn.aimhigh.aimhighbackend.controller;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import lombok.NoArgsConstructor;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import vn.aimhigh.aimhighbackend.dto.request.GoogleLoginRequest;
+import org.springframework.web.bind.annotation.*;
 import vn.aimhigh.aimhighbackend.dto.request.LoginRequest;
+import vn.aimhigh.aimhighbackend.dto.request.RefreshTokenRequest;
 import vn.aimhigh.aimhighbackend.dto.request.RegisterRequest;
-import vn.aimhigh.aimhighbackend.dto.respone.AuthResponse;
-import vn.aimhigh.aimhighbackend.dto.respone.LoginResponse;
-import vn.aimhigh.aimhighbackend.model.User;
-import vn.aimhigh.aimhighbackend.repository.UserRepository;
+import vn.aimhigh.aimhighbackend.dto.response.AuthResponse;
+import vn.aimhigh.aimhighbackend.dto.response.LoginResponse;
 import vn.aimhigh.aimhighbackend.service.AuthenticationService;
-import vn.aimhigh.aimhighbackend.service.UserService;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-
-    private final UserService userService;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody RegisterRequest request) {
-        return userService.createUser(request);
+    public ResponseEntity<AuthResponse> register(
+            @RequestBody @Valid RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(authenticationService.register(request));
     }
 
     @PostMapping("/login")
-    LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        return authenticationService.login(loginRequest);
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody @Valid LoginRequest request) {
+        return ResponseEntity.ok(authenticationService.login(request));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(
+            @RequestBody @Valid RefreshTokenRequest request) {
+        return ResponseEntity.ok(
+                authenticationService.refreshToken(request.getRefreshToken()));
+    }
 
+    //  Sửa logout — lấy AccessToken từ header
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestBody @Valid RefreshTokenRequest request,
+            @RequestHeader("Authorization") String authHeader) {
 
+        // Lấy token từ "Bearer xxxxx"
+        String accessToken = authHeader.substring(7);
+        authenticationService.logout(request.getRefreshToken(), accessToken);
+        return ResponseEntity.noContent().build();
+    }
 }
-
