@@ -477,6 +477,8 @@ function buildNav(){
     const box=document.createElement('div');
     box.className='partbox';
     box.id='partbox'+pi;
+    box.style.cursor='pointer';
+    box.onclick=(()=>{const idx=pi;return ()=>switchPracticePart(idx);})();
 
     const lbl=document.createElement('span');
     lbl.className='partbox-lbl';
@@ -493,27 +495,59 @@ function buildNav(){
     w.appendChild(box);
   });
 
-  // Highlight part đầu tiên
+  // Highlight part đầu tiên và hiện đúng section
   currentNavPart=0;
-  document.querySelectorAll('.partbox').forEach((b,i)=>b.classList.toggle('partbox-active',i===0));
+  if(!document.body.classList.contains('real-mode')){
+    switchPracticePart(0);
+  } else {
+    document.querySelectorAll('.partbox').forEach((b,i)=>b.classList.toggle('partbox-active',i===0));
+    updateNavArrows();
+  }
+}
+
+function switchPracticePart(idx){
+  // Chỉ áp dụng practice mode
+  if(document.body.classList.contains('real-mode')) return;
+
+  const parts = examSection==='full'
+    ? PRACTICE_PARTS
+    : PRACTICE_PARTS.filter(p=>String(PRACTICE_PARTS.indexOf(p)+1)===examSection);
+
+  const part = parts[idx];
+  if(!part) return;
+
+  // Ẩn tất cả data-section trong passage và questions
+  [1,2,3].forEach(s=>{
+    document.querySelectorAll(`#passagePanel [data-section="${s}"]`).forEach(el=>el.style.display='none');
+    document.querySelectorAll(`#questionPanel [data-section="${s}"]`).forEach(el=>el.style.display='none');
+  });
+
+  // Hiện đúng section tương ứng với part
+  const secNum = PRACTICE_PARTS.indexOf(part)+1;
+  document.querySelectorAll(`#passagePanel [data-section="${secNum}"]`).forEach(el=>el.style.display='');
+  document.querySelectorAll(`#questionPanel [data-section="${secNum}"]`).forEach(el=>el.style.display='');
+
+  // Scroll về đầu
+  const ps=document.getElementById('passageText'); if(ps) ps.scrollTop=0;
+  const qs=document.getElementById('qScroll');    if(qs) qs.scrollTop=0;
+
+  currentNavPart=idx;
+  document.querySelectorAll('.partbox').forEach((b,i)=>b.classList.toggle('partbox-active',i===idx));
   updateNavArrows();
 }
 
 function navPrev(){
-  if(currentNavPart>0){ currentNavPart--; scrollToPartbox(currentNavPart); }
+  if(currentNavPart>0) switchPracticePart(currentNavPart-1);
 }
 function navNext(){
   const boxes=document.querySelectorAll('.partbox');
-  if(currentNavPart<boxes.length-1){ currentNavPart++; scrollToPartbox(currentNavPart); }
+  if(currentNavPart<boxes.length-1) switchPracticePart(currentNavPart+1);
 }
 function scrollToPartbox(idx){
   const box=document.getElementById('partbox'+idx);
   const nav=document.getElementById('qnav');
   if(!box||!nav) return;
   nav.scrollTo({left:box.offsetLeft-nav.offsetLeft-4,behavior:'smooth'});
-  // Highlight active partbox
-  document.querySelectorAll('.partbox').forEach((b,i)=>b.classList.toggle('partbox-active',i===idx));
-  updateNavArrows();
 }
 function updateNavArrows(){
   const boxes=document.querySelectorAll('.partbox');
@@ -523,11 +557,21 @@ function updateNavArrows(){
   if(next) next.disabled=currentNavPart>=boxes.length-1;
 }
 function goQ(q){
-  const el=document.getElementById('qi'+q)||document.getElementById('q'+q);
-  if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
-  document.querySelectorAll('.qnb').forEach(b=>b.classList.remove('cur'));
-  const nb=document.getElementById('nb'+q);
-  if(nb&&!nb.classList.contains('done')) nb.classList.add('cur');
+  // Tìm part chứa câu q và switch sang đó trước
+  if(!document.body.classList.contains('real-mode')){
+    const parts = examSection==='full'
+      ? PRACTICE_PARTS
+      : PRACTICE_PARTS.filter(p=>String(PRACTICE_PARTS.indexOf(p)+1)===examSection);
+    const idx=parts.findIndex(p=>q>=p.from&&q<=p.to);
+    if(idx>=0 && idx!==currentNavPart) switchPracticePart(idx);
+  }
+  setTimeout(()=>{
+    const el=document.getElementById('qi'+q)||document.getElementById('q'+q);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    document.querySelectorAll('.qnb').forEach(b=>b.classList.remove('cur'));
+    const nb=document.getElementById('nb'+q);
+    if(nb&&!nb.classList.contains('done')) nb.classList.add('cur');
+  },50);
 }
 
 // ── REAL MODE ──
@@ -745,6 +789,8 @@ function updateRealBotNav(){
 }
 
 function updateRealCounter(){updateRealBotNav();}
+
+function pa(q,v){
   ans[q]=v;
   const el=document.getElementById('qi'+q);
   if(el){el.classList.toggle('done',!!v);const b=el.querySelector('.qbadge');if(b)b.style.background=v?'var(--success)':'var(--primary)';}
@@ -753,6 +799,7 @@ function updateRealCounter(){updateRealBotNav();}
   const nb=document.getElementById('nb'+q);
   if(nb){nb.classList.toggle('done',!!v);if(v)nb.classList.remove('cur');}
   updateRealCounter();
+}
 
 // TOOLS
 function setTool(t){
@@ -874,38 +921,41 @@ function confirmSub(){
 }
 
 // ── RESIZE HANDLE ──
-(function(){
+document.addEventListener('DOMContentLoaded',()=>{
   const handle=document.getElementById('resizeHandle');
   const left=document.getElementById('passagePanel');
   const right=document.getElementById('questionPanel');
   if(!handle||!left||!right) return;
-  let dragging=false,startX=0,startW=0;
-  handle.addEventListener('mousedown',e=>{
-    dragging=true;startX=e.clientX;
-    startW=left.getBoundingClientRect().width;
+  handle.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    const startX=e.clientX;
+    const startW=left.getBoundingClientRect().width;
     handle.classList.add('dragging');
     document.body.style.userSelect='none';
     document.body.style.cursor='col-resize';
+    function onMove(ev){
+      const delta=ev.clientX-startX;
+      const container=handle.parentElement;
+      const totalW=container.getBoundingClientRect().width;
+      const toolW=document.querySelector('.tools')?.offsetWidth||0;
+      const available=totalW-toolW-8;
+      const newW=Math.min(Math.max(startW+delta,available*0.25),available*0.75);
+      left.style.flex='none';
+      left.style.width=newW+'px';
+      right.style.flex='1';
+      right.style.minWidth='0';
+    }
+    function onUp(){
+      handle.classList.remove('dragging');
+      document.body.style.userSelect='';
+      document.body.style.cursor='';
+      handle.removeEventListener('pointermove',onMove);
+      handle.removeEventListener('pointerup',onUp);
+    }
+    handle.addEventListener('pointermove',onMove);
+    handle.addEventListener('pointerup',onUp);
   });
-  document.addEventListener('mousemove',e=>{
-    if(!dragging) return;
-    const delta=e.clientX-startX;
-    const container=handle.parentElement;
-    const totalW=container.getBoundingClientRect().width;
-    const toolW=document.querySelector('.tools')?.offsetWidth||0;
-    const available=totalW-toolW-8;
-    const newW=Math.min(Math.max(startW+delta, available*0.25), available*0.75);
-    left.style.flex='none';
-    left.style.width=newW+'px';
-    right.style.flex='1';
-  });
-  document.addEventListener('mouseup',()=>{
-    if(!dragging) return;
-    dragging=false;
-    handle.classList.remove('dragging');
-    document.body.style.userSelect='';
-    document.body.style.cursor='';
-  });
-})();
+});
 
 const eh=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
