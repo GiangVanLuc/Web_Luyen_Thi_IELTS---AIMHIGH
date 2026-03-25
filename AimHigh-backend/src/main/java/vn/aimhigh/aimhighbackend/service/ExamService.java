@@ -46,9 +46,6 @@ public class ExamService {
         ).collect(Collectors.toList());
     }
 
-    /**
-     * Lấy chi tiết đề thi (KHÔNG trả về correctAnswer)
-     */
     public ExamDetailResponse getExamDetail(Long examId) {
         log.info("Lấy chi tiết đề thi ID: {}", examId);
         Exam exam = examRepository.findById(examId)
@@ -61,7 +58,48 @@ public class ExamService {
                 .type(exam.getType())
                 .level(exam.getLevel())
                 .duration(exam.getDuration())
-                // TODO: Map Parts/Passages sang DTO (Bỏ correctAnswer)
+                .parts(exam.getListeningParts() == null ? null : exam.getListeningParts().stream().map(part -> 
+                        ExamDetailResponse.PartDto.builder()
+                                .id(part.getId())
+                                .partNumber(part.getPartNumber())
+                                .title(part.getTitle())
+                                .audioUrl(part.getAudioUrl())
+                                .audioDuration(part.getAudioDuration())
+                                .questions(mapQuestions(part.getQuestions()))
+                                .build()
+                ).collect(Collectors.toList()))
+                .passages(exam.getReadingPassages() == null ? null : exam.getReadingPassages().stream().map(passage ->
+                        ExamDetailResponse.PassageDto.builder()
+                                .id(passage.getId())
+                                .title(passage.getTitle())
+                                .content(passage.getContent())
+                                .imageUrl(passage.getImageUrl())
+                                .passageOrder(passage.getPassageOrder())
+                                .questions(mapQuestions(passage.getQuestions()))
+                                .build()
+                ).collect(Collectors.toList()))
                 .build();
+    }
+
+    private List<QuestionResponse> mapQuestions(List<vn.aimhigh.aimhighbackend.model.Question> questions) {
+        if (questions == null) return null;
+        return questions.stream().map(q -> QuestionResponse.builder()
+                .id(q.getId())
+                .questionNumber(q.getQuestionNumber())
+                .questionText(q.getQuestionText())
+                .questionType(q.getQuestionType() != null ? q.getQuestionType().getName() : null)
+                .audioStart(q.getAudioStart())
+                .audioEnd(q.getAudioEnd())
+                .points(q.getPoints() != null ? q.getPoints() : 1.0)
+                .choices(q.getChoices() == null ? null : q.getChoices().stream().map(c -> 
+                        QuestionResponse.ChoiceDto.builder()
+                                .id(c.getId())
+                                .label(c.getChoiceLabel())
+                                .text(c.getChoiceText())
+                                .build()
+                ).collect(Collectors.toList()))
+                // Cố tình KHÔNG MAP correctAnswer và explanation để chống gian lận
+                .build()
+        ).collect(Collectors.toList());
     }
 }

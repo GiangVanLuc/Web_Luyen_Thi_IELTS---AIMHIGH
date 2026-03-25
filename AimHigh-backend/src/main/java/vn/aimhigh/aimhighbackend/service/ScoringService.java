@@ -26,6 +26,8 @@ public class ScoringService {
     public void scoreAttempt(Attempt attempt, List<AnswerRequest> answers) {
         log.info("Chấm điểm attempt: {}", attempt.getId());
         int totalCorrect = 0, totalWrong = 0;
+        
+        java.util.List<vn.aimhigh.aimhighbackend.model.Answer> savedAnswers = new java.util.ArrayList<>();
 
         for (AnswerRequest answerReq : answers) {
             Question q = questionRepository.findById(answerReq.getQuestionId()).orElse(null);
@@ -33,9 +35,18 @@ public class ScoringService {
                 boolean isCorrect = scoreAnswer(q, answerReq.getAnswerText());
                 if (isCorrect) totalCorrect++;
                 else if (!Boolean.TRUE.equals(answerReq.getIsSkipped())) totalWrong++;
+                
+                savedAnswers.add(vn.aimhigh.aimhighbackend.model.Answer.builder()
+                        .attempt(attempt)
+                        .question(q)
+                        .answerText(answerReq.getAnswerText())
+                        .isSkipped(answerReq.getIsSkipped() != null ? answerReq.getIsSkipped() : false)
+                        .isCorrect(isCorrect)
+                        .build());
             }
         }
-
+        
+        attempt.setAnswers(savedAnswers);
         attempt.setTotalCorrect(totalCorrect);
         attempt.setTotalWrong(totalWrong);
         attempt.setStatus(AttemptStatus.SUBMITTED);
@@ -47,7 +58,7 @@ public class ScoringService {
     public Boolean scoreAnswer(Question question, String answerText) {
         if (answerText == null || answerText.trim().isEmpty() || question.getCorrectAnswer() == null) return false;
         // TODO: Enhance mapping theo QuestionType (Fill in blank, true false)
-        return answerText.trim().equalsIgnoreCase(question.getCorrectAnswer().trim());
+        return answerText.trim().toLowerCase().equals(question.getCorrectAnswer().trim().toLowerCase());
     }
 
     public Double calculateBandScore(int totalCorrect, Skill skill) {

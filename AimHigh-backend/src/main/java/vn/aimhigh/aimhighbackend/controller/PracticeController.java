@@ -30,20 +30,25 @@ public class PracticeController {
     @PostMapping("/attempts/{id}/notes")
     public ResponseEntity<ApiResponse<NoteResponse>> createNote(
             @PathVariable Long id,
-            @Valid @RequestBody NoteRequest request) {
-        Long userId = 1L;
+            @Valid @RequestBody NoteRequest request,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         return ResponseEntity.ok(ApiResponse.success(noteService.createNote(id, request, userId)));
     }
 
     @GetMapping("/attempts/{id}/notes")
-    public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes(@PathVariable Long id) {
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes(
+            @PathVariable Long id,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         return ResponseEntity.ok(ApiResponse.success(noteService.getNotes(id, userId)));
     }
 
     @DeleteMapping("/notes/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteNote(@PathVariable Long id) {
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<String>> deleteNote(
+            @PathVariable Long id,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         noteService.deleteNote(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Đã xoá note"));
     }
@@ -51,22 +56,26 @@ public class PracticeController {
     @PostMapping("/attempts/{id}/highlights")
     public ResponseEntity<ApiResponse<HighlightResponse>> createHighlight(
             @PathVariable Long id,
-            @Valid @RequestBody HighlightRequest request) {
-        Long userId = 1L;
+            @Valid @RequestBody HighlightRequest request,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         return ResponseEntity.ok(ApiResponse.success(highlightService.createHighlight(id, request, userId)));
     }
 
     @GetMapping("/attempts/{id}/highlights")
     public ResponseEntity<ApiResponse<List<HighlightResponse>>> getHighlights(
             @PathVariable Long id,
-            @RequestParam(required = false) Long passageId) {
-        Long userId = 1L;
+            @RequestParam(required = false) Long passageId,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         return ResponseEntity.ok(ApiResponse.success(highlightService.getHighlights(id, passageId, userId)));
     }
 
     @DeleteMapping("/highlights/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteHighlight(@PathVariable Long id) {
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<String>> deleteHighlight(
+            @PathVariable Long id,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         highlightService.deleteHighlight(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Đã xoá highlight"));
     }

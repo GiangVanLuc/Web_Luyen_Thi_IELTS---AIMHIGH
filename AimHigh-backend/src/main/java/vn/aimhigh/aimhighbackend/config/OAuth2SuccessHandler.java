@@ -12,6 +12,8 @@ import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.repository.UserRepository;
 import vn.aimhigh.aimhighbackend.service.JwtService;
 import vn.aimhigh.aimhighbackend.service.RedisService;
+import vn.aimhigh.aimhighbackend.enums.AuthProvider;
+import vn.aimhigh.aimhighbackend.enums.Role;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -35,8 +37,17 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = User.builder()
+                    .email(email)
+                    .name(oAuth2User.getAttribute("name"))
+                    .role(Role.STUDENT)
+                    .authProvider(AuthProvider.GOOGLE)
+                    .providerId(oAuth2User.getAttribute("sub"))
+                    .avatarUrl(oAuth2User.getAttribute("picture"))
+                    .build();
+            return userRepository.save(newUser);
+        });
 
         String accessToken  = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -45,7 +56,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         redisService.saveRefreshToken(user.getId(), refreshToken);
 
         String redirectUrl = String.format(
-                "%s/oauth2/callback?accessToken=%s&refreshToken=%s",
+                "%s/oauth2_callback.html?accessToken=%s&refreshToken=%s",
                 frontendUrl, accessToken, refreshToken
         );
 

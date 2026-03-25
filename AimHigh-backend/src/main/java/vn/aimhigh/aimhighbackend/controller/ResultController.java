@@ -18,8 +18,10 @@ public class ResultController {
     private final ResultService resultService;
 
     @GetMapping("/attempts/{id}/result")
-    public ResponseEntity<ApiResponse<ResultResponse>> getResult(@PathVariable Long id) {
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<ResultResponse>> getResult(
+            @PathVariable Long id,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
+        Long userId = user.getId();
         return ResponseEntity.ok(ApiResponse.success(resultService.getResult(id, userId)));
     }
 
