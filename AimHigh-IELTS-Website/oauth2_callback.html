@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xử lý đang nhập...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f4f7fb;
+            color: #0f2f53;
+            margin: 0;
+            text-align: center;
+        }
+        .loader {
+            border: 4px solid #d9e1ea;
+            border-top: 4px solid #1f3f66;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="loader"></div>
+        <h2>Đang xác thực thông tin...</h2>
+        <p>Vui lòng đợi giây lát trong khi chúng tôi xử lý đăng nhập của bạn.</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const accessToken = params.get('accessToken');
+            const refreshToken = params.get('refreshToken');
+
+            if (accessToken && refreshToken) {
+                // Save tokens to localStorage
+                localStorage.setItem('aimhigh_loggedIn', 'true');
+                localStorage.setItem('aimhigh_accessToken', accessToken);
+                localStorage.setItem('aimhigh_refreshToken', refreshToken);
+
+                // Optionally save empty username/email since Google OAuth doesn't append it to URL
+                // The frontend should ideally call `/api/users/me` with the access token next.
+                
+                // Redirect back to dashboard
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500); // slight delay for smooth transition
+            } else {
+                alert('Đăng nhập thất bại. Không tìm thấy token xác thực.');
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+</html>
