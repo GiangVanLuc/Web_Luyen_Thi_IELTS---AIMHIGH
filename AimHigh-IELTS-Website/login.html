@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #1f3f66;
-            --primary-blue-dark: #162f4d;
-            --text-primary: #0f2f53;
-            --text-secondary: #5f7390;
-            --input-border: #d9e1ea;
-            --bg-light: #f4f7fb;
-            --logo-gold: #d4a017;
+            --primary-blue: #c89a17;
+            --primary-blue-dark: #a97f0f;
+            --text-primary: #4a3800;
+            --text-secondary: #7a6a3a;
+            --input-border: #e4d7b2;
+            --bg-light: #f5efe2;
+            --logo-gold: #c89a17;
         }
 
         body {
@@ -37,7 +37,7 @@
         }
 
         .branding-pane {
-            background: linear-gradient(160deg, #1f3f66 0%, #2b5889 100%);
+            background: linear-gradient(160deg, #f7f1df 0%, #e6c76a 100%);
             color: #f1f8ff;
             position: relative;
             overflow: hidden;
@@ -92,8 +92,8 @@
         }
 
         .brand-mini img {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
             border-radius: 8px;
         }
@@ -217,13 +217,13 @@
             font-size: clamp(2rem, 3.4vw, 3rem);
             font-weight: 800;
             line-height: 1.2;
-            color: #ffffff;
+            color: #5a4300;
             margin-bottom: 12px;
         }
 
         .brand-desc {
             font-size: 1.05rem;
-            color: rgba(240, 248, 255, 0.9);
+            color: #5a4300;
             line-height: 1.6;
             max-width: 520px;
             margin: 0 auto 26px;
@@ -247,20 +247,20 @@
             font-size: 1.05rem;
             opacity: 0.95;
             margin-bottom: 6px;
-            color: var(--logo-gold);
+            color: #c89a17;
         }
 
         .stat-card h4 {
             font-size: 1.75rem;
             font-weight: 800;
             margin-bottom: 2px;
-            color: #ffffff;
+            color: #5a4300;
         }
 
         .stat-card p {
             margin: 0;
             font-size: 0.96rem;
-            color: rgba(255, 255, 255, 0.92);
+            color: #7a6a3a;
         }
 
         @media (max-width: 991.98px) {
@@ -331,7 +331,7 @@
                 <div class="brand-wrap">
                     <img src="assets/logo.png" alt="AimHigh logo" class="brand-logo-lg">
                     <h2 class="brand-title">Chinh Phục IELTS cùng AimHigh</h2>
-                    <p class="brand-desc">Nền tảng luyện thi IELTS toàn diện: luyện nghe, ngữ pháp, từ vựng, đề thi thử và đọc hiểu.</p>
+                    <p class="brand-desc">Nền tảng luyện thi IELTS toàn diện: Luyện đề chuẩn IELTS, chấm điểm band score và theo dõi tiến trình cải thiện 4 kỹ năng.</p>
 
                     <div class="stats-grid">
                         <article class="stat-card rounded-4 text-center">
@@ -352,7 +352,7 @@
                         <article class="stat-card rounded-4 text-center">
                             <i class="fa-solid fa-user-graduate"></i>
                             <h4>10000+</h4>
-                            <p>Học viên</p>
+                            <p>Lượt luyện tập</p>
                         </article>
                     </div>
                 </div>
@@ -362,6 +362,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ĐÃ CHỈNH SỬA LẠI HÀM NÀY ĐỂ GỌI API ĐĂNG NHẬP THẬT (FETCH)
         async function handleLogin(event) {
             event.preventDefault();
 

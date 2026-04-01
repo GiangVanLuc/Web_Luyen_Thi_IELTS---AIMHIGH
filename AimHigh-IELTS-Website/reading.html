@@ -1,1627 +1,227 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Test - AimHigh IELTS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/test.css">
-    <style>
-        .hidden-screen {
-            display: none !important;
-        }
-
-        .reading-home {
-            padding-top: 84px;
-            min-height: 100vh;
-            background: #f6f7fb;
-        }
-
-        .reading-home-wrap {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 290px 1fr;
-            gap: 16px;
-            padding: 12px 16px 24px;
-        }
-
-        .reading-filter {
-            background: #fff;
-            border: 1px solid #dde3ee;
-            border-radius: 16px;
-            padding: 14px;
-            height: calc(100vh - 116px);
-            overflow-y: auto;
-        }
-
-        .reading-filter .filter-top {
-            display: flex;
-            justify-content: space-between;
-            color: #64748b;
-            font-size: 26px;
-            margin-bottom: 12px;
-        }
-
-        .review-card {
-            border: 1px solid #d6dee8;
-            border-radius: 16px;
-            padding: 10px 14px;
-            font-weight: 700;
-            font-size: 34px;
-            line-height: 1.15;
-            margin-bottom: 14px;
-        }
-
-        .subject-box {
-            border: 2px solid #16a34a;
-            border-radius: 18px;
-            overflow: hidden;
-            margin-bottom: 14px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .subject-box.active {
-            border-color: #16a34a;
-            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
-        }
-
-        .subject-box:not(.active) {
-            border-color: #d6dbe5;
-        }
-
-        .subject-title {
-            background: #b7e2be;
-            font-weight: 700;
-            font-size: 34px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .subject-box:not(.active) .subject-title {
-            background: #eef0f3;
-        }
-
-        .subject-body {
-            padding: 12px 14px;
-            font-size: 38px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .subject-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .subject-option input[type="radio"] {
-            width: 22px;
-            height: 22px;
-            accent-color: #111827;
-            cursor: pointer;
-        }
-
-        .subject-option label {
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .subject-children {
-            margin: 6px 0 14px 28px;
-            border-left: 1px solid #cbd5e1;
-            padding-left: 14px;
-        }
-
-        .subject-body .sub-item {
-            display: block;
-            margin-bottom: 12px;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .subject-body .sub-branch {
-            margin-left: 24px;
-            border-left: 1px solid #cbd5e1;
-            padding-left: 14px;
-            font-size: 36px;
-            font-weight: 500;
-        }
-
-        .reading-content {
-            min-width: 0;
-        }
-
-        .reading-toolbar {
-            background: #efeff0;
-            border: 1px solid #dce1ea;
-            border-radius: 0;
-            padding: 10px 14px;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .tab-set {
-            display: flex;
-            gap: 8px;
-        }
-
-        .toolbar-tab {
-            border: 2px solid #16a34a;
-            background: #fff;
-            color: #16a34a;
-            padding: 8px 16px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .toolbar-tab.active {
-            background: #16a34a;
-            color: #fff;
-        }
-
-        .toolbar-search {
-            min-width: 340px;
-            max-width: 500px;
-            display: flex;
-            align-items: center;
-            background: #fff;
-            border: 1px solid #d6dbe5;
-            border-radius: 999px;
-            padding: 6px 8px 6px 12px;
-            gap: 8px;
-        }
-
-        .toolbar-search input {
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        .toolbar-search button {
-            border: none;
-            background: #d8f0db;
-            color: #16a34a;
-            font-weight: 700;
-            border-radius: 999px;
-            padding: 6px 20px;
-        }
-
-        .history-link {
-            color: #0d6efd;
-            font-size: 17px;
-            margin: 10px 0 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-
-        .reading-card-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .exercise-card {
-            background: #fff;
-            border: 1px solid #d6dbe5;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
-            cursor: pointer;
-        }
-
-        .exercise-card .thumb-wrap {
-            position: relative;
-            height: 146px;
-            overflow: hidden;
-        }
-
-        .exercise-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .exercise-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(33, 33, 33, 0.68);
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .passage-chip {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background: #f59e0b;
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 999px;
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .exercise-card-body {
-            padding: 12px 14px 14px;
-        }
-
-        .exercise-title {
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.35;
-            margin-bottom: 6px;
-            color: #0f172a;
-        }
-
-        .exercise-meta {
-            margin: 0;
-            padding-left: 14px;
-            color: #334155;
-            font-size: 16px;
-            line-height: 1.45;
-        }
-
-        .mode-select .modal-content {
-            border-radius: 0;
-            border: 1px solid #d6dbe5;
-        }
-
-        .mode-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 10px;
-        }
-
-        .mode-option {
-            border: 2px solid #d6dbe5;
-            border-radius: 10px;
-            background: #fff;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .mode-option.active {
-            border-color: #16a34a;
-            background: #ebf7ee;
-        }
-
-        .mode-option img {
-            width: 100%;
-            height: 170px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid #d3d9e2;
-        }
-
-        .mode-option h5 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .mode-option p {
-            margin: 0;
-            font-size: 16px;
-            color: #475569;
-        }
-
-        .exam-top-actions {
-            position: fixed;
-            top: 84px;
-            right: 16px;
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .exam-top-actions .test-timer {
-            background: #16a34a;
-            color: #fff;
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
-        }
-
-        .exam-top-actions .btn {
-            border-radius: 999px;
-            font-weight: 700;
-            padding: 7px 14px;
-        }
-
-        /* Reading Passage */
-        .reading-passage-container {
-            padding: 24px;
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
-        }
-
-        .passage-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--reading-color);
-        }
-
-        .passage-text {
-            font-size: 1rem;
-            line-height: 1.9;
-            color: var(--text-primary);
-            text-align: justify;
-        }
-
-        .passage-text p {
-            margin-bottom: 16px;
-            position: relative;
-        }
-
-        .passage-text .paragraph-label {
-            position: absolute;
-            left: -32px;
-            top: 2px;
-            font-weight: 700;
-            color: var(--reading-color);
-            font-size: 0.875rem;
-        }
-
-        /* Highlight & Vocab Popup */
-        .vocab-popup {
-            position: fixed;
-            background: white;
-            border-radius: var(--radius-md);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-            padding: 16px;
-            z-index: 9999;
-            display: none;
-            min-width: 260px;
-            max-width: 340px;
-            border: 2px solid var(--primary-color);
-        }
-
-        .vocab-popup.show { display: block; }
-
-        .vocab-popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .vocab-popup-header h4 {
-            font-size: 0.9375rem;
-            font-weight: 700;
-            margin: 0;
-            color: var(--primary-color);
-        }
-
-        .vocab-popup-close {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: var(--text-light);
-            cursor: pointer;
-        }
-
-        .vocab-selected-word {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
-            margin-bottom: 12px;
-            word-break: break-word;
-        }
-
-        .vocab-group-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 0.9375rem;
-            margin-bottom: 8px;
-            outline: none;
-        }
-
-        .vocab-group-select:focus {
-            border-color: var(--primary-color);
-        }
-
-        .vocab-new-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .vocab-new-group input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 0.875rem;
-            outline: none;
-        }
-
-        .vocab-new-group button {
-            padding: 8px 14px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .vocab-popup .btn-save-vocab {
-            width: 100%;
-            padding: 10px;
-            font-weight: 600;
-        }
-
-        /* Highlighted text */
-        .passage-text .vocab-highlight {
-            background: linear-gradient(120deg, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0.28) 100%);
-            border-bottom: 2px solid var(--reading-color);
-            padding: 1px 2px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .passage-text .vocab-highlight:hover {
-            background: rgba(6, 182, 212, 0.35);
-        }
-
-        /* Vocab sidebar panel */
-        .vocab-sidebar {
-            background: white;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .vocab-sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .vocab-sidebar-header h4 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .vocab-sidebar-header h4 i { color: var(--reading-color); }
-
-        .vocab-count-badge {
-            padding: 4px 10px;
-            background: rgba(6, 182, 212, 0.1);
-            color: var(--reading-color);
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 50px;
-        }
-
-        .vocab-group-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        .vocab-group-tab {
-            padding: 5px 12px;
-            background: var(--bg-secondary);
-            border: none;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .vocab-group-tab.active {
-            background: var(--reading-color);
-            color: white;
-        }
-
-        .vocab-word-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .vocab-word-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 4px;
-            font-size: 0.875rem;
-            transition: var(--transition);
-        }
-
-        .vocab-word-item:hover {
-            background: var(--bg-secondary);
-        }
-
-        .vocab-word-item .word { font-weight: 600; }
-
-        .vocab-word-item .remove-word {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            cursor: pointer;
-            font-size: 0.875rem;
-            padding: 2px;
-        }
-
-        .vocab-word-item .remove-word:hover { color: var(--error-color); }
-
-        .vocab-sidebar-footer {
-            margin-top: 12px;
-            text-align: center;
-        }
-
-        .vocab-sidebar-footer a {
-            font-size: 0.8125rem;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        /* Split layout tweak */
-        .reading-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .reading-left .test-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .reading-left .reading-passage-container {
-            flex: 1;
-        }
-
-        body.exam-mode-real .vocab-sidebar {
-            display: none;
-        }
-
-        body.exam-mode-real .test-header {
-            background: #efe7db;
-            border-bottom: 1px solid #d8cdbf;
-        }
-
-        body.exam-mode-real .questions-container {
-            border-top: 2px solid #111827;
-        }
-
-        body.exam-mode-real .answer-panel {
-            border: 1px solid #d7dbe3;
-            box-shadow: none;
-        }
-
-        @media (max-width: 1399px) {
-            .reading-card-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 1199px) {
-            .reading-home-wrap {
-                grid-template-columns: 260px 1fr;
-            }
-
-            .reading-card-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 991px) {
-            .reading-home-wrap {
-                grid-template-columns: 1fr;
-            }
-
-            .reading-filter {
-                height: auto;
-                max-height: none;
-            }
-
-            .reading-toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .toolbar-search {
-                min-width: 0;
-                max-width: none;
-                width: 100%;
-            }
-
-            .reading-card-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .mode-options {
-                grid-template-columns: 1fr;
-            }
-
-            .reading-passage-container {
-                max-height: none;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Test – AimHigh IELTS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/test.css">
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand" href="index.html">
-                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Trang chủ</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Luyện thi</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="listening.html"><i class="bi bi-headphones"></i> Listening</a></li>
-                            <li><a class="dropdown-item active" href="reading.html"><i class="bi bi-book"></i> Reading</a></li>
-                            <li><a class="dropdown-item" href="writing.html"><i class="bi bi-pencil"></i> Writing</a></li>
-                            <li><a class="dropdown-item" href="speaking.html"><i class="bi bi-mic"></i> Speaking</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
-                    </li>
-                </ul>
-                <div class="nav-user">
-                    <div class="user-dropdown dropdown">
-                        <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
-                            <div class="user-avatar">NT</div>
-                            <span>Nguyễn Thảo</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i> Cài đặt</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="reading-page">
 
-    <div class="exam-top-actions hidden-screen" id="examTopActions">
-        <div class="test-timer" id="testTimerBox">
-            <i class="bi bi-clock"></i>
-            <span id="timer">60:00</span>
+<!-- MAIN NAV -->
+<nav class="navbar navbar-expand-lg fixed-top" style="background:#fff;border-bottom:1px solid var(--border);">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <img src="assets/logo.png" alt="AimHigh Logo" style="height:65px;">
+      <span class="brand-name">AimHigh</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Luyện thi</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+      </ul>
+      <div class="nav-user">
+        <div class="user-dropdown dropdown">
+          <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+            <div class="user-avatar">NT</div>
+            <span>Nguyễn Thảo</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+          </ul>
         </div>
-        <button class="btn btn-outline-danger" id="submitTopBtn" onclick="submitTest()">
-            <i class="bi bi-send"></i> Nộp bài
-        </button>
+      </div>
     </div>
+  </div>
+</nav>
 
-    <section class="reading-home" id="readingHome">
-        <div class="reading-home-wrap">
-            <aside class="reading-filter">
-                <div class="filter-top">
-                    <i class="bi bi-funnel"></i>
-                    <i class="bi bi-chevron-left"></i>
-                </div>
-                <div class="review-card">YouPass Collect<br>Review đề thi thật</div>
+<!-- EXAM BAR -->
+<div class="exam-bar">
+  <a href="practice.html?skill=reading" class="nbtn nbtn-exit">
+    <i class="bi bi-x-lg"></i> Thoát
+  </a>
+  <span class="exam-title" id="examTitle">Đang tải…</span>
+  <div class="exam-right">
+    <div class="timer-pill"><i class="bi bi-alarm-fill"></i><span id="timer">01:00:00</span></div>
+  </div>
+</div>
 
-                <div class="subject-box active" data-subject-box="reading">
-                    <div class="subject-title"><i class="bi bi-book"></i> Reading</div>
-                    <div class="subject-body">
-                        <div class="subject-option">
-                            <input type="radio" name="readingType" id="readingSingle" value="single" checked>
-                            <label for="readingSingle">Bài lẻ</label>
-                        </div>
-                        <div class="subject-children" id="readingPassageWrap">
-                            <div class="subject-option">
-                                <input type="radio" name="readingPassage" id="passage1" value="1" checked>
-                                <label for="passage1">Passage 1</label>
-                            </div>
-                            <div class="subject-option">
-                                <input type="radio" name="readingPassage" id="passage2" value="2">
-                                <label for="passage2">Passage 2</label>
-                            </div>
-                            <div class="subject-option" style="margin-bottom:0;">
-                                <input type="radio" name="readingPassage" id="passage3" value="3">
-                                <label for="passage3">Passage 3</label>
-                            </div>
-                        </div>
-                        <div class="subject-option" style="margin-top:2px;">
-                            <input type="radio" name="readingType" id="readingFull" value="full">
-                            <label for="readingFull">Full đề</label>
-                        </div>
-                    </div>
-                </div>
+<!-- SUBNAV -->
+<div class="subnav" id="subnav">
+  <span class="sn-info" id="snInfo">Đang tải đề thi…</span>
+  <div class="sn-right">
+    <button class="sn-btn sn-btn-neutral" id="btnSubNote" onclick="toggleNote()">Hiện note</button>
+    <button class="sn-btn sn-btn-red" onclick="clearAllNotes()">Xoá tất cả note</button>
+  </div>
+  <!-- Real mode: Part tabs top -->
+  <div class="real-subnav-top" id="realSubnavTop">
+    <button class="rst-part active" id="rstp1" onclick="switchRealPart(1)">
+      Part 1 <span class="rst-sub" id="rstsub1">Read the text and answer questions 1–14</span>
+    </button>
+    <button class="rst-part" id="rstp2" onclick="switchRealPart(2)">
+      Part 2 <span class="rst-sub" id="rstsub2">Read the text and answer questions 15–27</span>
+    </button>
+    <button class="rst-part" id="rstp3" onclick="switchRealPart(3)">
+      Part 3 <span class="rst-sub" id="rstsub3">Read the text and answer questions 28–40</span>
+    </button>
+  </div>
+</div>
 
-                <div class="subject-box" data-subject-box="listening">
-                    <div class="subject-title"><i class="bi bi-headphones"></i> Listening</div>
-                    <div class="subject-body">
-                        <div class="subject-option">
-                            <input type="radio" name="listeningType" id="listeningSingle" value="single" checked>
-                            <label for="listeningSingle">Bài lẻ</label>
-                        </div>
-                        <div class="subject-children" id="listeningPartWrap">
-                            <div class="subject-option">
-                                <input type="radio" name="listeningPart" id="section1" value="1" checked>
-                                <label for="section1">Section 1</label>
-                            </div>
-                            <div class="subject-option">
-                                <input type="radio" name="listeningPart" id="section2" value="2">
-                                <label for="section2">Section 2</label>
-                            </div>
-                            <div class="subject-option">
-                                <input type="radio" name="listeningPart" id="section3" value="3">
-                                <label for="section3">Section 3</label>
-                            </div>
-                            <div class="subject-option" style="margin-bottom:0;">
-                                <input type="radio" name="listeningPart" id="section4" value="4">
-                                <label for="section4">Section 4</label>
-                            </div>
-                        </div>
-                        <div class="subject-option" style="margin-top:2px;">
-                            <input type="radio" name="listeningType" id="listeningFull" value="full">
-                            <label for="listeningFull">Full đề</label>
-                        </div>
-                    </div>
-                </div>
+<!-- PART INFO BAR (real mode only) -->
+<div class="part-info-bar" id="partInfoBar">
+  <strong id="partInfoLabel">Section 1</strong>
+  <span id="partInfoSub">Read the text and answer questions 1–14</span>
+</div>
 
-                <div class="subject-box" data-subject-box="writing">
-                    <div class="subject-title"><i class="bi bi-pencil"></i> Writing</div>
-                    <div class="subject-body">
-                        <div class="subject-option">
-                            <input type="radio" name="writingType" id="writingSingle" value="single" checked>
-                            <label for="writingSingle">Bài lẻ</label>
-                        </div>
-                        <div class="subject-children" id="writingPartWrap">
-                            <div class="subject-option">
-                                <input type="radio" name="writingPart" id="task1" value="1" checked>
-                                <label for="task1">Task 1</label>
-                            </div>
-                            <div class="subject-option">
-                                <input type="radio" name="writingPart" id="task2" value="2">
-                                <label for="task2">Task 2</label>
-                            </div>
-                            <div class="subject-option" style="margin-bottom:0;">
-                                <input type="radio" name="writingPart" id="taskBuilder" value="3">
-                                <label for="taskBuilder">Task 1 Builder</label>
-                            </div>
-                        </div>
-                        <div class="subject-option" style="margin-top:2px;">
-                            <input type="radio" name="writingType" id="writingFull" value="full">
-                            <label for="writingFull">Full đề</label>
-                        </div>
-                    </div>
-                </div>
+<!-- MAIN -->
+<div class="main">
 
-                <div class="subject-box" data-subject-box="speaking">
-                    <div class="subject-title"><i class="bi bi-mic"></i> Speaking</div>
-                    <div class="subject-body">
-                        <div class="subject-option">
-                            <input type="radio" name="speakingType" id="speakingSingle" value="single" checked>
-                            <label for="speakingSingle">Bài lẻ</label>
-                        </div>
-                        <div class="subject-children" id="speakingPartWrap">
-                            <div class="subject-option">
-                                <input type="radio" name="speakingPart" id="part1" value="1" checked>
-                                <label for="part1">Part 1</label>
-                            </div>
-                            <div class="subject-option">
-                                <input type="radio" name="speakingPart" id="part2" value="2">
-                                <label for="part2">Part 2</label>
-                            </div>
-                            <div class="subject-option" style="margin-bottom:0;">
-                                <input type="radio" name="speakingPart" id="part3" value="3">
-                                <label for="part3">Part 3</label>
-                            </div>
-                        </div>
-                        <div class="subject-option" style="margin-top:2px;">
-                            <input type="radio" name="speakingType" id="speakingFull" value="full">
-                            <label for="speakingFull">Full đề</label>
-                        </div>
-                    </div>
-                </div>
-            </aside>
+  <!-- TOOLS -->
+  <div class="tools">
+    <button class="tool" id="tHL" onclick="setTool('hl')" title="Highlight (H)">
+      <i class="bi bi-highlighter"></i>Highlight<br>Phím (H)
+    </button>
+    <button class="tool" id="tNT" onclick="setTool('nt')" title="Notes (N)">
+      <i class="bi bi-sticky-fill"></i>Notes<br>Phím (N)
+    </button>
+    <button class="tool" id="tVC" onclick="setTool('vc')" title="Tra từ (T)">
+      <i class="bi bi-translate"></i>Tra từ vựng<br>Phím (T)
+    </button>
+  </div>
 
-            <div class="reading-content">
-                <div class="reading-toolbar">
-                    <div class="tab-set">
-                        <button class="toolbar-tab">Bài chưa làm</button>
-                        <button class="toolbar-tab active">Bài đã làm</button>
-                    </div>
-                    <div class="toolbar-search">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Tìm theo tên bài tập">
-                        <button>Tìm kiếm</button>
-                    </div>
-                </div>
-
-                <a class="history-link" href="result.html"><i class="bi bi-clock-history"></i> Xem lịch sử làm bài</a>
-
-                <div class="reading-card-grid" id="readingCardGrid">
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="2" onclick="openModeModal('[YouPass Collect] - A Mechanical Friend for Children')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">2415 lượt làm bài</span>
-                            <span class="passage-chip">Passage 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - A Mechanical Friend for Children</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>Matching Features</li><li>Matching Headings</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="1" onclick="openModeModal('[YouPass Collect] - Dust and the American West')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">2219 lượt làm bài</span>
-                            <span class="passage-chip">Passage 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Dust and the American West</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>Multiple Choice</li><li>True - False - Not Given</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="3" onclick="openModeModal('[YouPass Collect] - Does class size matter?')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">251 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#8b5cf6;">Passage 3</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Does class size matter?</div>
-                            <ul class="exercise-meta"><li>Matching Features</li><li>Matching Information</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="2" onclick="openModeModal('[Actual Test] - Should We Stop Eating Meat?')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">3901 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#6366f1;">Passage 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[Actual Test] - Should We Stop Eating Meat?</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>Matching Features</li><li>Matching Information</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="2" onclick="openModeModal('[YouPass Collect] - Early Approaches to Organisational Design')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">1114 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#6366f1;">Passage 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Early Approaches to Organisational Design</div>
-                            <ul class="exercise-meta"><li>Matching Features</li><li>Multiple Choice (Many Answers)</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="1" onclick="openModeModal('[Actual Test] - The History of the Bar Code')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1603025080667-2f3f0f08f79e?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">5660 lượt làm bài</span>
-                            <span class="passage-chip">Passage 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[Actual Test] - The History of the Bar Code</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>True - False - Not Given</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="1" onclick="openModeModal('[YouPass Collect] - The Importance of Business Cards')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">7198 lượt làm bài</span>
-                            <span class="passage-chip">Passage 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - The Importance of Business Cards</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>True - False - Not Given</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="single" data-part="3" onclick="openModeModal('[YouPass Collect] - The Peopling of Patagonia')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">2188 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#8b5cf6;">Passage 3</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - The Peopling of Patagonia</div>
-                            <ul class="exercise-meta"><li>Gap Filling</li><li>Multiple Choice</li><li>Yes - No - Not Given</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="full" data-part="full" onclick="openModeModal('Cambridge IELTS 18 - Reading Full Test 1')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">1842 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#059669;">Full đề</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">Cambridge IELTS 18 - Reading Full Test 1</div>
-                            <ul class="exercise-meta"><li>Passage 1 + 2 + 3</li><li>40 câu đầy đủ format thi thật</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="reading" data-type="full" data-part="full" onclick="openModeModal('Cambridge IELTS 17 - Reading Full Test 3')">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=900&q=60" alt="Card">
-                            <span class="exercise-badge">2071 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#059669;">Full đề</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">Cambridge IELTS 17 - Reading Full Test 3</div>
-                            <ul class="exercise-meta"><li>Passage 1 + 2 + 3</li><li>Kèm review chi tiết theo kỹ năng</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="listening" data-type="single" data-part="1" onclick="openModeModal('[YouPass Collect] - Listening Section 1: Hotel Booking')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=60" alt="Listening">
-                            <span class="exercise-badge">1460 lượt làm bài</span>
-                            <span class="passage-chip">Section 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Listening: Hotel Booking</div>
-                            <ul class="exercise-meta"><li>Form Completion</li><li>Multiple Choice</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="listening" data-type="single" data-part="2" onclick="openModeModal('[YouPass Collect] - Listening Section 2: City Tour')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=900&q=60" alt="Listening">
-                            <span class="exercise-badge">1388 lượt làm bài</span>
-                            <span class="passage-chip">Section 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Listening: City Tour</div>
-                            <ul class="exercise-meta"><li>Map Labeling</li><li>Note Completion</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="listening" data-type="single" data-part="3" onclick="openModeModal('[YouPass Collect] - Listening Section 3: Research Discussion')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=60" alt="Listening">
-                            <span class="exercise-badge">1124 lượt làm bài</span>
-                            <span class="passage-chip">Section 3</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Listening: Research Discussion</div>
-                            <ul class="exercise-meta"><li>Multiple Choice</li><li>Matching</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="listening" data-type="single" data-part="4" onclick="openModeModal('[YouPass Collect] - Listening Section 4: Lecture')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=900&q=60" alt="Listening">
-                            <span class="exercise-badge">980 lượt làm bài</span>
-                            <span class="passage-chip">Section 4</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Listening: Academic Lecture</div>
-                            <ul class="exercise-meta"><li>Sentence Completion</li><li>Summary Completion</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="listening" data-type="full" data-part="full" onclick="openModeModal('Cambridge IELTS 18 - Listening Full Test')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=900&q=60" alt="Listening">
-                            <span class="exercise-badge">3012 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#059669;">Full đề</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">Cambridge IELTS 18 - Listening Full Test</div>
-                            <ul class="exercise-meta"><li>Sections 1-4</li><li>40 câu đầy đủ format</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="writing" data-type="single" data-part="1" onclick="openModeModal('[YouPass Collect] - Writing Task 1 Academic')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=60" alt="Writing">
-                            <span class="exercise-badge">1699 lượt làm bài</span>
-                            <span class="passage-chip">Task 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Writing Task 1 Academic</div>
-                            <ul class="exercise-meta"><li>Line Graph</li><li>AI chấm 4 tiêu chí</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="writing" data-type="single" data-part="2" onclick="openModeModal('[YouPass Collect] - Writing Task 2 Opinion Essay')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=900&q=60" alt="Writing">
-                            <span class="exercise-badge">2552 lượt làm bài</span>
-                            <span class="passage-chip">Task 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Writing Task 2 Opinion Essay</div>
-                            <ul class="exercise-meta"><li>AI feedback</li><li>Band descriptor guide</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="writing" data-type="single" data-part="3" onclick="openModeModal('[YouPass Collect] - Task 1 Builder Practice')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=60" alt="Writing">
-                            <span class="exercise-badge">932 lượt làm bài</span>
-                            <span class="passage-chip">Builder</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Task 1 Builder Practice</div>
-                            <ul class="exercise-meta"><li>Template builder</li><li>Paraphrase support</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="writing" data-type="full" data-part="full" onclick="openModeModal('Writing Full Test - Task 1 + Task 2')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=900&q=60" alt="Writing">
-                            <span class="exercise-badge">1416 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#059669;">Full đề</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">Writing Full Test - Task 1 + Task 2</div>
-                            <ul class="exercise-meta"><li>60 phút</li><li>Auto review rubric</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="speaking" data-type="single" data-part="1" onclick="openModeModal('[YouPass Collect] - Speaking Part 1 Topics')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=60" alt="Speaking">
-                            <span class="exercise-badge">1898 lượt làm bài</span>
-                            <span class="passage-chip">Part 1</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Speaking Part 1 Topics</div>
-                            <ul class="exercise-meta"><li>Q&A warm-up</li><li>Pronunciation hints</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="speaking" data-type="single" data-part="2" onclick="openModeModal('[YouPass Collect] - Speaking Part 2 Cue Card')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=900&q=60" alt="Speaking">
-                            <span class="exercise-badge">1620 lượt làm bài</span>
-                            <span class="passage-chip">Part 2</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Speaking Part 2 Cue Card</div>
-                            <ul class="exercise-meta"><li>1 minute prep</li><li>Sample ideas</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="speaking" data-type="single" data-part="3" onclick="openModeModal('[YouPass Collect] - Speaking Part 3 Discussion')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=900&q=60" alt="Speaking">
-                            <span class="exercise-badge">1350 lượt làm bài</span>
-                            <span class="passage-chip">Part 3</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">[YouPass Collect] - Speaking Part 3 Discussion</div>
-                            <ul class="exercise-meta"><li>Follow-up questions</li><li>Band vocab suggestion</li></ul>
-                        </div>
-                    </article>
-
-                    <article class="exercise-card" data-subject="speaking" data-type="full" data-part="full" onclick="openModeModal('Speaking Full Mock Test')" style="display:none;">
-                        <div class="thumb-wrap">
-                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=60" alt="Speaking">
-                            <span class="exercise-badge">1722 lượt làm bài</span>
-                            <span class="passage-chip" style="background:#059669;">Full đề</span>
-                        </div>
-                        <div class="exercise-card-body">
-                            <div class="exercise-title">Speaking Full Mock Test</div>
-                            <ul class="exercise-meta"><li>Part 1 + 2 + 3</li><li>AI fluency feedback</li></ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="test-container hidden-screen" id="readingExamScreen">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Left Panel - Passage -->
-                <div class="col-lg-6 reading-left">
-                    <div class="test-panel">
-                        <div class="test-header">
-                            <div class="test-info">
-                                <span class="test-badge reading">
-                                    <i class="bi bi-book"></i> Reading
-                                </span>
-                                <h1 class="test-title">Cambridge IELTS 18 - Test 1</h1>
-                            </div>
-                            <div class="test-progress">
-                                <span>Passage 1/3</span>
-                                <div class="progress">
-                                    <div class="progress-bar" style="width: 33%"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="reading-passage-container" id="passageContainer">
-                            <h2 class="passage-title">The Impact of Urbanization on Biodiversity</h2>
-                            <div class="passage-text" id="passageText">
-                                <p><span class="paragraph-label">A</span>
-                                Urbanization is one of the most significant global trends of the twenty-first century. As more people migrate to cities in search of employment and better living conditions, urban areas continue to expand at an unprecedented rate. According to the United Nations, approximately 55% of the world's population currently lives in urban settings, and this figure is projected to increase to 68% by 2050. This rapid urban growth has profound implications for biodiversity, as natural habitats are transformed into built environments.</p>
-
-                                <p><span class="paragraph-label">B</span>
-                                The conversion of natural landscapes into urban infrastructure is perhaps the most direct way in which urbanization affects biodiversity. Forests, wetlands, and grasslands are cleared to make way for residential developments, commercial complexes, and transportation networks. This habitat destruction leads to the displacement and local extinction of many species that are unable to adapt to the altered landscape. Research conducted by the World Wildlife Fund indicates that habitat loss is the primary driver of species decline worldwide, with urbanization being a major contributing factor.</p>
-
-                                <p><span class="paragraph-label">C</span>
-                                However, the relationship between urbanization and biodiversity is not entirely negative. Some species have demonstrated remarkable adaptability to urban environments. Pigeons, rats, and certain species of insects have thrived in cities, exploiting the abundant food resources and shelter provided by human structures. Urban green spaces, such as parks, gardens, and green roofs, can serve as important refuges for a variety of plant and animal species. Studies have shown that well-designed urban parks can support surprisingly high levels of biodiversity, particularly for birds and pollinators.</p>
-
-                                <p><span class="paragraph-label">D</span>
-                                The concept of urban ecology has emerged as a vital field of study in response to the growing need to understand and manage biodiversity in cities. Urban ecologists investigate how species interact within the urban matrix, examining factors such as habitat fragmentation, pollution, and the urban heat island effect. Their findings have contributed to the development of evidence-based strategies for enhancing urban biodiversity, including the creation of wildlife corridors that connect isolated patches of habitat across the cityscape.</p>
-
-                                <p><span class="paragraph-label">E</span>
-                                One innovative approach to promoting biodiversity in urban areas is the integration of ecological principles into urban planning and design. Biophilic design, which seeks to incorporate natural elements into the built environment, has gained considerable traction among architects and urban planners. Features such as living walls, rooftop gardens, and bioswales not only enhance the aesthetic appeal of urban areas but also provide valuable ecosystem services, including air purification, stormwater management, and temperature regulation.</p>
-
-                                <p><span class="paragraph-label">F</span>
-                                Community engagement plays a crucial role in urban biodiversity conservation. Citizen science programs, in which members of the public collect and share data about local wildlife, have proven to be effective tools for monitoring urban biodiversity. These initiatives not only generate valuable scientific data but also foster a sense of environmental stewardship among urban residents. Educational campaigns and community gardening projects further contribute to raising awareness about the importance of biodiversity in cities and encouraging sustainable practices.</p>
-
-                                <p><span class="paragraph-label">G</span>
-                                Despite the challenges posed by urbanization, there are reasons for optimism. Cities around the world are increasingly recognizing the value of biodiversity and incorporating green infrastructure into their development plans. Singapore, for example, has embraced the concept of a "City in a Garden," investing heavily in urban greenery and achieving remarkable success in maintaining high levels of biodiversity within a densely populated urban environment. Similarly, cities like Melbourne and Copenhagen have implemented ambitious urban greening programs that have resulted in measurable improvements in local biodiversity.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Panel - Questions & Answer Sheet -->
-                <div class="col-lg-6">
-                    <!-- Vocab Sidebar -->
-                    <div class="vocab-sidebar" id="vocabSidebar">
-                        <div class="vocab-sidebar-header">
-                            <h4><i class="bi bi-bookmark-star-fill"></i> Từ vựng đã lưu</h4>
-                            <span class="vocab-count-badge" id="vocabTotalCount">0 từ</span>
-                        </div>
-                        <div class="vocab-group-tabs" id="vocabGroupTabs">
-                            <button class="vocab-group-tab active" data-group="all">Tất cả</button>
-                        </div>
-                        <ul class="vocab-word-list" id="vocabWordList">
-                            <li style="text-align:center;color:var(--text-light);padding:16px;font-size:0.875rem;">
-                                Bôi đen từ trong passage để thêm vào danh sách
-                            </li>
-                        </ul>
-                        <div class="vocab-sidebar-footer">
-                            <a href="vocabulary.html"><i class="bi bi-box-arrow-up-right"></i> Xem & ôn tập từ vựng</a>
-                        </div>
-                    </div>
-
-                    <!-- Questions -->
-                    <div class="test-panel">
-                        <div class="questions-container">
-                            <h3 class="questions-header">Questions 1-13</h3>
-                            <p class="questions-instruction">
-                                Reading Passage 1 has seven paragraphs, <strong>A-G</strong>.
-                            </p>
-
-                            <!-- Questions 1-5: Matching Headings -->
-                            <div class="question-group">
-                                <div class="group-title">
-                                    <i class="bi bi-signpost-split"></i>
-                                    Match headings (Questions 1-5)
-                                </div>
-                                <p class="questions-instruction" style="margin-top:-8px;">
-                                    Choose the correct heading for each paragraph from the list below.
-                                </p>
-
-                                <div class="question-item" data-question="1">
-                                    <div class="question-number">1</div>
-                                    <div class="question-content">
-                                        <label>Paragraph B</label>
-                                        <select class="answer-input" id="q1" onchange="updateAnswer('1', this.value)">
-                                            <option value="">-- Chọn heading --</option>
-                                            <option value="i">i. The role of citizen involvement</option>
-                                            <option value="ii">ii. Habitat destruction as a major threat</option>
-                                            <option value="iii">iii. Positive examples from global cities</option>
-                                            <option value="iv">iv. Designing cities with nature in mind</option>
-                                            <option value="v">v. Urban species that benefit from cities</option>
-                                            <option value="vi">vi. A new scientific discipline for cities</option>
-                                            <option value="vii">vii. Global trends in population movement</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="2">
-                                    <div class="question-number">2</div>
-                                    <div class="question-content">
-                                        <label>Paragraph C</label>
-                                        <select class="answer-input" id="q2" onchange="updateAnswer('2', this.value)">
-                                            <option value="">-- Chọn heading --</option>
-                                            <option value="i">i. The role of citizen involvement</option>
-                                            <option value="ii">ii. Habitat destruction as a major threat</option>
-                                            <option value="iii">iii. Positive examples from global cities</option>
-                                            <option value="iv">iv. Designing cities with nature in mind</option>
-                                            <option value="v">v. Urban species that benefit from cities</option>
-                                            <option value="vi">vi. A new scientific discipline for cities</option>
-                                            <option value="vii">vii. Global trends in population movement</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="3">
-                                    <div class="question-number">3</div>
-                                    <div class="question-content">
-                                        <label>Paragraph D</label>
-                                        <select class="answer-input" id="q3" onchange="updateAnswer('3', this.value)">
-                                            <option value="">-- Chọn heading --</option>
-                                            <option value="i">i. The role of citizen involvement</option>
-                                            <option value="ii">ii. Habitat destruction as a major threat</option>
-                                            <option value="iii">iii. Positive examples from global cities</option>
-                                            <option value="iv">iv. Designing cities with nature in mind</option>
-                                            <option value="v">v. Urban species that benefit from cities</option>
-                                            <option value="vi">vi. A new scientific discipline for cities</option>
-                                            <option value="vii">vii. Global trends in population movement</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="4">
-                                    <div class="question-number">4</div>
-                                    <div class="question-content">
-                                        <label>Paragraph E</label>
-                                        <select class="answer-input" id="q4" onchange="updateAnswer('4', this.value)">
-                                            <option value="">-- Chọn heading --</option>
-                                            <option value="i">i. The role of citizen involvement</option>
-                                            <option value="ii">ii. Habitat destruction as a major threat</option>
-                                            <option value="iii">iii. Positive examples from global cities</option>
-                                            <option value="iv">iv. Designing cities with nature in mind</option>
-                                            <option value="v">v. Urban species that benefit from cities</option>
-                                            <option value="vi">vi. A new scientific discipline for cities</option>
-                                            <option value="vii">vii. Global trends in population movement</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="5">
-                                    <div class="question-number">5</div>
-                                    <div class="question-content">
-                                        <label>Paragraph F</label>
-                                        <select class="answer-input" id="q5" onchange="updateAnswer('5', this.value)">
-                                            <option value="">-- Chọn heading --</option>
-                                            <option value="i">i. The role of citizen involvement</option>
-                                            <option value="ii">ii. Habitat destruction as a major threat</option>
-                                            <option value="iii">iii. Positive examples from global cities</option>
-                                            <option value="iv">iv. Designing cities with nature in mind</option>
-                                            <option value="v">v. Urban species that benefit from cities</option>
-                                            <option value="vi">vi. A new scientific discipline for cities</option>
-                                            <option value="vii">vii. Global trends in population movement</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Questions 6-9: True/False/Not Given -->
-                            <div class="question-group">
-                                <div class="group-title">
-                                    <i class="bi bi-check2-circle"></i>
-                                    True / False / Not Given (Questions 6-9)
-                                </div>
-                                <p class="questions-instruction" style="margin-top:-8px;">
-                                    Do the following statements agree with the information given in the passage?
-                                </p>
-
-                                <div class="question-item mcq" data-question="6">
-                                    <div class="question-number">6</div>
-                                    <div class="question-content">
-                                        <p class="question-text">More than half of the global population lives in cities today.</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="TRUE" onchange="updateAnswer('6','TRUE')">
-                                                <span class="option-label">T</span>
-                                                <span class="option-text">TRUE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="FALSE" onchange="updateAnswer('6','FALSE')">
-                                                <span class="option-label">F</span>
-                                                <span class="option-text">FALSE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="NOT GIVEN" onchange="updateAnswer('6','NOT GIVEN')">
-                                                <span class="option-label">NG</span>
-                                                <span class="option-text">NOT GIVEN</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="question-item mcq" data-question="7">
-                                    <div class="question-number">7</div>
-                                    <div class="question-content">
-                                        <p class="question-text">All species are negatively affected by urbanization.</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="TRUE" onchange="updateAnswer('7','TRUE')">
-                                                <span class="option-label">T</span>
-                                                <span class="option-text">TRUE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="FALSE" onchange="updateAnswer('7','FALSE')">
-                                                <span class="option-label">F</span>
-                                                <span class="option-text">FALSE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="NOT GIVEN" onchange="updateAnswer('7','NOT GIVEN')">
-                                                <span class="option-label">NG</span>
-                                                <span class="option-text">NOT GIVEN</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="question-item mcq" data-question="8">
-                                    <div class="question-number">8</div>
-                                    <div class="question-content">
-                                        <p class="question-text">Biophilic design is only used in residential buildings.</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="TRUE" onchange="updateAnswer('8','TRUE')">
-                                                <span class="option-label">T</span>
-                                                <span class="option-text">TRUE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="FALSE" onchange="updateAnswer('8','FALSE')">
-                                                <span class="option-label">F</span>
-                                                <span class="option-text">FALSE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="NOT GIVEN" onchange="updateAnswer('8','NOT GIVEN')">
-                                                <span class="option-label">NG</span>
-                                                <span class="option-text">NOT GIVEN</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="question-item mcq" data-question="9">
-                                    <div class="question-number">9</div>
-                                    <div class="question-content">
-                                        <p class="question-text">Singapore has been successful in maintaining biodiversity within an urban setting.</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="TRUE" onchange="updateAnswer('9','TRUE')">
-                                                <span class="option-label">T</span>
-                                                <span class="option-text">TRUE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="FALSE" onchange="updateAnswer('9','FALSE')">
-                                                <span class="option-label">F</span>
-                                                <span class="option-text">FALSE</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="NOT GIVEN" onchange="updateAnswer('9','NOT GIVEN')">
-                                                <span class="option-label">NG</span>
-                                                <span class="option-text">NOT GIVEN</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Questions 10-13: Sentence Completion -->
-                            <div class="question-group">
-                                <div class="group-title">
-                                    <i class="bi bi-journal-text"></i>
-                                    Sentence Completion (Questions 10-13)
-                                </div>
-                                <p class="questions-instruction" style="margin-top:-8px;">
-                                    Complete the sentences below. Write <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.
-                                </p>
-
-                                <div class="question-item" data-question="10">
-                                    <div class="question-number">10</div>
-                                    <div class="question-content">
-                                        <label>The UN projects urban population to reach 68% by the year ___.</label>
-                                        <input type="text" class="answer-input" id="q10" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="11">
-                                    <div class="question-number">11</div>
-                                    <div class="question-content">
-                                        <label>According to WWF, ___ is the primary cause of species decline.</label>
-                                        <input type="text" class="answer-input" id="q11" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="12">
-                                    <div class="question-number">12</div>
-                                    <div class="question-content">
-                                        <label>Urban ecologists study factors like habitat fragmentation, pollution, and ___.</label>
-                                        <input type="text" class="answer-input" id="q12" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <div class="question-item" data-question="13">
-                                    <div class="question-number">13</div>
-                                    <div class="question-content">
-                                        <label>___ programs encourage the public to collect data about local wildlife.</label>
-                                        <input type="text" class="answer-input" id="q13" placeholder="Type your answer">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Answer Sheet -->
-                    <div class="answer-panel">
-                        <div class="answer-panel-header">
-                            <h3><i class="bi bi-grid-3x3"></i> Answer Sheet</h3>
-                            <span class="answered-count"><span id="answeredCount">0</span>/13 answered</span>
-                        </div>
-                        <div class="answer-grid">
-                            <div class="answer-cell" data-question="1"><span class="cell-number">1</span><span class="cell-answer" id="answer1">-</span></div>
-                            <div class="answer-cell" data-question="2"><span class="cell-number">2</span><span class="cell-answer" id="answer2">-</span></div>
-                            <div class="answer-cell" data-question="3"><span class="cell-number">3</span><span class="cell-answer" id="answer3">-</span></div>
-                            <div class="answer-cell" data-question="4"><span class="cell-number">4</span><span class="cell-answer" id="answer4">-</span></div>
-                            <div class="answer-cell" data-question="5"><span class="cell-number">5</span><span class="cell-answer" id="answer5">-</span></div>
-                            <div class="answer-cell" data-question="6"><span class="cell-number">6</span><span class="cell-answer" id="answer6">-</span></div>
-                            <div class="answer-cell" data-question="7"><span class="cell-number">7</span><span class="cell-answer" id="answer7">-</span></div>
-                            <div class="answer-cell" data-question="8"><span class="cell-number">8</span><span class="cell-answer" id="answer8">-</span></div>
-                            <div class="answer-cell" data-question="9"><span class="cell-number">9</span><span class="cell-answer" id="answer9">-</span></div>
-                            <div class="answer-cell" data-question="10"><span class="cell-number">10</span><span class="cell-answer" id="answer10">-</span></div>
-                            <div class="answer-cell" data-question="11"><span class="cell-number">11</span><span class="cell-answer" id="answer11">-</span></div>
-                            <div class="answer-cell" data-question="12"><span class="cell-number">12</span><span class="cell-answer" id="answer12">-</span></div>
-                            <div class="answer-cell" data-question="13"><span class="cell-number">13</span><span class="cell-answer" id="answer13">-</span></div>
-                        </div>
-                        <div class="section-nav">
-                            <h4>Passages</h4>
-                            <div class="section-buttons">
-                                <button class="section-btn active">Passage 1 (1-13)</button>
-                                <button class="section-btn">Passage 2 (14-26)</button>
-                                <button class="section-btn">Passage 3 (27-40)</button>
-                            </div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn btn-outline-secondary" onclick="reviewAnswers()">
-                                <i class="bi bi-eye"></i> Review
-                            </button>
-                            <button class="btn btn-primary" onclick="submitTest()">
-                                <i class="bi bi-send-fill"></i> Nộp bài
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- PASSAGE — nội dung sẽ được JS inject vào -->
+  <div class="passage" id="passagePanel">
+    <div class="p-scroll" id="passageText">
+      <div style="padding:40px;text-align:center;color:#9d8c52;">
+        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+        Đang tải bài đọc…
+      </div>
     </div>
+  </div>
 
-    <div class="modal fade mode-select" id="modeSelectModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="modeModalTitle">[YouPass Collect] - A Mechanical Friend for Children</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <h3 style="font-weight:700;font-size:34px;margin-bottom:8px;">Chọn giao diện làm bài</h3>
-                    <div class="mode-options">
-                        <div class="mode-option" data-mode="real" onclick="selectModeOption('real')">
-                            <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1200&q=60" alt="Real mode">
-                            <h5>Giao diện như Thi thật</h5>
-                            <p>Mô phỏng 100% giao diện thi máy, tập trung tối đa.</p>
-                        </div>
-                        <div class="mode-option active" data-mode="practice" onclick="selectModeOption('practice')">
-                            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=60" alt="Practice mode">
-                            <h5>Giao diện Luyện tập</h5>
-                            <p>Hỗ trợ công cụ highlight, notes, tra từ vựng khi luyện.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button class="btn btn-primary" style="border-radius:999px;padding:10px 30px;font-weight:700;" onclick="startSelectedExercise()">Bắt đầu làm bài</button>
-                </div>
-            </div>
-        </div>
+  <!-- RESIZE HANDLE -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
+  <!-- QUESTIONS — nội dung sẽ được JS inject vào -->
+  <div class="qpanel" id="questionPanel">
+    <div class="q-scroll" id="qScroll">
+      <div style="padding:40px;text-align:center;color:#9d8c52;">
+        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+        Đang tải câu hỏi…
+      </div>
     </div>
+  </div>
 
-    <!-- Vocabulary Popup -->
-    <div class="vocab-popup" id="vocabPopup">
-        <div class="vocab-popup-header">
-            <h4><i class="bi bi-bookmark-plus"></i> Lưu từ vựng</h4>
-            <button class="vocab-popup-close" onclick="closeVocabPopup()">&times;</button>
-        </div>
-        <div class="vocab-selected-word" id="vocabSelectedWord"></div>
-        <select class="vocab-group-select" id="vocabGroupSelect">
-            <option value="">-- Chọn nhóm từ --</option>
-        </select>
-        <div class="vocab-new-group">
-            <input type="text" id="newGroupName" placeholder="Tạo nhóm mới...">
-            <button onclick="createNewGroup()"><i class="bi bi-plus"></i> Thêm</button>
-        </div>
-        <button class="btn btn-primary btn-save-vocab" onclick="saveVocab()">
-            <i class="bi bi-bookmark-check"></i> Lưu từ
-        </button>
+  <!-- NOTE SIDEBAR -->
+  <div class="notebar off" id="notebar">
+    <div class="nb-inner">
+      <div class="nb-head"><i class="bi bi-sticky-fill" style="color:var(--primary);"></i> Ghi chú của tôi</div>
+      <div class="nb-list" id="nbList">
+        <div class="nb-empty" id="nbEmpty">Bôi đen đoạn văn trong passage và chọn công cụ Notes để thêm ghi chú</div>
+      </div>
     </div>
+  </div>
 
-    <!-- Submit Modal -->
-    <div class="modal fade" id="submitModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Xác nhận nộp bài</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="submit-summary">
-                        <div class="summary-item">
-                            <span>Đã trả lời:</span>
-                            <strong><span id="modalAnswered">0</span>/13</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Chưa trả lời:</span>
-                            <strong><span id="modalUnanswered">13</span></strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Thời gian còn lại:</span>
-                            <strong id="modalTime">60:00</strong>
-                        </div>
-                    </div>
-                    <p class="submit-warning">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Bạn có chắc chắn muốn nộp bài? Hành động này không thể hoàn tác.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục làm</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmSubmit()">Nộp bài</button>
-                </div>
-            </div>
-        </div>
+</div><!-- /main -->
+
+<!-- BOTTOM NAV -->
+<div class="botnav" id="botnav">
+  <!-- Luyện tập mode -->
+  <button class="nav-arrow" id="btnNavPrev" onclick="navPrev()" title="Part trước">&#8592;</button>
+  <button class="nav-arrow" id="btnNavNext" onclick="navNext()" title="Part tiếp theo">&#8594;</button>
+  <div class="qnav" id="qnav"></div>
+  <button class="btn-done" onclick="submitTest()">Hoàn thành</button>
+
+  <!-- Thi thật mode -->
+  <div class="real-bot" id="realBot">
+    <div class="rbot-part active" id="rbp1" onclick="switchRealPart(1)">
+      <span class="rbot-part-label">Part 1</span>
+      <div class="rbot-qnums" id="rbq1"></div>
+      <span class="rbot-count" id="rbc1">0 of 14</span>
     </div>
+    <div class="rbot-part" id="rbp2" onclick="switchRealPart(2)">
+      <span class="rbot-part-label">Part 2</span>
+      <div class="rbot-qnums" id="rbq2"></div>
+      <span class="rbot-count" id="rbc2">0 of 13</span>
+    </div>
+    <div class="rbot-part" id="rbp3" onclick="switchRealPart(3)">
+      <span class="rbot-part-label">Part 3</span>
+      <div class="rbot-qnums" id="rbq3"></div>
+      <span class="rbot-count" id="rbc3">0 of 13</span>
+    </div>
+    <div class="rbot-spacer"></div>
+    <div class="rbot-controls">
+      <button class="rbot-prevnext" id="btnPrev" onclick="prevQuestion()" title="Câu trước">&#8592;</button>
+      <button class="rbot-prevnext" id="btnNext" onclick="nextQuestion()" title="Câu tiếp theo">&#8594;</button>
+      <button class="rbot-submit" onclick="submitTest()">Hoàn thành &#10003;</button>
+    </div>
+  </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/reading.js"></script>
+<!-- VOCAB POPUP -->
+<div class="vpop" id="vpop">
+  <div class="vp-hd">
+    <div class="vp-word"><i class="bi bi-volume-up" style="color:var(--text-3);font-size:.85rem;"></i><span id="vpW">word</span></div>
+    <div class="vp-acts">
+      <button class="vp-btn vp-btn-save" onclick="saveVW()"><i class="bi bi-bookmark-plus"></i> Lưu từ vựng</button>
+      <button class="vp-btn" onclick="copyVW()"><i class="bi bi-clipboard"></i> Sao chép</button>
+      <button class="vp-x" onclick="closeVP()">&times;</button>
+    </div>
+  </div>
+  <div class="vp-body">
+    <div class="vp-lbl">Từ/Cấu trúc liên quan:</div><div class="vp-val" id="vpR">None</div>
+    <div class="vp-lbl">Giải thích nghĩa tiếng Việt:</div><div class="vp-mean" id="vpM">None</div>
+    <div class="vp-lbl">Ví dụ:</div><div class="vp-val" id="vpE">None</div>
+  </div>
+  <div class="vp-sec">Dịch nghĩa cả câu</div>
+  <div class="vp-tr" id="vpT">None</div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal fade" id="subModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Xác nhận nộp bài</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="sub-sum">
+          <div class="sub-row"><span>Đã trả lời:</span><strong><span id="mA">0</span>/<span id="mTotal">40</span></strong></div>
+          <div class="sub-row"><span>Chưa trả lời:</span><strong id="mU">40</strong></div>
+          <div class="sub-row"><span>Thời gian còn lại:</span><strong id="mT">—</strong></div>
+        </div>
+        <p style="color:var(--error);font-size:.85rem;display:flex;align-items:center;gap:5px;">
+          <i class="bi bi-exclamation-triangle-fill"></i> Hành động này không thể hoàn tác.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tiếp tục làm</button>
+        <button class="btn btn-sm" style="background:var(--primary);color:#fff;border:none;" onclick="confirmSub()">Nộp bài</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/reading.js"></script>
 </body>
 </html>

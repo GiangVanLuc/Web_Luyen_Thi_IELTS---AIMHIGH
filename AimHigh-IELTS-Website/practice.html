@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện Đề Thi - AimHigh IELTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/test.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030; background: white;">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="index.html">
+                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
+                <span class="brand-name">AimHigh</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Luyện thi</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                </ul>
+                <div class="nav-user">
+                    <div class="user-dropdown dropdown">
+                        <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="user-avatar">NT</div>
+                            <span>Nguyễn Thảo</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="reading-home" id="practiceHome">
+        <div class="reading-home-wrap" id="practiceWrap">
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" title="Thu gọn/Mở bộ lọc">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <aside class="reading-filter">
+
+                <div class="subject-box active" data-subject-box="listening">
+                    <div class="subject-title"><i class="bi bi-headphones"></i> Listening</div>
+                    <div class="subject-body">
+                        <div class="subject-option">
+                            <input type="radio" name="listeningType" id="listeningSingle" value="single" checked>
+                            <label for="listeningSingle">Bài lẻ</label>
+                        </div>
+                        <div class="subject-children" id="listeningPartWrap">
+                            <div class="subject-option">
+                                <input type="radio" name="listeningPart" id="section1" value="1" checked>
+                                <label for="section1">Section 1</label>
+                            </div>
+                            <div class="subject-option">
+                                <input type="radio" name="listeningPart" id="section2" value="2">
+                                <label for="section2">Section 2</label>
+                            </div>
+                            <div class="subject-option">
+                                <input type="radio" name="listeningPart" id="section3" value="3">
+                                <label for="section3">Section 3</label>
+                            </div>
+                            <div class="subject-option" style="margin-bottom:0;">
+                                <input type="radio" name="listeningPart" id="section4" value="4">
+                                <label for="section4">Section 4</label>
+                            </div>
+                        </div>
+                        <div class="subject-option" style="margin-top:2px;">
+                            <input type="radio" name="listeningType" id="listeningFull" value="full">
+                            <label for="listeningFull">Full đề</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subject-box" data-subject-box="reading">
+                    <div class="subject-title"><i class="bi bi-book"></i> Reading</div>
+                    <div class="subject-body">
+                        <div class="subject-option">
+                            <input type="radio" name="readingType" id="readingSingle" value="single" checked>
+                            <label for="readingSingle">Bài lẻ</label>
+                        </div>
+                        <div class="subject-children" id="readingPassageWrap" style="display: none;">
+                            <div class="subject-option">
+                                <input type="radio" name="readingPassage" id="passage1" value="1" checked>
+                                <label for="passage1">Passage 1</label>
+                            </div>
+                            <div class="subject-option">
+                                <input type="radio" name="readingPassage" id="passage2" value="2">
+                                <label for="passage2">Passage 2</label>
+                            </div>
+                            <div class="subject-option" style="margin-bottom:0;">
+                                <input type="radio" name="readingPassage" id="passage3" value="3">
+                                <label for="passage3">Passage 3</label>
+                            </div>
+                        </div>
+                        <div class="subject-option" style="margin-top:2px;">
+                            <input type="radio" name="readingType" id="readingFull" value="full">
+                            <label for="readingFull">Full đề</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subject-box" data-subject-box="writing">
+                    <div class="subject-title"><i class="bi bi-pencil"></i> Writing</div>
+                    <div class="subject-body">
+                        <div class="subject-option">
+                            <input type="radio" name="writingType" id="writingSingle" value="single" checked>
+                            <label for="writingSingle">Bài lẻ</label>
+                        </div>
+                        <div class="subject-children" id="writingPartWrap" style="display: none;">
+                            <div class="subject-option">
+                                <input type="radio" name="writingPart" id="task1" value="1" checked>
+                                <label for="task1">Task 1</label>
+                            </div>
+                            <div class="subject-option">
+                                <input type="radio" name="writingPart" id="task2" value="2">
+                                <label for="task2">Task 2</label>
+                            </div>
+                        </div>
+                        <div class="subject-option" style="margin-top:2px;">
+                            <input type="radio" name="writingType" id="writingFull" value="full">
+                            <label for="writingFull">Full đề</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subject-box" data-subject-box="speaking">
+                    <div class="subject-title"><i class="bi bi-mic"></i> Speaking</div>
+                    <div class="subject-body">
+                        <div class="subject-option">
+                            <input type="radio" name="speakingType" id="speakingSingle" value="single" checked>
+                            <label for="speakingSingle">Bài lẻ</label>
+                        </div>
+                        <div class="subject-children" id="speakingPartWrap" style="display: none;">
+                            <div class="subject-option">
+                                <input type="radio" name="speakingPart" id="part1" value="1" checked>
+                                <label for="part1">Part 1</label>
+                            </div>
+                            <div class="subject-option">
+                                <input type="radio" name="speakingPart" id="part2" value="2">
+                                <label for="part2">Part 2</label>
+                            </div>
+                            <div class="subject-option" style="margin-bottom:0;">
+                                <input type="radio" name="speakingPart" id="part3" value="3">
+                                <label for="part3">Part 3</label>
+                            </div>
+                        </div>
+                        <div class="subject-option" style="margin-top:2px;">
+                            <input type="radio" name="speakingType" id="speakingFull" value="full">
+                            <label for="speakingFull">Full đề</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="reading-content">
+                <div class="reading-toolbar">
+                    <div class="tab-set">
+                        <button class="toolbar-tab active" id="tabChuaLam">Bài chưa làm</button>
+                        <button class="toolbar-tab" id="tabDaLam">Bài đã làm</button>
+                    </div>
+                    <div class="toolbar-search">
+                        <i class="bi bi-search text-muted"></i>
+                        <input type="text" placeholder="Tìm theo tên bài tập">
+                        <button>Tìm kiếm</button>
+                    </div>
+                </div>
+
+                <a class="history-link" href="result.html"><i class="bi bi-clock-history"></i> Xem lịch sử làm bài</a>
+
+                <!--
+                  readingCardGrid: để TRỐNG.
+                  practice.js sẽ gọi /api/exams rồi render <article> vào đây.
+                -->
+                <div class="reading-card-grid" id="readingCardGrid">
+                    <!-- Skeleton loading — JS xoá sau khi fetch xong -->
+                    <div style="grid-column:1/-1;padding:40px;text-align:center;color:#9d8c52;">
+                        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+                        Đang tải danh sách đề thi…
+                    </div>
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <i class="bi bi-journal-x"></i>
+                    <h4>Bạn chưa làm bài tập nào</h4>
+                    <p>Các bài thi bạn đã hoàn thành sẽ xuất hiện ở đây để tiện xem lại lịch sử.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL CHỌN CHẾ ĐỘ THI -->
+    <div class="modal fade mode-select" id="modeSelectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content p-2">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-5 pt-0 pb-4 text-center">
+                    <h5 class="text-muted mb-1" id="modeModalTitle">[Tên đề thi]</h5>
+                    <h3 class="fw-bold mb-4">Chọn giao diện làm bài</h3>
+                    <div class="mode-options">
+                        <div class="mode-option" data-mode="real" onclick="selectModeOption('real')">
+                            <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=800&q=60" alt="Real mode">
+                            <h5>Giao diện như Thi thật</h5>
+                            <p>Mô phỏng 100% giao diện thi máy, tập trung tối đa.</p>
+                        </div>
+                        <div class="mode-option active" data-mode="practice" onclick="selectModeOption('practice')">
+                            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=60" alt="Practice mode">
+                            <h5>Giao diện Luyện tập</h5>
+                            <p>Hỗ trợ công cụ highlight, notes, tra từ vựng.</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg rounded-pill px-5 mt-4" style="font-weight:700;" onclick="startActualTest()">
+                        Bắt đầu làm bài <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/practice.js"></script>
+</body>
+</html>

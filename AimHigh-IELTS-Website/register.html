@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #1f3f66;
-            --primary-blue-dark: #162f4d;
-            --text-primary: #0f2f53;
-            --text-secondary: #5f7390;
-            --input-border: #d9e1ea;
-            --bg-light: #f4f7fb;
-            --logo-gold: #d4a017;
+            --primary-blue: #c89a17;
+            --primary-blue-dark: #a97f0f;
+            --text-primary: #4a3800;
+            --text-secondary: #7a6a3a;
+            --input-border: #e4d7b2;
+            --bg-light: #f5efe2;
+            --logo-gold: #c89a17;
         }
 
         body {
@@ -37,7 +37,7 @@
         }
 
         .branding-pane {
-            background: linear-gradient(160deg, #1f3f66 0%, #2b5889 100%);
+            background: linear-gradient(160deg, #f7f1df 0%, #e6c76a 100%);
             color: #f1f8ff;
             position: relative;
             overflow: hidden;
@@ -86,18 +86,18 @@
             gap: 10px;
             font-size: 1.05rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #5a4300;
             text-decoration: none;
             margin-bottom: 22px;
         }
 
         .brand-mini img {
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 4px;
+            border-radius: 0;
+            background: transparent;
+            padding: 0;
         }
 
         .brand-mini span {
@@ -123,13 +123,13 @@
             font-size: clamp(2rem, 3.4vw, 3rem);
             font-weight: 800;
             line-height: 1.2;
-            color: #ffffff;
+            color: #5a4300;
             margin-bottom: 12px;
         }
 
         .brand-desc {
             font-size: 1.03rem;
-            color: rgba(240, 248, 255, 0.9);
+            color: #5a4300;
             line-height: 1.6;
             max-width: 520px;
             margin-bottom: 18px;
@@ -146,7 +146,7 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 9px;
-            color: rgba(240, 248, 255, 0.95);
+            color: #5a4300;
             font-weight: 500;
         }
 
@@ -181,8 +181,8 @@
         }
 
         .input-icon-wrap .form-control:focus {
-            border-color: rgba(46, 117, 182, 0.6);
-            box-shadow: 0 0 0 0.2rem rgba(46, 117, 182, 0.14);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(200,154,23,0.25);
         }
 
         .btn-primary-auth {
@@ -265,13 +265,13 @@
             font-size: 1.75rem;
             font-weight: 800;
             margin-bottom: 2px;
-            color: #ffffff;
+            color: #5a4300;
         }
 
         .stat-card p {
             margin: 0;
             font-size: 0.96rem;
-            color: rgba(255, 255, 255, 0.92);
+            color: #7a6a3a;
         }
 
         @media (max-width: 991.98px) {
@@ -306,10 +306,10 @@
                     <p class="brand-desc">Nền tảng học IELTS theo lộ trình cá nhân hóa với AI hỗ trợ toàn diện và chấm điểm tức thì.</p>
 
                     <ul class="feature-list">
-                        <li><i class="fa-solid fa-circle-check"></i> Luyện nghe thông minh theo level</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Luyện đề thi thử chuẩn format thật</li>
-                        <li><i class="fa-solid fa-circle-check"></i> AI sửa bài Writing chi tiết</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Theo dõi tiến bộ theo từng kỹ năng</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Luyện Listening, Reading theo cấp độ chuẩn IELTS</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Luyện đề thi thử sát cấu trúc đề IELTS thật</li>
+                        <li><i class="fa-solid fa-circle-check"></i> AI chấm điểm và sửa bài Writing chi tiết</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Theo dõi tiến bộ và dự đoán band score</li>
                     </ul>
 
                     <div class="stats-grid">
@@ -331,7 +331,7 @@
                         <article class="stat-card rounded-4 text-center">
                             <i class="fa-solid fa-user-graduate"></i>
                             <h4>10000+</h4>
-                            <p>Học viên</p>
+                            <p>Lượt luyện tập</p>
                         </article>
                     </div>
                 </div>
@@ -343,14 +343,6 @@
                     <p class="heading-sub">Bắt đầu chinh phục IELTS ngay hôm nay</p>
 
                     <form id="registerForm" onsubmit="handleRegister(event)">
-                        <div class="mb-3">
-                            <label for="registerName" class="form-label">Họ và tên</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-user"></i>
-                                <input type="text" class="form-control rounded-3" id="registerName" placeholder="Tên của bạn" required>
-                            </div>
-                        </div>
-
                         <div class="mb-3">
                             <label for="registerEmail" class="form-label">Email</label>
                             <div class="input-icon-wrap">
@@ -395,10 +387,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        async function handleRegister(event) {
+        function handleRegister(event) {
             event.preventDefault();
 
-            const name = document.getElementById('registerName').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -408,26 +399,15 @@
                 return;
             }
 
-            try {
-                const response = await fetch('http://localhost:8080/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, password })
-                });
+            const user = {
+                email,
+                password,
+                createdAt: new Date().toISOString()
+            };
 
-                if (response.ok) {
-                    alert('Đăng ký thành công! Vui lòng đăng nhập.');
-                    window.location.href = 'login.html';
-                } else {
-                    const errorData = await response.json();
-                    alert('Đăng ký thất bại: ' + (errorData.message || 'Lỗi hệ thống'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Lỗi kết nối tới máy chủ.');
-            }
+            localStorage.setItem('aimhigh_user', JSON.stringify(user));
+            alert('Đăng ký thành công! Vui lòng đăng nhập.');
+            window.location.href = 'login.html';
         }
     </script>
 </body>

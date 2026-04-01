@@ -1,395 +1,221 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listening Test - AimHigh IELTS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/test.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listening Test – AimHigh IELTS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/test.css">
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
-            </a>
-            <div class="test-timer">
-                <i class="bi bi-clock"></i>
-                <span id="timer">30:00</span>
-            </div>
-            <button class="btn btn-outline-danger btn-sm" onclick="submitTest()">
-                <i class="bi bi-send"></i> Nộp bài
-            </button>
+<body class="listening-page">
+
+<!-- CONFIRM OVERLAY (real mode only) -->
+<div class="confirm-overlay hidden" id="confirmOverlay">
+  <div class="confirm-box">
+    <i class="bi bi-headphones big-icon"></i>
+    <h3 id="confirmTitle">Đang tải…</h3>
+    <p id="confirmDesc">Vui lòng chờ</p>
+    <p class="warn"><i class="bi bi-exclamation-triangle-fill"></i> Sau khi bắt đầu, audio sẽ phát và không thể tua lại.</p>
+    <button class="confirm-start" onclick="startRealTest()">
+      <i class="bi bi-play-fill"></i> Bắt đầu làm bài
+    </button>
+  </div>
+</div>
+
+<!-- PART INFO BAR (real mode) -->
+<div class="part-info-bar" id="partInfoBar">
+  <strong id="partInfoLabel">Section 1</strong>
+  <span id="partInfoSub">Questions 1–10 &nbsp;·&nbsp; Note Completion</span>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top" style="background:#fff;border-bottom:1px solid var(--border);">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <img src="assets/logo.png" alt="AimHigh" style="height:65px;">
+      <span class="brand-name">AimHigh</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Luyện thi</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+      </ul>
+      <div class="nav-user">
+        <div class="user-dropdown dropdown">
+          <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+            <div class="user-avatar">NT</div>
+            <span>Nguyễn Thảo</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+          </ul>
         </div>
-    </nav>
-
-    <div class="test-container">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Left Panel - Audio & Questions -->
-                <div class="col-lg-7">
-                    <div class="test-panel">
-                        <!-- Test Header -->
-                        <div class="test-header">
-                            <div class="test-info">
-                                <span class="test-badge listening">
-                                    <i class="bi bi-headphones"></i> Listening
-                                </span>
-                                <h1 class="test-title">Cambridge IELTS 18 - Test 1</h1>
-                            </div>
-                            <div class="test-progress">
-                                <span>Section 1/4</span>
-                                <div class="progress">
-                                    <div class="progress-bar" style="width: 25%"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Audio Player -->
-                        <div class="audio-player-container">
-                            <div class="audio-info">
-                                <span class="section-label">Section 1: Conversation about booking a tour</span>
-                            </div>
-                            <div class="audio-player">
-                                <button class="play-btn" id="playBtn" onclick="togglePlay()">
-                                    <i class="bi bi-play-fill"></i>
-                                </button>
-                                <div class="audio-progress">
-                                    <div class="progress-bar-container">
-                                        <div class="progress-fill" id="progressFill"></div>
-                                    </div>
-                                    <div class="time-display">
-                                        <span id="currentTime">0:00</span>
-                                        <span id="duration">3:45</span>
-                                    </div>
-                                </div>
-                                <div class="audio-controls">
-                                    <button class="control-btn" onclick="rewind()">
-                                        <i class="bi bi-skip-backward-fill"></i>
-                                    </button>
-                                    <button class="control-btn" onclick="forward()">
-                                        <i class="bi bi-skip-forward-fill"></i>
-                                    </button>
-                                    <div class="volume-control">
-                                        <i class="bi bi-volume-up-fill"></i>
-                                        <input type="range" min="0" max="100" value="80">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Questions -->
-                        <div class="questions-container">
-                            <h3 class="questions-header">Questions 1-10</h3>
-                            <p class="questions-instruction">
-                                Complete the notes below. Write <strong>NO MORE THAN TWO WORDS AND/OR A NUMBER</strong> for each answer.
-                            </p>
-
-                            <div class="question-group">
-                                <div class="group-title">
-                                    <i class="bi bi-journal-text"></i>
-                                    Tour Booking Form
-                                </div>
-                                
-                                <!-- Question 1 -->
-                                <div class="question-item" data-question="1">
-                                    <div class="question-number">1</div>
-                                    <div class="question-content">
-                                        <label>Tour destination:</label>
-                                        <input type="text" class="answer-input" id="q1" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <!-- Question 2 -->
-                                <div class="question-item" data-question="2">
-                                    <div class="question-number">2</div>
-                                    <div class="question-content">
-                                        <label>Number of participants:</label>
-                                        <input type="text" class="answer-input" id="q2" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <!-- Question 3 -->
-                                <div class="question-item" data-question="3">
-                                    <div class="question-number">3</div>
-                                    <div class="question-content">
-                                        <label>Departure date:</label>
-                                        <input type="text" class="answer-input" id="q3" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <!-- Question 4 -->
-                                <div class="question-item" data-question="4">
-                                    <div class="question-number">4</div>
-                                    <div class="question-content">
-                                        <label>Total cost: $</label>
-                                        <input type="text" class="answer-input" id="q4" placeholder="Type your answer">
-                                    </div>
-                                </div>
-
-                                <!-- Question 5 -->
-                                <div class="question-item" data-question="5">
-                                    <div class="question-number">5</div>
-                                    <div class="question-content">
-                                        <label>Payment method:</label>
-                                        <input type="text" class="answer-input" id="q5" placeholder="Type your answer">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="question-group">
-                                <div class="group-title">
-                                    <i class="bi bi-list-check"></i>
-                                    Multiple Choice (Questions 6-10)
-                                </div>
-
-                                <!-- Question 6 -->
-                                <div class="question-item mcq" data-question="6">
-                                    <div class="question-number">6</div>
-                                    <div class="question-content">
-                                        <p class="question-text">What is included in the tour package?</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="A">
-                                                <span class="option-label">A</span>
-                                                <span class="option-text">Airport transfers only</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="B">
-                                                <span class="option-label">B</span>
-                                                <span class="option-text">Meals and accommodation</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q6" value="C">
-                                                <span class="option-label">C</span>
-                                                <span class="option-text">All of the above</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Question 7 -->
-                                <div class="question-item mcq" data-question="7">
-                                    <div class="question-number">7</div>
-                                    <div class="question-content">
-                                        <p class="question-text">The guide recommends bringing...</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="A">
-                                                <span class="option-label">A</span>
-                                                <span class="option-text">comfortable walking shoes</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="B">
-                                                <span class="option-label">B</span>
-                                                <span class="option-text">formal attire</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q7" value="C">
-                                                <span class="option-label">C</span>
-                                                <span class="option-text">swimming gear</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Question 8 -->
-                                <div class="question-item mcq" data-question="8">
-                                    <div class="question-number">8</div>
-                                    <div class="question-content">
-                                        <p class="question-text">What time does the bus depart?</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="A">
-                                                <span class="option-label">A</span>
-                                                <span class="option-text">7:00 AM</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="B">
-                                                <span class="option-label">B</span>
-                                                <span class="option-text">7:30 AM</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q8" value="C">
-                                                <span class="option-label">C</span>
-                                                <span class="option-text">8:00 AM</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Question 9 -->
-                                <div class="question-item mcq" data-question="9">
-                                    <div class="question-number">9</div>
-                                    <div class="question-content">
-                                        <p class="question-text">Where is the meeting point?</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="A">
-                                                <span class="option-label">A</span>
-                                                <span class="option-text">Central Station</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="B">
-                                                <span class="option-label">B</span>
-                                                <span class="option-text">City Hall</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q9" value="C">
-                                                <span class="option-label">C</span>
-                                                <span class="option-text">Tourist Office</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Question 10 -->
-                                <div class="question-item mcq" data-question="10">
-                                    <div class="question-number">10</div>
-                                    <div class="question-content">
-                                        <p class="question-text">The cancellation policy allows refund if cancelled...</p>
-                                        <div class="options">
-                                            <label class="option">
-                                                <input type="radio" name="q10" value="A">
-                                                <span class="option-label">A</span>
-                                                <span class="option-text">24 hours before</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q10" value="B">
-                                                <span class="option-label">B</span>
-                                                <span class="option-text">48 hours before</span>
-                                            </label>
-                                            <label class="option">
-                                                <input type="radio" name="q10" value="C">
-                                                <span class="option-label">C</span>
-                                                <span class="option-text">1 week before</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Panel - Answer Sheet -->
-                <div class="col-lg-5">
-                    <div class="answer-panel">
-                        <div class="answer-panel-header">
-                            <h3><i class="bi bi-grid-3x3"></i> Answer Sheet</h3>
-                            <span class="answered-count"><span id="answeredCount">0</span>/10 answered</span>
-                        </div>
-                        <div class="answer-grid">
-                            <div class="answer-cell" data-question="1">
-                                <span class="cell-number">1</span>
-                                <span class="cell-answer" id="answer1">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="2">
-                                <span class="cell-number">2</span>
-                                <span class="cell-answer" id="answer2">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="3">
-                                <span class="cell-number">3</span>
-                                <span class="cell-answer" id="answer3">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="4">
-                                <span class="cell-number">4</span>
-                                <span class="cell-answer" id="answer4">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="5">
-                                <span class="cell-number">5</span>
-                                <span class="cell-answer" id="answer5">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="6">
-                                <span class="cell-number">6</span>
-                                <span class="cell-answer" id="answer6">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="7">
-                                <span class="cell-number">7</span>
-                                <span class="cell-answer" id="answer7">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="8">
-                                <span class="cell-number">8</span>
-                                <span class="cell-answer" id="answer8">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="9">
-                                <span class="cell-number">9</span>
-                                <span class="cell-answer" id="answer9">-</span>
-                            </div>
-                            <div class="answer-cell" data-question="10">
-                                <span class="cell-number">10</span>
-                                <span class="cell-answer" id="answer10">-</span>
-                            </div>
-                        </div>
-
-                        <!-- Section Navigation -->
-                        <div class="section-nav">
-                            <h4>Sections</h4>
-                            <div class="section-buttons">
-                                <button class="section-btn active">Section 1 (1-10)</button>
-                                <button class="section-btn">Section 2 (11-20)</button>
-                                <button class="section-btn">Section 3 (21-30)</button>
-                                <button class="section-btn">Section 4 (31-40)</button>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="action-buttons">
-                            <button class="btn btn-outline-secondary" onclick="reviewAnswers()">
-                                <i class="bi bi-eye"></i> Review
-                            </button>
-                            <button class="btn btn-primary" onclick="submitTest()">
-                                <i class="bi bi-send-fill"></i> Nộp bài
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+</nav>
 
-    <!-- Submit Modal -->
-    <div class="modal fade" id="submitModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Xác nhận nộp bài</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="submit-summary">
-                        <div class="summary-item">
-                            <span>Đã trả lời:</span>
-                            <strong><span id="modalAnswered">0</span>/10</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Chưa trả lời:</span>
-                            <strong><span id="modalUnanswered">10</span></strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Thời gian còn lại:</span>
-                            <strong id="modalTime">30:00</strong>
-                        </div>
-                    </div>
-                    <p class="submit-warning">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Bạn có chắc chắn muốn nộp bài? Hành động này không thể hoàn tác.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục làm</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmSubmit()">Nộp bài</button>
-                </div>
-            </div>
-        </div>
+<!-- EXAM BAR -->
+<div class="exam-bar">
+  <a href="practice.html?skill=listening" class="nbtn nbtn-exit">
+    <i class="bi bi-x-lg"></i> Thoát
+  </a>
+  <span class="exam-title" id="examTitle">Đang tải…</span>
+  <div class="exam-right">
+    <div class="timer-pill" id="timerPill"><i class="bi bi-alarm-fill"></i><span id="timer">00:30:00</span></div>
+  </div>
+</div>
+
+<!-- SUBNAV -->
+<div class="subnav">
+  <span class="sn-info" id="snInfo">Đang tải đề thi…</span>
+  <div class="sn-right">
+    <button class="sn-btn sn-btn-neutral" id="btnSubNote" onclick="toggleNote()">Hiện note</button>
+    <button class="sn-btn sn-btn-red" onclick="clearAllNotes()">Xoá tất cả note</button>
+  </div>
+</div>
+
+<!-- AUDIO BAR -->
+<div class="audio-bar">
+  <button class="ab-skip" onclick="skipAudio(-5)" title="Lùi 5s">-5</button>
+  <button class="ab-play" id="playBtn" onclick="togglePlay()"><i class="bi bi-play-fill" id="playIcon"></i></button>
+  <button class="ab-skip" onclick="skipAudio(5)" title="Tiến 5s">+5</button>
+  <div class="ab-prog-wrap">
+    <div class="ab-prog-bar" id="progBar" onclick="seekAudio(event)">
+      <div class="ab-prog-fill" id="progFill" style="width:0%"></div>
+      <div class="ab-prog-dot" id="progDot" style="left:0%"></div>
     </div>
+    <div class="ab-time">
+      <span id="curTime">0:00</span>
+      <span id="totTime">30:00</span>
+    </div>
+  </div>
+  <div class="ab-sep"></div>
+  <div class="ab-vol">
+    <i class="bi bi-volume-up-fill"></i>
+    <input type="range" min="0" max="100" value="80" id="volRange">
+  </div>
+  <button class="ab-speed" id="speedBtn" onclick="cycleSpeed()">1×</button>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/listening.js"></script>
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOOL SIDEBAR -->
+  <div class="tools">
+    <button class="tool" id="tHL" onclick="setTool('hl')" title="Highlight (H)">
+      <i class="bi bi-highlighter"></i>Highlight<br>Phím (H)
+    </button>
+    <button class="tool" id="tNT" onclick="setTool('nt')" title="Notes (N)">
+      <i class="bi bi-sticky-fill"></i>Notes<br>Phím (N)
+    </button>
+  </div>
+
+  <!-- QUESTIONS PANEL — nội dung sẽ được JS inject vào -->
+  <div class="qpanel" id="questionPanel">
+    <div class="q-scroll" id="qScroll">
+      <div style="padding:40px;text-align:center;color:#9d8c52;">
+        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+        Đang tải câu hỏi…
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTE SIDEBAR -->
+  <div class="notebar off" id="notebar">
+    <div class="nb-inner">
+      <div class="nb-head"><i class="bi bi-sticky-fill" style="color:var(--primary);"></i> Ghi chú của tôi</div>
+      <div class="nb-list" id="nbList">
+        <div class="nb-empty" id="nbEmpty">Bôi đen đoạn text trong transcript và chọn công cụ Notes để thêm ghi chú</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- BOTTOM NAV -->
+<div class="botnav" id="botnav">
+  <!-- Practice mode -->
+  <button class="sec-arrow" id="btnSecPrev" onclick="prevSection()" title="Section trước">&#8592;</button>
+  <button class="sec-arrow" id="btnSecNext" onclick="nextSection()" title="Section tiếp theo">&#8594;</button>
+  <div id="qnav" class="qnav"></div>
+  <button class="btn-done" onclick="submitTest()">Hoàn thành ✓</button>
+
+  <!-- Real mode -->
+  <div class="real-bot" id="realBot">
+    <div class="rbot-sec active" id="rbs1" onclick="switchRealSec(1)">
+      <span class="rbot-sec-label">S1</span>
+      <div class="rbot-qnums" id="rbsq1"></div>
+      <span class="rbot-count" id="rbsc1">0 of 10</span>
+    </div>
+    <div class="rbot-sec" id="rbs2" onclick="switchRealSec(2)">
+      <span class="rbot-sec-label">S2</span>
+      <div class="rbot-qnums" id="rbsq2"></div>
+      <span class="rbot-count" id="rbsc2">0 of 10</span>
+    </div>
+    <div class="rbot-sec" id="rbs3" onclick="switchRealSec(3)">
+      <span class="rbot-sec-label">S3</span>
+      <div class="rbot-qnums" id="rbsq3"></div>
+      <span class="rbot-count" id="rbsc3">0 of 10</span>
+    </div>
+    <div class="rbot-sec" id="rbs4" onclick="switchRealSec(4)">
+      <span class="rbot-sec-label">S4</span>
+      <div class="rbot-qnums" id="rbsq4"></div>
+      <span class="rbot-count" id="rbsc4">0 of 10</span>
+    </div>
+    <div class="rbot-spacer"></div>
+    <div class="rbot-controls">
+      <button class="rbot-prevnext" id="rbPrev" onclick="realPrevQ()" title="Câu trước">&#8592;</button>
+      <button class="rbot-prevnext" id="rbNext" onclick="realNextQ()" title="Câu tiếp theo">&#8594;</button>
+      <button class="rbot-submit" onclick="submitTest()">Hoàn thành &#10003;</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal fade" id="subModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Xác nhận nộp bài</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="sub-sum">
+          <div class="sub-row"><span>Đã trả lời:</span><strong><span id="mA">0</span>/<span id="mTotal">40</span></strong></div>
+          <div class="sub-row"><span>Chưa trả lời:</span><strong id="mU">40</strong></div>
+          <div class="sub-row"><span>Thời gian còn lại:</span><strong id="mT">—</strong></div>
+        </div>
+        <p style="color:var(--error);font-size:.85rem;display:flex;align-items:center;gap:5px;">
+          <i class="bi bi-exclamation-triangle-fill"></i> Hành động này không thể hoàn tác.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tiếp tục làm</button>
+        <button class="btn btn-sm" style="background:var(--primary);color:#fff;border:none;" onclick="confirmSub()">Nộp bài</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/listening.js"></script>
 </body>
 </html>
