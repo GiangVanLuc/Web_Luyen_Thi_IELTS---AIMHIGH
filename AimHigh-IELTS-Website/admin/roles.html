@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phan quyen - AimHigh IELTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar" id="adminSidebar">
+            <a href="dashboard.html" class="sidebar-brand"><img src="../assets/logo.png" alt="AimHigh"><span class="sidebar-brand-text">AIM HIGH</span></a>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-label">Tong quan</div>
+                <a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
+                <div class="sidebar-nav-label">Quan ly hoc tap</div>
+                <a href="users.html" class="sidebar-link"><i class="bi bi-people"></i><span>Nguoi dung</span></a>
+                <a href="test-manager.html" class="sidebar-link"><i class="bi bi-collection"></i><span>Danh sach de thi</span></a>
+                <a href="test-builder.html" class="sidebar-link"><i class="bi bi-plus-square"></i><span>Tao de thi</span></a>
+                <div class="sidebar-nav-label">Cham diem & Bao cao</div>
+                <a href="grading.html" class="sidebar-link"><i class="bi bi-pencil-square"></i><span>Cham bai</span><span class="sidebar-badge">12</span></a>
+                <a href="reports.html" class="sidebar-link"><i class="bi bi-bar-chart-line"></i><span>Bao cao hoc tap</span></a>
+                <div class="sidebar-nav-label">Van hanh</div>
+                <a href="notifications.html" class="sidebar-link"><i class="bi bi-megaphone"></i><span>Thong bao</span></a>
+                <a href="roles.html" class="sidebar-link active"><i class="bi bi-shield-check"></i><span>Phan quyen</span></a>
+                <a href="audit-log.html" class="sidebar-link"><i class="bi bi-journal-check"></i><span>Nhat ky he thong</span></a>
+                <div class="sidebar-nav-label">He thong</div>
+                <a href="settings.html" class="sidebar-link"><i class="bi bi-gear"></i><span>Cai dat</span></a>
+                <div class="sidebar-nav-label">Khac</div>
+                <a href="../index.html" class="sidebar-link"><i class="bi bi-box-arrow-up-right"></i><span>Xem Website</span></a>
+            </nav>
+            <div class="sidebar-footer"><button class="sidebar-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-chevron-bar-left" id="sidebarToggleIcon"></i><span> Thu gon</span></button></div>
+        </aside>
+
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div class="topbar-left"><button class="topbar-btn d-lg-none" onclick="toggleMobileSidebar()"><i class="bi bi-list"></i></button><h1 class="topbar-title">Vai tro va phan quyen</h1></div>
+                <div class="topbar-right"><button class="btn-admin-primary"><i class="bi bi-person-plus"></i> Them vai tro</button></div>
+            </header>
+
+            <main class="admin-content">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon red"><i class="bi bi-person-gear"></i></div></div><div class="stat-card-value">3</div><div class="stat-card-label">Vai tro he thong</div></div></div>
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon blue"><i class="bi bi-shield-lock"></i></div></div><div class="stat-card-value">26</div><div class="stat-card-label">Quyen han dang ap dung</div></div></div>
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon amber"><i class="bi bi-exclamation-triangle"></i></div></div><div class="stat-card-value">2</div><div class="stat-card-label">Canh bao quyen nhay cam</div></div></div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header"><h3 class="admin-card-title">Danh sach vai tro</h3></div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Vai tro</th><th>Mo ta</th><th>So thanh vien</th><th>Trang thai</th><th></th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Super Admin</strong></td><td>Toan quyen quan tri va cau hinh he thong</td><td>2</td><td><span class="status-badge published">Active</span></td><td><button class="btn-icon-sm"><i class="bi bi-pencil"></i></button></td></tr>
+                                <tr><td><strong>Content Admin</strong></td><td>Quan ly de thi, noi dung, tu vung, thong bao</td><td>5</td><td><span class="status-badge published">Active</span></td><td><button class="btn-icon-sm"><i class="bi bi-pencil"></i></button></td></tr>
+                                <tr><td><strong>Reviewer</strong></td><td>Cham bai Writing/Speaking, phe duyet noi dung</td><td>8</td><td><span class="status-badge published">Active</span></td><td><button class="btn-icon-sm"><i class="bi bi-pencil"></i></button></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header"><h3 class="admin-card-title">Ma tran quyen theo module</h3></div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Module</th><th>Super Admin</th><th>Content Admin</th><th>Reviewer</th></tr></thead>
+                            <tbody>
+                                <tr><td>Nguoi dung</td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-dash-lg text-secondary"></i></td></tr>
+                                <tr><td>De thi</td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td></tr>
+                                <tr><td>Cham bai</td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td></tr>
+                                <tr><td>Thong bao</td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-dash-lg text-secondary"></i></td></tr>
+                                <tr><td>Cau hinh he thong</td><td><i class="bi bi-check-lg text-success"></i></td><td><i class="bi bi-dash-lg text-secondary"></i></td><td><i class="bi bi-dash-lg text-secondary"></i></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -30,7 +30,7 @@ public class ScoringService {
         java.util.List<vn.aimhigh.aimhighbackend.model.Answer> savedAnswers = new java.util.ArrayList<>();
 
         for (AnswerRequest answerReq : answers) {
-            Question q = questionRepository.findById(answerReq.getQuestionId()).orElse(null);
+            Question q = questionRepository.findByExamIdAndQuestionNumber(attempt.getExam().getId(), answerReq.getQuestionNumber()).orElse(null);
             if (q != null) {
                 boolean isCorrect = scoreAnswer(q, answerReq.getAnswerText());
                 if (isCorrect) totalCorrect++;
@@ -57,8 +57,38 @@ public class ScoringService {
 
     public Boolean scoreAnswer(Question question, String answerText) {
         if (answerText == null || answerText.trim().isEmpty() || question.getCorrectAnswer() == null) return false;
-        // TODO: Enhance mapping theo QuestionType (Fill in blank, true false)
-        return answerText.trim().toLowerCase().equals(question.getCorrectAnswer().trim().toLowerCase());
+        
+        String actualStr = sanitize(answerText);
+        String[] possibleAnswers = question.getCorrectAnswer().split("/");
+        
+        for (String expectedVar : possibleAnswers) {
+            String expectedStr = sanitize(expectedVar);
+            if (actualStr.equals(expectedStr)) {
+                return true;
+            }
+            if (isTrueFalseShortcut(actualStr, expectedStr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String sanitize(String input) {
+        if (input == null) return "";
+        return input.trim().toLowerCase()
+                .replaceAll("\\b(a|an|the)\\b", "")
+                .replaceAll("[.,;!?]", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
+    private boolean isTrueFalseShortcut(String actual, String expected) {
+        if (expected.equals("true") && (actual.equals("t") || actual.equals("true"))) return true;
+        if (expected.equals("false") && (actual.equals("f") || actual.equals("false"))) return true;
+        if (expected.equals("not given") && (actual.equals("ng") || actual.equals("not given"))) return true;
+        if (expected.equals("yes") && (actual.equals("y") || actual.equals("yes"))) return true;
+        if (expected.equals("no") && (actual.equals("n") || actual.equals("no"))) return true;
+        return false;
     }
 
     public Double calculateBandScore(int totalCorrect, Skill skill) {

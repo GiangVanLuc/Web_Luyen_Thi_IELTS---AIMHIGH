@@ -9,6 +9,8 @@ import vn.aimhigh.aimhighbackend.dto.request.NoteRequest;
 import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
 import vn.aimhigh.aimhighbackend.dto.response.HighlightResponse;
 import vn.aimhigh.aimhighbackend.dto.response.NoteResponse;
+import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
+import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.service.HighlightService;
 import vn.aimhigh.aimhighbackend.service.NoteService;
 
@@ -32,7 +34,7 @@ public class PracticeController {
             @PathVariable Long id,
             @Valid @RequestBody NoteRequest request,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         return ResponseEntity.ok(ApiResponse.success(noteService.createNote(id, request, userId)));
     }
 
@@ -40,7 +42,7 @@ public class PracticeController {
     public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes(
             @PathVariable Long id,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         return ResponseEntity.ok(ApiResponse.success(noteService.getNotes(id, userId)));
     }
 
@@ -48,7 +50,7 @@ public class PracticeController {
     public ResponseEntity<ApiResponse<String>> deleteNote(
             @PathVariable Long id,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         noteService.deleteNote(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Đã xoá note"));
     }
@@ -58,7 +60,7 @@ public class PracticeController {
             @PathVariable Long id,
             @Valid @RequestBody HighlightRequest request,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         return ResponseEntity.ok(ApiResponse.success(highlightService.createHighlight(id, request, userId)));
     }
 
@@ -67,7 +69,7 @@ public class PracticeController {
             @PathVariable Long id,
             @RequestParam(required = false) Long passageId,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         return ResponseEntity.ok(ApiResponse.success(highlightService.getHighlights(id, passageId, userId)));
     }
 
@@ -75,8 +77,15 @@ public class PracticeController {
     public ResponseEntity<ApiResponse<String>> deleteHighlight(
             @PathVariable Long id,
             @org.springframework.security.core.annotation.AuthenticationPrincipal vn.aimhigh.aimhighbackend.model.User user) {
-        Long userId = user.getId();
+        Long userId = requireUserId(user);
         highlightService.deleteHighlight(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Đã xoá highlight"));
+    }
+
+    private Long requireUserId(User user) {
+        if (user == null || user.getId() == null) {
+            throw new UnauthorizedException("Bạn cần đăng nhập để thực hiện thao tác này");
+        }
+        return user.getId();
     }
 }

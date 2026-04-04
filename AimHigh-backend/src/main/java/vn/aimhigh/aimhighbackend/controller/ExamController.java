@@ -27,7 +27,7 @@ public class ExamController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExamDetailResponse>> getExamDetail(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Object>> getExamDetail(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(examService.getExamDetail(id)));
     }
 }

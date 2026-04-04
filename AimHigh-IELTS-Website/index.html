@@ -27,12 +27,12 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="listening.html"><i class="bi bi-headphones"></i> Listening</a></li>
-                            <li><a class="dropdown-item" href="reading.html"><i class="bi bi-book"></i> Reading</a></li>
-                            <li><a class="dropdown-item" href="writing.html"><i class="bi bi-pencil"></i> Writing</a></li>
-                            <li><a class="dropdown-item" href="speaking.html"><i class="bi bi-mic"></i> Speaking</a></li>
-                        </ul>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                                <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                                <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                                <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                            </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Từ vựng</a>
@@ -42,9 +42,23 @@
                         </ul>
                     </li>
                 </ul>
-                <div class="nav-buttons">
+                <div class="nav-buttons" id="guestActions">
                     <a href="login.html" class="btn btn-outline-primary me-2">Đăng nhập</a>
                     <a href="register.html" class="btn btn-primary">Đăng ký</a>
+                </div>
+                <div class="nav-user d-none" id="userActions">
+                    <div class="user-dropdown dropdown">
+                        <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="user-avatar" id="homeHeaderAvatar">U</div>
+                            <span id="homeHeaderName">Người dùng</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="dashboard.html#my-study-overview"><i class="bi bi-grid-1x2"></i> My Study</a></li>
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="homeLogoutLink"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -470,6 +484,58 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const guestActions = document.getElementById('guestActions');
+            const userActions = document.getElementById('userActions');
+            const nameEl = document.getElementById('homeHeaderName');
+            const avatarEl = document.getElementById('homeHeaderAvatar');
+            const logoutLink = document.getElementById('homeLogoutLink');
+
+            const isLoggedIn = localStorage.getItem('aimhigh_loggedIn') === 'true';
+            let user = null;
+
+            try {
+                user = JSON.parse(localStorage.getItem('aimhigh_currentUser') || localStorage.getItem('aimhigh_user') || 'null');
+            } catch (err) {
+                user = null;
+            }
+
+            if (isLoggedIn && userActions && guestActions) {
+                guestActions.classList.add('d-none');
+                userActions.classList.remove('d-none');
+
+                const fullName = user && (user.name || user.fullName || user.username)
+                    ? (user.name || user.fullName || user.username)
+                    : 'Người dùng';
+
+                if (nameEl) {
+                    nameEl.textContent = fullName;
+                }
+
+                if (avatarEl) {
+                    const initials = fullName
+                        .trim()
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((part) => part.charAt(0).toUpperCase())
+                        .join('') || 'U';
+                    avatarEl.textContent = initials;
+                }
+            }
+
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.removeItem('aimhigh_loggedIn');
+                    localStorage.removeItem('aimhigh_currentUser');
+                    window.location.href = 'index.html';
+                });
+            }
+        })();
+    </script>
     <script src="js/main.js"></script>
 </body>
 </html>
+

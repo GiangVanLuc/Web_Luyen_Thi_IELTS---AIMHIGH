@@ -380,12 +380,19 @@
 
                 if (response.ok) {
                     const data = await response.json();
+                    // Đồng bộ key với api.js (dùng 'aimhigh_token')
                     localStorage.setItem('aimhigh_loggedIn', 'true');
-                    localStorage.setItem('aimhigh_accessToken', data.accessToken);
+                    localStorage.setItem('aimhigh_token', data.accessToken);
                     localStorage.setItem('aimhigh_refreshToken', data.refreshToken);
+                    localStorage.setItem('aimhigh_currentUser', JSON.stringify({
+                        email: data.email,
+                        name: data.name,
+                        role: data.role
+                    }));
                     window.location.href = 'dashboard.html';
                 } else {
-                    alert('Email hoặc mật khẩu không đúng.');
+                    const errData = await response.json().catch(() => ({}));
+                    alert(errData.message || 'Email hoặc mật khẩu không đúng.');
                 }
             } catch (error) {
                 console.error('Error:', error);

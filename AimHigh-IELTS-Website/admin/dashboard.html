@@ -26,7 +26,11 @@
                     <span>Dashboard</span>
                 </a>
 
-                <div class="sidebar-nav-label">Quản lý đề thi</div>
+                <div class="sidebar-nav-label">Quản lý học tập</div>
+                <a href="users.html" class="sidebar-link">
+                    <i class="bi bi-people"></i>
+                    <span>Người dùng</span>
+                </a>
                 <a href="test-manager.html" class="sidebar-link">
                     <i class="bi bi-collection"></i>
                     <span>Danh sách đề thi</span>
@@ -36,17 +40,35 @@
                     <span>Tạo đề thi</span>
                 </a>
 
-                <div class="sidebar-nav-label">Chấm điểm</div>
+                <div class="sidebar-nav-label">Chấm điểm & Báo cáo</div>
                 <a href="grading.html" class="sidebar-link">
                     <i class="bi bi-pencil-square"></i>
                     <span>Chấm bài</span>
                     <span class="sidebar-badge">12</span>
                 </a>
+                <a href="reports.html" class="sidebar-link">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span>Báo cáo học tập</span>
+                </a>
 
-                <div class="sidebar-nav-label">Người dùng</div>
-                <a href="users.html" class="sidebar-link">
-                    <i class="bi bi-people"></i>
-                    <span>Quản lý tài khoản</span>
+                <div class="sidebar-nav-label">Vận hành</div>
+                <a href="notifications.html" class="sidebar-link">
+                    <i class="bi bi-megaphone"></i>
+                    <span>Thông báo</span>
+                </a>
+                <a href="roles.html" class="sidebar-link">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Phân quyền</span>
+                </a>
+                <a href="audit-log.html" class="sidebar-link">
+                    <i class="bi bi-journal-check"></i>
+                    <span>Nhật ký hệ thống</span>
+                </a>
+
+                <div class="sidebar-nav-label">Hệ thống</div>
+                <a href="settings.html" class="sidebar-link">
+                    <i class="bi bi-gear"></i>
+                    <span>Cài đặt</span>
                 </a>
 
                 <div class="sidebar-nav-label">Khác</div>
@@ -240,6 +262,33 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6 col-xl-3">
+                        <a href="notifications.html" class="admin-card text-decoration-none h-100 d-block">
+                            <h3 class="admin-card-title"><i class="bi bi-megaphone me-2"></i>Trung tâm thông báo</h3>
+                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Gửi thông báo theo nhóm học viên, theo dõi trạng thái gửi và lịch sử chiến dịch.</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <a href="roles.html" class="admin-card text-decoration-none h-100 d-block">
+                            <h3 class="admin-card-title"><i class="bi bi-shield-check me-2"></i>Vai trò & quyền</h3>
+                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Thiết lập quyền theo module cho Super Admin, Content Admin, Reviewer, Support.</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <a href="audit-log.html" class="admin-card text-decoration-none h-100 d-block">
+                            <h3 class="admin-card-title"><i class="bi bi-journal-check me-2"></i>Audit Log</h3>
+                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Theo dõi mọi thao tác chỉnh sửa, đăng nhập, phân quyền để truy vết sự cố.</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <a href="settings.html" class="admin-card text-decoration-none h-100 d-block">
+                            <h3 class="admin-card-title"><i class="bi bi-gear me-2"></i>Cấu hình hệ thống</h3>
+                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Quản lý bảo mật, tích hợp email, API key, lịch backup và chính sách phiên đăng nhập.</p>
+                        </a>
                     </div>
                 </div>
             </main>

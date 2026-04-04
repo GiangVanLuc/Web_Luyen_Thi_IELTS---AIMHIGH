@@ -69,85 +69,75 @@
 
         .form-wrap {
             width: min(470px, 100%);
-            padding: 32px 12px;
+            padding: 18px 12px;
         }
 
         .brand-wrap {
             width: min(560px, 100%);
-            padding: 24px 12px;
+            padding: 16px 12px;
             position: relative;
             z-index: 2;
-            text-align: left;
+            text-align: center;
         }
 
         .brand-mini {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #5a4300;
+            display: flex;
+            justify-content: center;
             text-decoration: none;
-            margin-bottom: 22px;
+            margin-bottom: 14px;
         }
 
         .brand-mini img {
-            width: 80px;
-            height: 80px;
+            width: 130px;
+            height: 130px;
             object-fit: contain;
-            border-radius: 0;
-            background: transparent;
-            padding: 0;
-        }
-
-        .brand-mini span {
-            font-size: 1.85rem;
-            font-weight: 800;
-            letter-spacing: 0.2px;
         }
 
         .heading-main {
-            font-size: clamp(2rem, 3.2vw, 2.65rem);
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
             font-weight: 800;
             line-height: 1.2;
-            margin-bottom: 10px;
+            margin-bottom: 4px;
         }
 
         .heading-sub {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-bottom: 24px;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
         }
 
         .brand-heading {
-            font-size: clamp(2rem, 3.4vw, 3rem);
+            font-size: clamp(1.6rem, 2.8vw, 2.1rem);
             font-weight: 800;
             line-height: 1.2;
             color: #5a4300;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .brand-desc {
-            font-size: 1.03rem;
+            font-size: 0.95rem;
             color: #5a4300;
-            line-height: 1.6;
+            line-height: 1.5;
             max-width: 520px;
-            margin-bottom: 18px;
+            margin: 0 auto 12px;
         }
 
         .feature-list {
             list-style: none;
             padding-left: 0;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
+            display: inline-block;
+            text-align: left;
         }
 
         .feature-list li {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 9px;
+            gap: 8px;
+            margin-bottom: 5px;
             color: #5a4300;
             font-weight: 500;
+            font-size: 0.92rem;
         }
 
         .feature-list li i {
@@ -173,11 +163,12 @@
         }
 
         .input-icon-wrap .form-control {
-            height: 48px;
+            height: 42px;
             border: 1px solid var(--input-border);
             padding-left: 42px;
             border-radius: 0.85rem;
             background: #fcfdff;
+            font-size: 0.93rem;
         }
 
         .input-icon-wrap .form-control:focus {
@@ -190,7 +181,7 @@
             border: none;
             color: #fff;
             font-weight: 700;
-            height: 48px;
+            height: 42px;
             border-radius: 0.85rem;
         }
 
@@ -216,12 +207,13 @@
         }
 
         .btn-google {
-            height: 46px;
+            height: 40px;
             border-radius: 0.85rem;
             border: 1px solid #d4deea;
             font-weight: 600;
             color: #1f3550;
             background: #ffffff;
+            font-size: 0.93rem;
         }
 
         .btn-google:hover {
@@ -242,8 +234,9 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            max-width: 520px;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .stat-card {
@@ -251,7 +244,7 @@
             border: 1px solid rgba(212, 160, 23, 0.32);
             border-radius: 1rem;
             backdrop-filter: blur(9px);
-            padding: 1rem;
+            padding: 0.6rem 0.8rem;
         }
 
         .stat-card i {
@@ -262,9 +255,9 @@
         }
 
         .stat-card h4 {
-            font-size: 1.75rem;
+            font-size: 1.4rem;
             font-weight: 800;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
             color: #5a4300;
         }
 
@@ -299,7 +292,6 @@
                 <div class="brand-wrap">
                     <a href="index.html" class="brand-mini">
                         <img src="assets/logo.png" alt="AimHigh IELTS logo">
-                        <span>AimHigh</span>
                     </a>
 
                     <h2 class="brand-heading">Bắt Đầu Hành Trình IELTS</h2>
@@ -339,11 +331,21 @@
 
             <section class="col-lg-6 split-pane form-pane d-flex align-items-center justify-content-center">
                 <div class="form-wrap">
-                    <h1 class="heading-main mb-2">Tạo tài khoản</h1>
+                    <h1 class="heading-main mb-1">Tạo tài khoản</h1>
                     <p class="heading-sub">Bắt đầu chinh phục IELTS ngay hôm nay</p>
 
+                    <div id="registerAlert" class="alert d-none mb-2" role="alert"></div>
+
                     <form id="registerForm" onsubmit="handleRegister(event)">
-                        <div class="mb-3">
+                        <div class="mb-2">
+                            <label for="registerName" class="form-label">Họ và tên</label>
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="text" class="form-control rounded-3" id="registerName" placeholder="Nguyễn Văn A" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
                             <label for="registerEmail" class="form-label">Email</label>
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-envelope"></i>
@@ -351,15 +353,15 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label for="registerPassword" class="form-label">Mật khẩu</label>
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-lock"></i>
-                                <input type="password" class="form-control rounded-3" id="registerPassword" placeholder="Tối thiểu 8 ký tự" minlength="6" required>
+                                <input type="password" class="form-control rounded-3" id="registerPassword" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-lock"></i>
@@ -367,17 +369,17 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary-auth w-100">Đăng ký</button>
+                        <button type="submit" id="btnRegister" class="btn btn-primary-auth w-100">Đăng ký</button>
                     </form>
 
-                    <div class="auth-divider my-3"><span>Hoặc tiếp tục với</span></div>
+                    <div class="auth-divider my-2"><span>Hoặc tiếp tục với</span></div>
 
                     <button type="button" onclick="window.location.href='http://localhost:8080/oauth2/authorization/google'" class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2">
                         <i class="fa-brands fa-google"></i>
                         <span>Google Login</span>
                     </button>
 
-                    <p class="switch-auth text-center mt-3 mb-0">
+                    <p class="switch-auth text-center mt-2 mb-0">
                         Đã có tài khoản? <a href="login.html">Đăng nhập</a>
                     </p>
                 </div>
@@ -387,27 +389,72 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function handleRegister(event) {
+        const API_BASE = 'http://localhost:8080/api';
+
+        function showAlert(msg, type = 'danger') {
+            const el = document.getElementById('registerAlert');
+            el.className = `alert alert-${type} mb-3`;
+            el.textContent = msg;
+            el.classList.remove('d-none');
+        }
+
+        async function handleRegister(event) {
             event.preventDefault();
 
+            const name = document.getElementById('registerName').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
+            // Validate
+            if (!name) {
+                showAlert('Vui lòng nhập họ và tên.');
+                return;
+            }
             if (password !== confirmPassword) {
-                alert('Mật khẩu xác nhận không khớp.');
+                showAlert('Mật khẩu xác nhận không khớp.');
                 return;
             }
 
-            const user = {
-                email,
-                password,
-                createdAt: new Date().toISOString()
-            };
+            const btn = document.getElementById('btnRegister');
+            btn.disabled = true;
+            btn.textContent = 'Đang xử lý...';
 
-            localStorage.setItem('aimhigh_user', JSON.stringify(user));
-            alert('Đăng ký thành công! Vui lòng đăng nhập.');
-            window.location.href = 'login.html';
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || `Lỗi ${response.status}`);
+                }
+
+                // Lưu token và thông tin user
+                if (data.accessToken) {
+                    localStorage.setItem('aimhigh_token', data.accessToken);
+                    localStorage.setItem('aimhigh_loggedIn', 'true');
+                    localStorage.setItem('aimhigh_currentUser', JSON.stringify({
+                        email: data.email,
+                        name: data.name,
+                        role: data.role
+                    }));
+                }
+
+                showAlert('Đăng ký thành công! Đang chuyển hướng...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } catch (err) {
+                showAlert(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Đăng ký';
+            }
         }
     </script>
 </body>

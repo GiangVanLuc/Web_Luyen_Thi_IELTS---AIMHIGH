@@ -11,12 +11,15 @@ import vn.aimhigh.aimhighbackend.repository.ExamRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExamService {
     private final ExamRepository examRepository;
+    private final ObjectMapper objectMapper;
 
     /**
      * Lấy danh sách đề thi theo điều kiện
@@ -46,10 +49,18 @@ public class ExamService {
         ).collect(Collectors.toList());
     }
 
-    public ExamDetailResponse getExamDetail(Long examId) {
+    public Object getExamDetail(Long examId) {
         log.info("Lấy chi tiết đề thi ID: {}", examId);
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đề thi"));
+
+        if (exam.getExamData() != null) {
+            try {
+                return objectMapper.readTree(exam.getExamData());
+            } catch (Exception e) {
+                log.error("Lỗi parse examData", e);
+            }
+        }
 
         return ExamDetailResponse.builder()
                 .id(exam.getId())

@@ -85,12 +85,12 @@ public class AttemptService {
         Long examId = attempt.getExam().getId();
         Object rawData = redisService.getExamProgress(userId, examId);
         
-        Map<Long, SaveProgressRequest> progressMap = new HashMap<>();
+        Map<Integer, SaveProgressRequest> progressMap = new HashMap<>();
         if (rawData != null) {
-            progressMap = objectMapper.convertValue(rawData, new TypeReference<Map<Long, SaveProgressRequest>>() {});
+            progressMap = objectMapper.convertValue(rawData, new TypeReference<Map<Integer, SaveProgressRequest>>() {});
         }
         
-        progressMap.put(request.getQuestionId(), request);
+        progressMap.put(request.getQuestionNumber(), request);
         redisService.saveExamProgress(userId, examId, progressMap);
     }
 
@@ -106,11 +106,11 @@ public class AttemptService {
         Object rawData = redisService.getExamProgress(userId, attempt.getExam().getId());
         if (rawData == null) return new ArrayList<>();
         
-        Map<Long, SaveProgressRequest> progressMap = objectMapper.convertValue(rawData, new TypeReference<Map<Long, SaveProgressRequest>>() {});
+        Map<Integer, SaveProgressRequest> progressMap = objectMapper.convertValue(rawData, new TypeReference<Map<Integer, SaveProgressRequest>>() {});
         
         return progressMap.values().stream().map(req -> 
                 ProgressResponse.builder()
-                        .questionId(req.getQuestionId())
+                        .questionId(Long.valueOf(req.getQuestionNumber()))
                         .answerText(req.getAnswerText())
                         .build()
         ).collect(Collectors.toList());

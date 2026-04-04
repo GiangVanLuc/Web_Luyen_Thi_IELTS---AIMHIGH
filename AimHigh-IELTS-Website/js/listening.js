@@ -1,6 +1,6 @@
 // ===== LISTENING.JS — Render động từ API =====
-// Fetch /api/exam/listening/{id} rồi build questions vào DOM.
-// Giữ nguyên 100% logic: timer, audio player, tools, notes, real/practice mode.
+// Fetch /api/exams/{id} rồi build questions vào DOM.
+// Tích hợp API Backend: startAttempt, autoSave, submit.
 
 // ─── CONFIG từ localStorage ───────────────────────────────────────────────────
 const examSection = localStorage.getItem('currentExamSection') || 'full';
@@ -16,11 +16,12 @@ const isSingle  = examSection !== 'full';
 const singleSec = isSingle ? parseInt(examSection) : null;
 
 let examData = null;
-let KEY      = {};
 let TOTAL    = isSingle ? 10 : 40;
 let timeLeft = isSingle ? SEC_CFG[singleSec].time : 30*60;
 
 let ans = {}, timerInt, activeTool = null, noteVisible = false, notes = [];
+let attemptId = null;  // ID phiên thi từ Backend
+let autoSaveInt = null; // Interval auto-save
 
 // Audio
 const SEC_AUDIO = {1:{start:0,end:480},2:{start:480,end:960},3:{start:960,end:1440},4:{start:1440,end:1800}};
@@ -37,17 +38,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadExam() {
     try {
-        const res = await fetch(`data/exam-listening-${examId}.json`);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        examData = await res.json();
+        // --- Gọi API Backend lấy đề thi ---
+        const apiRes = await getExamData(examId);
+        examData = apiRes.data || apiRes;
     } catch (err) {
         document.getElementById('qScroll').innerHTML =
             '<p style="padding:30px;color:#ef4444;">Không thể tải đề thi. Vui lòng thử lại.</p>';
-        console.error(err);
+        console.error('Lỗi tải đề thi:', err);
         return;
     }
 
-    buildKey();
+    // --- Khởi tạo phiên thi (Attempt) ---
+    try {
+        const examMode = localStorage.getItem('currentExamMode') || 'practice';
+        const attemptRes = await startAttempt(examId, examMode);
+        const attemptData = attemptRes.data || attemptRes;
+        attemptId = attemptData.id;
+        localStorage.setItem('currentAttemptId', attemptId);
+        console.log('Phiên thi Listening đã khởi tạo. AttemptId:', attemptId);
+    } catch (err) {
+        console.warn('Không thể tạo phiên thi:', err.message);
+        attemptId = localStorage.getItem('currentAttemptId');
+    }
+
     TOTAL    = isSingle ? (SEC_CFG[singleSec].to - SEC_CFG[singleSec].from + 1) : 40;
     timeLeft = isSingle ? SEC_CFG[singleSec].time : 30*60;
 
@@ -79,23 +92,14 @@ async function loadExam() {
         startTimer();
     }
 
+    // Auto-save progress
+    startAutoSave();
+
+    // Khôi phục tiến độ nếu user F5
+    await restoreProgress();
+
     document.getElementById('qScroll').addEventListener('mouseup', onSel);
     document.addEventListener('keydown', onKey);
-}
-
-// ─── ANSWER KEY ───────────────────────────────────────────────────────────────
-function buildKey() {
-    KEY = {};
-    const fromQ = isSingle ? SEC_CFG[singleSec].from : 1;
-    const toQ   = isSingle ? SEC_CFG[singleSec].to   : 40;
-    (examData.sections || []).forEach(sec => {
-        (sec.groups || []).forEach(g => {
-            (g.questions || []).forEach(q => {
-                if (q.questionNumber >= fromQ && q.questionNumber <= toQ)
-                    KEY[q.questionNumber] = q.correctAnswer;
-            });
-        });
-    });
 }
 
 // ─── RENDER QUESTIONS ────────────────────────────────────────────────────────

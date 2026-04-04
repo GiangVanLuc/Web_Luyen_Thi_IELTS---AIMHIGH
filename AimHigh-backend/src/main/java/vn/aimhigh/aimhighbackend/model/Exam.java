@@ -36,6 +36,9 @@ public class Exam {
     
     private String thumbnail;
     
+    @Column(name = "exam_data", columnDefinition = "LONGTEXT")
+    private String examData;
+    
     @Column(name = "is_active")
     private Boolean isActive;
     

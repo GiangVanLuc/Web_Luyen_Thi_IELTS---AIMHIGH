@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import vn.aimhigh.aimhighbackend.dto.request.JsonExamRequest;
+import tools.jackson.databind.JsonNode;
 import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
 import vn.aimhigh.aimhighbackend.enums.Skill;
 import vn.aimhigh.aimhighbackend.model.Exam;
@@ -21,8 +21,8 @@ public class AdminExamController {
 
     @PostMapping("/import/json")
     public ResponseEntity<ApiResponse<Exam>> importJson(
-            @Valid @RequestBody JsonExamRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(examImportService.importFromJson(null), "Import JSON thành công"));
+            @RequestBody JsonNode request) {
+        return ResponseEntity.ok(ApiResponse.success(examImportService.importFromJson(request), "Import JSON thành công"));
     }
 
     @PostMapping("/import/excel")
@@ -53,7 +53,7 @@ public class AdminExamController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> updateExam(
             @PathVariable Long id,
-            @Valid @RequestBody JsonExamRequest request) {
+            @RequestBody JsonNode request) {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật đề thi " + id));
     }
 

@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AimHigh IELTS</title>
+    <title>My Study - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/test.css">
 </head>
 <body>
-    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" aria-label="Thu gọn menu" title="Thu gọn menu">
-        <i class="bi bi-chevron-left"></i>
-    </button>
-
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid px-4">
@@ -33,27 +28,38 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="listening.html"><i class="bi bi-headphones"></i> Listening</a></li>
-                            <li><a class="dropdown-item" href="reading.html"><i class="bi bi-book"></i> Reading</a></li>
-                            <li><a class="dropdown-item" href="writing.html"><i class="bi bi-pencil"></i> Writing</a></li>
-                            <li><a class="dropdown-item" href="speaking.html"><i class="bi bi-mic"></i> Speaking</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.html">Dashboard</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Từ vựng</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-bookmark-heart"></i> Sổ từ vựng</a></li>
+                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-collection"></i> Kho từ vựng AimHigh Pick</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="dashboard.html" data-bs-toggle="dropdown">My Study</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#my-study-overview"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="#submission-history"><i class="bi bi-clock-history"></i> Lịch sử nộp bài</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <div class="nav-user">
                     <div class="user-dropdown dropdown">
                         <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
-                            <div class="user-avatar">NT</div>
-                            <span>Nguyễn Thảo</span>
+                            <div class="user-avatar" id="headerUserAvatar">NT</div>
+                            <span id="headerUserName">Người dùng</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
                             <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i> Cài đặt</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="#" id="logoutLink"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -62,58 +68,11 @@
     </nav>
 
     <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
-            <div class="sidebar-menu">
-                <div class="menu-label">Home</div>
-                <a href="dashboard.html" class="menu-item active">
-                    <i class="bi bi-grid-1x2"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="result.html" class="menu-item">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Lịch sử làm bài</span>
-                </a>
-
-                <div class="menu-divider"></div>
-
-                <div class="menu-label">Luyện thi</div>
-                <a href="listening.html" class="menu-item">
-                    <i class="bi bi-headphones"></i>
-                    <span>Listening</span>
-                </a>
-                <a href="reading.html" class="menu-item">
-                    <i class="bi bi-book"></i>
-                    <span>Reading</span>
-                </a>
-                <a href="writing.html" class="menu-item">
-                    <i class="bi bi-pencil"></i>
-                    <span>Writing</span>
-                </a>
-                <a href="speaking.html" class="menu-item">
-                    <i class="bi bi-mic"></i>
-                    <span>Speaking</span>
-                </a>
-
-                <div class="menu-divider"></div>
-
-                <div class="menu-label">Từ vựng</div>
-                <a href="vocabulary.html" class="menu-item">
-                    <i class="bi bi-collection"></i>
-                    <span>Kho từ vựng AimHigh</span>
-                </a>
-                <a href="flashcard.html" class="menu-item">
-                    <i class="bi bi-bookmark-heart"></i>
-                    <span>Your library</span>
-                </a>
-            </div>
-            
-        </aside>
-
         <!-- Main Content -->
         <main class="dashboard-main">
             <div class="dashboard-container">
-                <div class="row g-4 mb-4">
+                <section id="my-study-overview" class="study-section">
+                <div class="row g-4 overview-top-row">
                     <div class="col-lg-6">
                         <section class="panel-box target-panel">
                             <header class="panel-head">
@@ -154,7 +113,7 @@
                     </div>
                 </div>
 
-                <div class="row g-4">
+                <div class="row g-4 overview-bottom-row">
                     <div class="col-lg-6">
                         <section class="panel-box calendar-box">
                             <header class="panel-head panel-head-between">
@@ -215,6 +174,59 @@
                         </section>
                     </div>
                 </div>
+                </section>
+
+                <section id="submission-history" class="study-section history-section">
+                    <header class="history-head">
+                        <h2><i class="bi bi-clock-history me-2"></i>Lịch sử nộp bài</h2>
+                    </header>
+                    <section class="history-card">
+                        <div class="history-tabs">
+                            <button type="button" class="history-tab active"><i class="bi bi-pencil"></i> Writing</button>
+                            <button type="button" class="history-tab"><i class="bi bi-mic"></i> Speaking</button>
+                            <button type="button" class="history-tab"><i class="bi bi-book"></i> Reading</button>
+                            <button type="button" class="history-tab"><i class="bi bi-headphones"></i> Listening</button>
+                        </div>
+                        <div class="history-subtab active">Theo tên bài</div>
+                        <div class="history-empty-state">
+                            <div class="history-empty-icon"><i class="bi bi-journal-x"></i></div>
+                            <p>Bạn hiện chưa làm bài tập nào! Hãy chọn dạng phù hợp và luyện tập ngay nào!</p>
+                            <a href="practice.html" class="btn btn-history-action">Tiến hành làm bài tập ngay</a>
+                        </div>
+                    </section>
+                </section>
+
+                <footer class="study-footer">
+                    <div class="study-footer-grid">
+                        <div class="study-footer-brand">
+                            <a class="navbar-brand" href="index.html">
+                                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 46px;">
+                                <span class="brand-name">AIM HIGH</span>
+                            </a>
+                            <p>Hệ thống theo dõi học tập và luyện thi IELTS toàn diện dành cho học viên AimHigh.</p>
+                        </div>
+                        <div class="study-footer-col">
+                            <h4>My Study</h4>
+                            <a href="#my-study-overview">Dashboard</a>
+                            <a href="#submission-history">Lịch sử nộp bài</a>
+                        </div>
+                        <div class="study-footer-col">
+                            <h4>Điều hướng</h4>
+                            <a href="practice.html">Luyện thi</a>
+                            <a href="vocabulary.html">Kho từ vựng</a>
+                            <a href="profile.html">Hồ sơ</a>
+                        </div>
+                        <div class="study-footer-col">
+                            <h4>Liên hệ</h4>
+                            <span><i class="bi bi-envelope"></i> support@aimhigh.vn</span>
+                            <span><i class="bi bi-telephone"></i> 1900 xxxx</span>
+                        </div>
+                    </div>
+                    <div class="study-footer-bottom">
+                        <span>© 2026 AimHigh. All rights reserved.</span>
+                        <a href="index.html">Về Trang chủ</a>
+                    </div>
+                </footer>
             </div>
         </main>
     </div>
@@ -261,62 +273,15 @@
     </div>
 
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         .dashboard-wrapper {
-            display: flex;
+            display: block;
             padding-top: 72px;
             min-height: 100vh;
             background: #f3f5f9;
-        }
-
-        .dashboard-sidebar {
-            width: 260px;
-            background: #fff;
-            border-right: 1px solid #e3e8ef;
-            padding: 24px 16px;
-            position: fixed;
-            top: 72px;
-            bottom: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.25s ease;
-        }
-
-        .sidebar-menu {
-            flex: 1;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: #667085;
-            font-weight: 500;
-            margin-bottom: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .menu-item:hover,
-        .menu-item.active {
-            background: #edf1f7;
-            color: #1d2939;
-        }
-
-        .menu-divider {
-            height: 1px;
-            background: #e3e8ef;
-            margin: 16px 0;
-        }
-
-        .menu-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #98a2b3;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 8px 16px;
         }
 
         .target-widget {
@@ -343,70 +308,45 @@
 
         .dashboard-main {
             flex: 1;
-            margin-left: 260px;
-            min-height: 100vh;
-            transition: margin-left 0.25s ease;
-        }
-
-        .sidebar-toggle-btn {
-            position: fixed;
-            top: 94px;
-            left: 244px;
-            width: 34px;
-            height: 34px;
-            border: 1px solid #cfd6e1;
-            border-radius: 999px;
-            background: #ffffff;
-            color: #344054;
-            z-index: 1041;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(16, 24, 40, 0.12);
-            transition: left 0.25s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-
-        .sidebar-toggle-btn:hover {
-            background: #eef2f7;
-            color: #1d2939;
-            transform: translateX(1px);
-        }
-
-        body.sidebar-collapsed .dashboard-sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .dashboard-main {
             margin-left: 0;
-        }
-
-        body.sidebar-collapsed .sidebar-toggle-btn {
-            left: 12px;
-        }
-
-        body.sidebar-collapsed .dashboard-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding-left: 52px;
-            padding-right: 52px;
+            min-height: 100vh;
         }
 
         .dashboard-container {
-            padding: 28px;
-            max-width: 1380px;
+            padding: 14px 20px 24px;
+            max-width: 1560px;
             margin: 0 auto;
+        }
+
+        .overview-top-row {
+            margin-bottom: 4px;
+        }
+
+        .overview-bottom-row {
+            margin-top: 2px;
+        }
+
+        .study-section {
+            scroll-margin-top: 96px;
+        }
+
+        .study-section + .study-section {
+            margin-top: 28px;
         }
 
         .panel-box {
             background: #fff;
             border: 1px solid #e3e8ef;
-            border-radius: 18px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 0;
             height: 100%;
+            overflow: hidden;
         }
 
         .panel-head {
-            margin-bottom: 16px;
+            margin: 0;
+            padding: 14px 18px;
+            border-bottom: 1px solid #dfe5ee;
         }
 
         .target-panel {
@@ -416,12 +356,12 @@
 
         .target-panel .panel-head {
             margin: 0;
-            padding: 15px 20px;
-            border-bottom: 1px solid #d7dde8;
+            padding: 14px 18px;
+            border-bottom: 1px solid #dfe5ee;
         }
 
         .target-panel .target-grid {
-            padding: 14px;
+            padding: 12px;
         }
 
         .panel-head h3 {
@@ -446,8 +386,8 @@
 
         .target-grid {
             display: grid;
-            grid-template-columns: 1.05fr repeat(4, 1fr);
-            gap: 12px;
+            grid-template-columns: 1.2fr repeat(4, 1fr);
+            gap: 10px;
         }
 
         .overall-item,
@@ -458,9 +398,9 @@
         .target-item,
         .exam-item {
             background: #f9fafb;
-            border: 1px solid #b6c1d0;
-            border-radius: 14px;
-            padding: 16px 14px 14px;
+            border: 1px solid #b9c2d0;
+            border-radius: 12px;
+            padding: 10px 12px;
             min-height: 88px;
         }
 
@@ -489,7 +429,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 156px;
+            min-height: 96px;
             min-width: 0;
         }
 
@@ -506,12 +446,12 @@
         }
 
         .overall-item h4 {
-            font-size: clamp(42px, 3.8vw, 56px);
+            font-size: clamp(36px, 3vw, 46px);
             font-weight: 700;
         }
 
         .skill-item h4 {
-            font-size: clamp(24px, 2.2vw, 38px);
+            font-size: clamp(20px, 1.8vw, 34px);
             font-weight: 700;
             color: #0f172a;
         }
@@ -541,12 +481,13 @@
         .exam-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
+            padding: 12px;
         }
 
         .calendar-box {
-            background: #eef2f8;
-            border-color: #dbe2ee;
+            background: #fff;
+            border-color: #e3e8ef;
         }
 
         .submit-flag {
@@ -562,17 +503,17 @@
         }
 
         .calendar-grid {
-            background: #f8fafc;
-            border: 1px solid #dde3ee;
-            border-radius: 14px;
-            padding: 14px;
+            background: #fff;
+            border: 0;
+            border-radius: 0;
+            padding: 10px 14px 12px;
         }
 
         .week-labels {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 12px;
             color: #667085;
         }
@@ -591,10 +532,10 @@
         }
 
         .day-cell {
-            height: 36px;
+            height: 34px;
             border-radius: 10px;
-            border: 1px solid #e4e7ec;
-            background: #fff;
+            border: 0;
+            background: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -603,8 +544,8 @@
         }
 
         .table-box {
-            background: #f5f7fc;
-            border-color: #dde3ee;
+            background: #fff;
+            border-color: #e3e8ef;
         }
 
         .weekly-table {
@@ -618,18 +559,18 @@
         .weekly-table th {
             background: #eef2f8;
             color: #344054;
-            font-size: 13px;
+            font-size: 14px;
             border: none;
-            padding: 12px;
+            padding: 10px;
             font-weight: 600;
             text-align: center;
         }
 
         .weekly-table td {
-            font-size: 13px;
+            font-size: 14px;
             color: #475467;
             border-color: #f0f2f5;
-            padding: 10px 12px;
+            padding: 10px 10px;
             text-align: center;
             vertical-align: middle;
         }
@@ -740,6 +681,181 @@
             background: #f15b27;
         }
 
+        .history-section {
+            margin-bottom: 18px;
+        }
+
+        .study-footer {
+            margin-top: 18px;
+            background: #fff;
+            border: 1px solid #e3e8ef;
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .study-footer-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr 1fr;
+            gap: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #edf1f6;
+        }
+
+        .study-footer-brand p {
+            margin: 10px 0 0;
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 420px;
+        }
+
+        .study-footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .study-footer-col h4 {
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #101828;
+        }
+
+        .study-footer-col a,
+        .study-footer-col span {
+            color: #667085;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .study-footer-col a:hover {
+            color: #ff6b38;
+        }
+
+        .study-footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 12px;
+            color: #98a2b3;
+            font-size: 13px;
+        }
+
+        .study-footer-bottom a {
+            color: #667085;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .study-footer-bottom a:hover {
+            color: #ff6b38;
+        }
+
+        .history-head {
+            margin-bottom: 14px;
+        }
+
+        .history-head h2 {
+            font-size: 34px;
+            font-weight: 800;
+            color: #1d2939;
+            margin: 0;
+        }
+
+        .history-card {
+            background: #fff;
+            border: 1px solid #e3e8ef;
+            border-radius: 18px;
+            overflow: hidden;
+            min-height: 480px;
+        }
+
+        .history-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 18px 18px 10px;
+            border-bottom: 1px solid #e7edf5;
+            flex-wrap: wrap;
+        }
+
+        .history-tab {
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: #7f8c9f;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 8px 22px;
+            transition: all 0.2s ease;
+        }
+
+        .history-tab.active {
+            background: #fdece5;
+            color: #ff6b38;
+        }
+
+        .history-subtab {
+            display: inline-block;
+            margin: 16px 20px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b38;
+            border-bottom: 4px solid #ff6b38;
+            padding-bottom: 8px;
+        }
+
+        .history-empty-state {
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            text-align: center;
+            padding: 32px 20px 44px;
+        }
+
+        .history-empty-icon {
+            width: 132px;
+            height: 132px;
+            border-radius: 999px;
+            background: #fff3ec;
+            color: #ff6b38;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+
+        .history-empty-state p {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 500;
+            color: #111827;
+            max-width: 860px;
+            line-height: 1.35;
+        }
+
+        .btn-history-action {
+            border-radius: 999px;
+            background: #eef1f5;
+            color: #111827;
+            font-weight: 700;
+            font-size: 22px;
+            padding: 10px 26px;
+            border: 0;
+        }
+
+        .btn-history-action:hover {
+            background: #e5e9ef;
+            color: #111827;
+        }
+
         @media (max-width: 1199px) {
             .target-grid {
                 grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -756,29 +872,41 @@
         }
 
         @media (max-width: 991px) {
-            .dashboard-sidebar {
-                display: none;
-            }
-
             .dashboard-main {
                 margin-left: 0;
-            }
-
-            .sidebar-toggle-btn {
-                display: none;
             }
 
             .dashboard-container {
                 padding: 18px;
             }
 
-            body.sidebar-collapsed .dashboard-container {
-                padding-left: 18px;
-                padding-right: 18px;
-            }
-
             .target-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .history-head h2 {
+                font-size: 28px;
+            }
+
+            .study-footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .history-tab {
+                font-size: 18px;
+                padding: 8px 16px;
+            }
+
+            .history-subtab {
+                font-size: 24px;
+            }
+
+            .history-empty-state p {
+                font-size: 22px;
+            }
+
+            .btn-history-action {
+                font-size: 20px;
             }
 
             .target-item {
@@ -825,36 +953,134 @@
                 font-size: 18px;
                 width: 100%;
             }
+
+            .history-tabs {
+                padding: 14px;
+                gap: 8px;
+            }
+
+            .history-tab {
+                font-size: 16px;
+                padding: 7px 14px;
+            }
+
+            .history-subtab {
+                margin: 12px 14px 0;
+                font-size: 18px;
+                border-bottom-width: 3px;
+            }
+
+            .history-empty-state {
+                min-height: 280px;
+                padding: 22px 16px 28px;
+            }
+
+            .study-footer {
+                padding: 14px;
+            }
+
+            .study-footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .study-footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-empty-state p {
+                font-size: 16px;
+            }
+
+            .btn-history-action {
+                font-size: 16px;
+                padding: 10px 18px;
+            }
         }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         (function () {
-            const key = 'aimhigh_dashboard_sidebar_collapsed';
-            const button = document.getElementById('sidebarToggleBtn');
-            if (!button) return;
+            const nameEl = document.getElementById('headerUserName');
+            const avatarEl = document.getElementById('headerUserAvatar');
+            const logoutLink = document.getElementById('logoutLink');
 
-            const icon = button.querySelector('i');
-            const updateIcon = () => {
-                const collapsed = document.body.classList.contains('sidebar-collapsed');
-                if (!icon) return;
-                icon.className = collapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
-                button.setAttribute('aria-label', collapsed ? 'Mở menu' : 'Thu gọn menu');
-                button.setAttribute('title', collapsed ? 'Mở menu' : 'Thu gọn menu');
+            let user = null;
+            try {
+                user = JSON.parse(localStorage.getItem('aimhigh_currentUser') || localStorage.getItem('aimhigh_user') || 'null');
+            } catch (err) {
+                user = null;
+            }
+
+            const displayName = (user && (user.name || user.fullName || user.username)) ? (user.name || user.fullName || user.username) : 'Người dùng';
+            if (nameEl) {
+                nameEl.textContent = displayName;
+            }
+
+            if (avatarEl) {
+                const initials = displayName
+                    .trim()
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((w) => w.charAt(0).toUpperCase())
+                    .join('') || 'U';
+                avatarEl.textContent = initials;
+            }
+
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.removeItem('aimhigh_loggedIn');
+                    localStorage.removeItem('aimhigh_currentUser');
+                    window.location.href = 'login.html';
+                });
+            }
+        })();
+
+        (function () {
+            const sectionLinks = document.querySelectorAll('.navbar .dropdown-item[href^="#"]');
+            const trackedSections = document.querySelectorAll('#my-study-overview, #submission-history');
+
+            const setActiveSectionLink = (targetId) => {
+                const myStudyTrigger = document.querySelector('.navbar .nav-link.dropdown-toggle.active');
+                if (myStudyTrigger) {
+                    myStudyTrigger.setAttribute('data-active-section', targetId);
+                }
             };
 
-            if (localStorage.getItem(key) === '1') {
-                document.body.classList.add('sidebar-collapsed');
-            }
-            updateIcon();
+            sectionLinks.forEach((link) => {
+                link.addEventListener('click', function (event) {
+                    const href = link.getAttribute('href');
+                    if (!href || !href.startsWith('#')) return;
+                    const target = document.querySelector(href);
+                    if (!target) return;
 
-            button.addEventListener('click', function () {
-                document.body.classList.toggle('sidebar-collapsed');
-                const collapsed = document.body.classList.contains('sidebar-collapsed');
-                localStorage.setItem(key, collapsed ? '1' : '0');
-                updateIcon();
+                    event.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (history.replaceState) {
+                        history.replaceState(null, '', href);
+                    }
+
+                    const id = href.replace('#', '');
+                    setActiveSectionLink(id);
+                });
             });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSectionLink(entry.target.id);
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.3,
+                rootMargin: '-90px 0px -45% 0px'
+            });
+
+            trackedSections.forEach((section) => observer.observe(section));
         })();
 
         (function () {

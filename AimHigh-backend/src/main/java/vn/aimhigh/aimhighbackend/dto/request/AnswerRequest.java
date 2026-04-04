@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 
 @Data
 public class AnswerRequest {
-    @NotNull(message = "QuestionId không được bỏ trống")
-    private Long questionId;
+    @NotNull(message = "QuestionNumber không được bỏ trống")
+    private Integer questionNumber;
     
     private String answerText;
     private Boolean isSkipped;

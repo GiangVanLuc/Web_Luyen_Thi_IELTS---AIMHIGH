@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 public class LoginRequest {
 
     @NotBlank(message = "Email không được để trống")

@@ -408,3 +408,120 @@ async function adminToggleUserLock(userId, locked) {
 async function adminGetDashboardStats() {
     return apiFetch('/admin/dashboard/stats');
 }
+
+// ===== EXAM SESSION API (Listening & Reading) =====
+
+/**
+ * Lấy dữ liệu đề thi (đã strip correctAnswer)
+ * @param {number} examId
+ */
+async function getExamData(examId) {
+    return apiFetch(`/exams/${examId}`);
+}
+
+/**
+ * Bắt đầu phiên thi mới
+ * @param {number} examId
+ * @param {string} mode - 'practice' | 'real'
+ */
+async function startAttempt(examId, mode = 'practice') {
+    return apiFetch('/attempts/start', {
+        method: 'POST',
+        body: JSON.stringify({ examId, mode })
+    });
+}
+
+/**
+ * Lưu tiến độ thi (auto-save, mỗi câu)
+ * @param {number} attemptId
+ * @param {number} questionNumber
+ * @param {string} answerText
+ */
+async function saveAttemptProgress(attemptId, questionNumber, answerText) {
+    return apiFetch(`/attempts/${attemptId}/progress`, {
+        method: 'POST',
+        body: JSON.stringify({ questionNumber, answerText })
+    });
+}
+
+/**
+ * Lấy lại tiến độ thi đã lưu (sau khi F5)
+ * @param {number} attemptId
+ */
+async function getAttemptProgress(attemptId) {
+    return apiFetch(`/attempts/${attemptId}/progress`);
+}
+
+/**
+ * Nộp bài thi
+ * @param {number} attemptId
+ * @param {Array} answers - [{ questionNumber, answerText, isSkipped }]
+ */
+async function submitAttemptAnswers(attemptId, answers) {
+    return apiFetch(`/attempts/${attemptId}/submit`, {
+        method: 'POST',
+        body: JSON.stringify({ answers })
+    });
+}
+
+/**
+ * Tạo highlight trong Reading practice
+ * @param {number} attemptId
+ * @param {object} payload - { passageId, startOffset, endOffset, color, note }
+ */
+async function createPracticeHighlight(attemptId, payload) {
+    return apiFetch(`/attempts/${attemptId}/highlights`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+/**
+ * Lấy danh sách highlight của attempt
+ * @param {number} attemptId
+ * @param {number|null} passageId
+ */
+async function getPracticeHighlights(attemptId, passageId = null) {
+    const query = passageId ? `?passageId=${passageId}` : '';
+    return apiFetch(`/attempts/${attemptId}/highlights${query}`);
+}
+
+/**
+ * Xóa highlight
+ * @param {number} highlightId
+ */
+async function deletePracticeHighlight(highlightId) {
+    return apiFetch(`/highlights/${highlightId}`, {
+        method: 'DELETE'
+    });
+}
+
+/**
+ * Tạo note theo question (API backend hiện tại yêu cầu questionId)
+ * @param {number} attemptId
+ * @param {object} payload - { questionId, content }
+ */
+async function createPracticeNote(attemptId, payload) {
+    return apiFetch(`/attempts/${attemptId}/notes`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+/**
+ * Lấy notes theo attempt
+ * @param {number} attemptId
+ */
+async function getPracticeNotes(attemptId) {
+    return apiFetch(`/attempts/${attemptId}/notes`);
+}
+
+/**
+ * Xóa note
+ * @param {number} noteId
+ */
+async function deletePracticeNote(noteId) {
+    return apiFetch(`/notes/${noteId}`, {
+        method: 'DELETE'
+    });
+}
