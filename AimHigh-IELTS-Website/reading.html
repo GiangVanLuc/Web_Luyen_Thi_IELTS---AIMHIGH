@@ -12,31 +12,46 @@
 </head>
 <body class="reading-page">
 
-<!-- MAIN NAV (giống practice.html) -->
+<!-- MAIN NAV -->
 <nav class="navbar navbar-expand-lg fixed-top" style="background:#fff;border-bottom:1px solid var(--border);">
   <div class="container-fluid px-4">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
       <img src="assets/logo.png" alt="AimHigh Logo" style="height:65px;">
-      <span class="brand-name">AIM HIGH</span>
+      <span class="brand-name">AimHigh</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Luyện thi</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
-            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
-            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
-            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
-          </ul>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
-      </ul>
-      <div class="nav-user">
+                    <li class="nav-item">
+                        <a class="nav-link " href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="practice.html" onclick="window.location.href='practice.html'">Luyện thi</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Từ vựng</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i> Flashcard</a></li>
+                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">My Journal</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử làm bài</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="nav-user">
         <div class="user-dropdown dropdown">
           <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
             <div class="user-avatar">NT</div>
@@ -58,15 +73,15 @@
   <a href="practice.html?skill=reading" class="nbtn nbtn-exit">
     <i class="bi bi-x-lg"></i> Thoát
   </a>
-  <span class="exam-title">Cambridge IELTS 18 GT – Reading Test 1</span>
+  <span class="exam-title" id="examTitle">Đang tải…</span>
   <div class="exam-right">
-    <div class="timer-pill"><i class="bi bi-alarm-fill"></i><span id="timer">00:59:51</span></div>
+    <div class="timer-pill"><i class="bi bi-alarm-fill"></i><span id="timer">01:00:00</span></div>
   </div>
 </div>
 
 <!-- SUBNAV -->
 <div class="subnav" id="subnav">
-  <span class="sn-info" id="snInfo">Đề: <strong>Cambridge IELTS 18 GT Test 1</strong> &nbsp;|&nbsp; 40 câu &nbsp;|&nbsp; 60 phút</span>
+  <span class="sn-info" id="snInfo">Đang tải đề thi…</span>
   <div class="sn-right">
     <button class="sn-btn sn-btn-neutral" id="btnSubNote" onclick="toggleNote()">Hiện note</button>
     <button class="sn-btn sn-btn-red" onclick="clearAllNotes()">Xoá tất cả note</button>
@@ -107,259 +122,28 @@
     </button>
   </div>
 
-  <!-- PASSAGE -->
+  <!-- PASSAGE — nội dung sẽ được JS inject vào -->
   <div class="passage" id="passagePanel">
     <div class="p-scroll" id="passageText">
-
-      <!-- S1 -->
-      <div data-section="1">
-      <div class="p-label">Reading Passage 1</div>
-      <div class="p-section-head">Section 1 — Questions 1–14</div>
-      <div class="p-meta">You should spend about 20 minutes on questions 1–14 which are based on the texts below.</div>
-      <div class="p-title">What to do if your clothes have been lost or damaged by a dry cleaner</div>
-      <div class="p-text">
-        <p class="ni">Dry cleaners are legally required to take reasonable care of anything left with them. You can claim compensation if your belongings are damaged or lost while in their care.</p>
-        <p class="ni">Even if the dry-cleaning company has a sign saying they aren't responsible for items left with them, this isn't necessarily true. They can't opt out of this responsibility just by putting up a sign.</p>
-        <p class="ni">As soon as you realise there's a problem, contact them and explain the situation. They might offer you compensation straight away. If they don't, you should ask them to either cover the cost of repairing the item or to pay for a replacement (if it can't be repaired).</p>
-        <p class="ni">If they have to pay the cost of replacing a damaged or lost item, the maximum they're obliged to offer you is the value of the item when it was left with them, not what it would cost to replace as new. You'll probably be asked to provide evidence of how much it originally cost – for example, a receipt. The dry cleaner can then offer you a reduced amount depending on the condition of the item – you'll have to negotiate the cost with them.</p>
-        <p class="ni">If the dry cleaner is part of a national chain, you could get in touch with the customer services department of their head office and make the complaint to them directly.</p>
-        <p class="ni">If the dry cleaner refuses to compensate you or they offer you too little, try the following steps:</p>
-        <p class="ni">• If the dry cleaner is a member of a trade association such as the UK Fashion and Textile Association, you can pass your complaint to them and they may be able to help you.</p>
-        <p class="ni">• You could get an independent organisation to look at your issue and produce a report, but this could be expensive (often around £100).</p>
-        <p class="ni">If you've tried the options above and are still unhappy with the outcome, you could take your case to court. There's a time limit for going to court – from when you took the item to the dry cleaner, you have up to six years.</p>
+      <div style="padding:40px;text-align:center;color:#9d8c52;">
+        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+        Đang tải bài đọc…
       </div>
-
-      <div class="subtitle" style="margin-top:26px;">Groups for readers and writers</div>
-      <div class="p-text">
-        <p><span class="plbl">A</span><strong>Teenvision</strong> — Reading group for teens aged 12–16, last Thursday monthly. Keen to talk about recent reads and suggest next books. Fans of action, fantasy and adventure but include a mix of genres.</p>
-        <p><span class="plbl">B</span><strong>Creative writing workshops</strong> — Share your writing and hear constructive suggestions. Got a book inside you? Build confidence formulating ideas for storylines and characters. Open to all – beginners and established writers.</p>
-        <p><span class="plbl">C</span><strong>Books for now</strong> — Meets second and fourth Mondays in members' homes. Open to men and women enjoying science fiction novels from the 1960s onwards, including feminist sci-fi, cyberpunk and scientific romance.</p>
-        <p><span class="plbl">D</span><strong>Readers' book group</strong> — Open group for parents at the library; toddlers welcome in the children's library. Reads mainly fiction of different genres. Books supplied by library. Check the website for the next book.</p>
-        <p><span class="plbl">E</span><strong>The book club</strong> — Monthly business book discussion. Network with like-minded businesswomen in a relaxed environment. Lots of ideas, refreshments and fun!</p>
-        <p><span class="plbl">F</span><strong>Poetry writing group</strong> — For young poets aged 12–18 at the library. Explore imagination; poems displayed in library and online. Meets fortnightly Saturdays 12–2pm. Currently full – join the waiting list.</p>
-      </div>
-
-      </div><!-- /data-section 1 -->
-
-      <!-- S2 -->
-      <div data-section="2">
-      <div class="divider">
-        <div class="p-label">Reading Passage 2</div>
-        <div class="p-section-head">Section 2 — Questions 15–27</div>
-        <div class="p-meta">You should spend about 20 minutes on questions 15–27 which are based on the texts below.</div>
-        <div class="p-title">Mechanical lifting equipment</div>
-        <div class="p-text">
-          <p class="ni">If some simple precautions are taken, lifting equipment that is essential for construction and engineering projects can be used safely. Forklift trucks, lifting trolleys, mobile and fixed cranes and all their parts are classed as lifting equipment.</p>
-          <p class="ni">All equipment used for lifting or moving heavy loads should be properly constructed. For example, equipment bearing a CE mark has been constructed to international standards. In addition, equipment that meets these standards will have documented instructions for tests that should be adhered to prior to using the equipment. Certain types of machinery, such as cranes, must be inspected by a qualified engineer on a six-monthly basis.</p>
-          <p class="ni">For operations that use cranes, a formal lift plan must be prepared. Lift plans are a type of risk assessment, whereby the possible dangers of the operation are carefully calculated, and control measures are identified and put in place. Before any lift proceeds, the plan should be talked over with the lifting crew during what is often referred to as a 'Tool Box Talk' (TBT). This is an important opportunity for them to ask questions about their role in the operation.</p>
-          <p class="ni">When heavy loads are being moved around, there are some practical things that should be done to prevent accidents. Firstly, if a load needs to be moved where workers or members of the public are present, the area must have barriers or other means to ensure no one is allowed to walk under the load while it is moving. Secondly, someone called a banksman should always be used when moving heavy loads by crane. As a crane driver often cannot see the load, especially during touch-down, this person tells him or her which way to move it.</p>
-          <p class="ni">It is very unusual for machinery such as cranes to fail. However, it is all too easy to ignore the importance of the secondary equipment. This refers to those items that are attached between the mechanical lifting machine and the load that is being lifted. Chains, slings, shackles and rigging are all examples of secondary lifting equipment, and it is perhaps surprising to note that most injuries occur due to faults or weaknesses in these items. It is essential that a six-monthly visual inspection is carried out to ensure there are no signs of wear or damage to the slings and shackles.</p>
-        </div>
-        <div class="subtitle">Dealing with customer complaints</div>
-        <div class="p-text">
-          <p class="ni">When a customer complains, it is usually for a good reason. Here are some strategies that will help you handle a customer complaint in a smooth and professional manner.</p>
-          <p class="ni">When a customer presents you with a complaint, keep in mind that the issue is not personal. Aiming to win the confrontation accomplishes nothing. He or she has usually made a purchase that did not meet their expectations – a product, service, or maybe a combination of the two. A worker who remains in control of their emotions deals from a position of strength.</p>
-          <p class="ni">Let the customer say what they need to. Respond with phrases such as, 'Hmm', 'I see', and 'Tell me more'. Then be quiet. As the customer expresses their annoyance yet sees you are not reacting, he or she will begin to relax. The customer needs to do this before being able to hear your solution.</p>
-          <p class="ni">When the customer has calmed down and feels you have heard his or her side, start asking questions. Be careful not to give scripted replies but use this as an opportunity to start a genuine conversation, building a relationship of trust with your customer. To help you understand the situation, get as many details as possible.</p>
-          <p class="ni">Take charge of the situation and let the customer know what you are going to do to solve the problem. One thing to keep in mind is that you should know what you can and cannot do within the policy of the business you work for. The cost could be minimal – maybe a simple upgrade on the customer's next purchase or a small gift certificate. A simple gesture like this could result in a word-of-mouth recommendation to others, while making a promise you cannot commit to will only set you back.</p>
-        </div>
-      </div>
-      </div><!-- /data-section 2 -->
-
-      <!-- S3 -->
-      <div data-section="3">
-      <div class="divider">
-        <div class="p-label">Reading Passage 3</div>
-        <div class="p-section-head">Section 3 — Questions 28–40</div>
-        <div class="p-meta">You should spend about 20 minutes on questions 28–40 which are based on the text below.</div>
-        <div class="p-title">White storks back in Britain after hundreds of years</div>
-        <p style="font-size:.79rem;color:var(--text-2);font-style:italic;text-align:center;margin-bottom:16px;">These beautiful birds could be about to become a feature of the British landscape again</p>
-        <div class="p-text">
-          <p><span class="plbl">A</span>The last definitive record of a pair of white storks successfully breeding in Britain was in 1416, from a nest on St Giles Cathedral in Edinburgh. No one knows why storks disappeared from our shores. They often featured on the menus of medieval banquets so we might, quite simply, have consumed them all. But there could be a more ominous reason. Storks are migrants arriving after the end of winter, nesting on rooftops and happily associating with humans, and because of this they have long been a symbol of hope and new life. Yet their association with rebirth also meant they became a symbol of rebellion. Shortly after the restoration of King Charles II in 1660, while storks were rare but surviving, parliament debated putting greater effort into destroying them entirely for fear they might inspire republicanism. Today, fortunately, that notion has disappeared, and the stork retains its association with new life, appearing on cards given to celebrate the arrival of a new child.</p>
-          <p><span class="plbl">B</span>So, after such a long absence, there was great excitement when in April of this year a pair of white storks built an untidy nest of sticks in the top branches of a huge oak in the middle of our rewilding project at Knepp Estate in West Sussex. Drone footage showed three large eggs. The fact that they were infertile and did not hatch was not too disappointing. The pair are only four years old, and storks can live to over thirty, with their first attempts to breed often failing. These young storks are part of a project to return the species to Britain, inspired by reintroductions in European countries. Imported from Poland, they have spent the best part of three years in a six-acre pen. Other birds have already shown strong loyalty to the site. Two years ago, a young bird from Knepp flew across the Channel to France and, this summer, returned to its companions.</p>
-          <p><span class="plbl">C</span>In the face of reports of unrelenting ecological loss (the UN estimates a million species are on the brink of extinction globally), the white stork's return is refreshing news. As tens of thousands of people demonstrate about the growing climate crisis and eco-anxiety besets us, these glimpses of restoration are important. The ecologist Chris Packham described the project as 'imaginative, intelligent, progressive and practical'.</p>
-          <p><span class="plbl">D</span>And yet its path to restoration in the UK has not been smooth. Support from conservation bodies has been surprisingly difficult to obtain; some were hard-pressed with their own initiatives, while others were simply reluctant to stick their necks out. The committee of the Sussex Wildlife Trust raised doubts about the stork ever having been a British bird. They also had concerns that English-bred birds would migrate across the Channel, and feared that their messy nests and closeness to humans would cause a hazard. The project has had to rely on private individuals building the introduction pens and feeding the birds at their own expense. The expertise of conservation charities such as the Roy Dennis Wildlife Foundation and the support of Cotswold Wildlife Park have proved invaluable.</p>
-          <p><span class="plbl">E</span>Across Europe, as stork populations have suffered from the draining of wetlands and disappearance of insect-rich pastures, their loss has been felt deeply. Where storks have been reintroduced, they are greeted with great happiness and some historical stork festivals have been restored. The Spanish erect poles for nests along their motorways, and in Alsace householders install cartwheels for storks to build nests on their roofs. During a cold snap in Bulgaria last March, villagers even gave white storks access to their homes.</p>
-          <p><span class="plbl">F</span>A driving motivation behind the project in the UK is the aspiration that the storks' return will spark feelings of empathy and affection from townspeople who see their nests on rooftops. White storks could be that charismatic species that connects urban communities directly with landscape restoration. The name of our local village, Storrington, was originally 'Estorcheton' or 'home of the storks'. The public response has been overwhelming, with crowds coming to see white storks flying free in England for the first time in hundreds of years, and private landowners queueing up to offer more introduction sites.</p>
-        </div>
-      </div>
-      </div><!-- /data-section 3 -->
-
-    </div><!-- /p-scroll -->
-  </div><!-- /passage -->
+    </div>
+  </div>
 
   <!-- RESIZE HANDLE -->
   <div class="resize-handle" id="resizeHandle"></div>
 
-  <!-- QUESTIONS -->
+  <!-- QUESTIONS — nội dung sẽ được JS inject vào -->
   <div class="qpanel" id="questionPanel">
     <div class="q-scroll" id="qScroll">
-
-      <div data-section="1">
-      <!-- Q1-6 TF/NG -->
-      <div class="qsh"><div class="qsh-title">Questions 1 – 6</div>
-        <div class="qsh-inst">Do the following statements agree with the information given in Reading Passage 1?<br>
-          <strong>TRUE</strong> if the statement agrees &nbsp; <strong>FALSE</strong> if it contradicts &nbsp; <strong>NOT GIVEN</strong> if no information
-        </div>
+      <div style="padding:40px;text-align:center;color:#9d8c52;">
+        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+        Đang tải câu hỏi…
       </div>
-      <div id="qi1" class="qi" data-q="1"><div class="qi-head"><span class="qbadge">1</span><span class="qtext">Dry cleaners are generally responsible for items left with them, even if there's a sign saying the opposite.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q1" value="TRUE" onchange="pa(1,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q1" value="FALSE" onchange="pa(1,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q1" value="NOT GIVEN" onchange="pa(1,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-      <div id="qi2" class="qi" data-q="2"><div class="qi-head"><span class="qbadge">2</span><span class="qtext">If the dry cleaner loses an item, they should give you enough money to buy a completely new one.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q2" value="TRUE" onchange="pa(2,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q2" value="FALSE" onchange="pa(2,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q2" value="NOT GIVEN" onchange="pa(2,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-      <div id="qi3" class="qi" data-q="3"><div class="qi-head"><span class="qbadge">3</span><span class="qtext">If you have the receipt, the company should refund the amount you originally paid.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q3" value="TRUE" onchange="pa(3,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q3" value="FALSE" onchange="pa(3,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q3" value="NOT GIVEN" onchange="pa(3,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-      <div id="qi4" class="qi" data-q="4"><div class="qi-head"><span class="qbadge">4</span><span class="qtext">It may be possible to get support for your complaint from a dry cleaners' trade association.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q4" value="TRUE" onchange="pa(4,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q4" value="FALSE" onchange="pa(4,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q4" value="NOT GIVEN" onchange="pa(4,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-      <div id="qi5" class="qi" data-q="5"><div class="qi-head"><span class="qbadge">5</span><span class="qtext">If offered too little compensation, you can request a free report from an independent organisation.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q5" value="TRUE" onchange="pa(5,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q5" value="FALSE" onchange="pa(5,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q5" value="NOT GIVEN" onchange="pa(5,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-      <div id="qi6" class="qi" data-q="6"><div class="qi-head"><span class="qbadge">6</span><span class="qtext">Most people who take a case about a dry-cleaning company to court are satisfied with the outcome.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q6" value="TRUE" onchange="pa(6,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q6" value="FALSE" onchange="pa(6,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q6" value="NOT GIVEN" onchange="pa(6,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Question 7</div><div class="qsh-inst"><strong>TRUE</strong> / <strong>FALSE</strong> / <strong>NOT GIVEN</strong></div></div>
-      <div id="qi7" class="qi" data-q="7"><div class="qi-head"><span class="qbadge">7</span><span class="qtext">If an item was lost nine months ago, you can still take the dry cleaner to court.</span></div>
-        <div class="ropts"><label class="ropt"><input type="radio" name="q7" value="TRUE" onchange="pa(7,'TRUE')"><span class="rcircle"></span><span class="rtext">TRUE</span></label><label class="ropt"><input type="radio" name="q7" value="FALSE" onchange="pa(7,'FALSE')"><span class="rcircle"></span><span class="rtext">FALSE</span></label><label class="ropt"><input type="radio" name="q7" value="NOT GIVEN" onchange="pa(7,'NOT GIVEN')"><span class="rcircle"></span><span class="rtext">NOT GIVEN</span></label></div></div>
-
-      <!-- Q8-14 Matching -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 8 – 14</div>
-        <div class="qsh-inst">Which paragraph <strong>A–F</strong> mentions the following? <em>You may use any letter more than once.</em></div>
-      </div>
-      <div id="qi8" class="qi" data-q="8"><div class="qi-head"><span class="qbadge">8</span><span class="qtext">Members share ideas for the books they would like to read.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(8,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi9" class="qi" data-q="9"><div class="qi-head"><span class="qbadge">9</span><span class="qtext">It isn't possible for any new members to join this group at present.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(9,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi10" class="qi" data-q="10"><div class="qi-head"><span class="qbadge">10</span><span class="qtext">You can get feedback on your own work from other members.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(10,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi11" class="qi" data-q="11"><div class="qi-head"><span class="qbadge">11</span><span class="qtext">This group focuses on stories belonging to just one genre.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(11,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi12" class="qi" data-q="12"><div class="qi-head"><span class="qbadge">12</span><span class="qtext">Work produced by members will be available to the public.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(12,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi13" class="qi" data-q="13"><div class="qi-head"><span class="qbadge">13</span><span class="qtext">This group doesn't read or write either poetry or fiction.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(13,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-      <div id="qi14" class="qi" data-q="14"><div class="qi-head"><span class="qbadge">14</span><span class="qtext">This group would suit someone who thinks they could write a book.</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(14,this.value)"><option value="">-- Group --</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div></div>
-
-      </div><!-- /q data-section 1 -->
-
-      <div data-section="2">
-      <!-- Q15-22 Notes -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 15 – 22</div>
-        <div class="qsh-inst">Complete the notes below. Choose <strong>NO MORE THAN TWO WORDS</strong> from the text for each answer.</div>
-      </div>
-      <div class="fill-block">
-        <div class="fill-title">Lifting equipment</div>
-        <div class="fill-line">• must be manufactured well, e.g., have a <span id="b15" class="fb">15</span> <input class="finp" id="q15" placeholder="……" oninput="pa(15,this.value)"> on it</div>
-        <div class="fill-line">• may need to undergo <span id="b16" class="fb">16</span> <input class="finp" id="q16" placeholder="……" oninput="pa(16,this.value)"> before use</div>
-        <div class="fill-line">• may need a regular check by a <span id="b17" class="fb">17</span> <input class="finp" id="q17" placeholder="……" style="width:130px;" oninput="pa(17,this.value)"></div>
-        <div class="fill-title" style="margin-top:9px;">Lift plans</div>
-        <div class="fill-line">• establish and carry out <span id="b18" class="fb">18</span> <input class="finp" id="q18" placeholder="……" style="width:120px;" oninput="pa(18,this.value)"> for any risks</div>
-        <div class="fill-line">• a <span id="b19" class="fb">19</span> <input class="finp" id="q19" placeholder="……" style="width:110px;" oninput="pa(19,this.value)"> consulted during 'Tool Box Talk'</div>
-        <div class="fill-title" style="margin-top:9px;">Preventing accidents</div>
-        <div class="fill-line">• use <span id="b20" class="fb">20</span> <input class="finp" id="q20" placeholder="……" oninput="pa(20,this.value)"> so load doesn't pass over anyone's head</div>
-        <div class="fill-line">• appoint a <span id="b21" class="fb">21</span> <input class="finp" id="q21" placeholder="……" oninput="pa(21,this.value)"> to give verbal directions to crane driver</div>
-        <div class="fill-title" style="margin-top:9px;">Secondary equipment</div>
-        <div class="fill-line">• more likely to cause <span id="b22" class="fb">22</span> <input class="finp" id="q22" placeholder="……" oninput="pa(22,this.value)"></div>
-      </div>
-
-      <!-- Q23-27 Table -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 23 – 27</div>
-        <div class="qsh-inst">Complete the table below. Choose <strong>ONE WORD ONLY</strong> from the text for each answer.</div>
-      </div>
-      <div class="real-tbl-wrap">
-        <table class="qtbl">
-          <thead><tr><th>Strategy</th><th>Your approach</th><th>The customer</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><strong>Stay calm</strong></td>
-              <td>Do not try to <span id="b23" class="fb" style="display:inline-flex;vertical-align:middle;">23</span> <input class="finp" id="q23" placeholder="…" style="width:75px;" oninput="pa(23,this.value)"> the argument</td>
-              <td>Had <span id="b24" class="fb" style="display:inline-flex;vertical-align:middle;">24</span> <input class="finp" id="q24" placeholder="…" style="width:95px;" oninput="pa(24,this.value)"> not fulfilled</td>
-            </tr>
-            <tr>
-              <td><strong>Listen well</strong></td>
-              <td>Use short phrases</td>
-              <td>Cannot recognise a <span id="b25" class="fb" style="display:inline-flex;vertical-align:middle;">25</span> <input class="finp" id="q25" placeholder="…" style="width:75px;" oninput="pa(25,this.value)"> until calm</td>
-            </tr>
-            <tr><td><strong>Get the facts</strong></td><td>Start genuine conversation</td><td>Will start to trust you</td></tr>
-            <tr>
-              <td><strong>Suggest action</strong></td>
-              <td>Be sure of company's <span id="b26" class="fb" style="display:inline-flex;vertical-align:middle;">26</span> <input class="finp" id="q26" placeholder="…" style="width:75px;" oninput="pa(26,this.value)"></td>
-              <td>May make a verbal <span id="b27" class="fb" style="display:inline-flex;vertical-align:middle;">27</span> <input class="finp" id="q27" placeholder="…" style="width:105px;" oninput="pa(27,this.value)"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      </div><!-- /q data-section 2 -->
-
-      <div data-section="3">
-      <!-- Q28-33 Matching headings -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 28 – 33</div>
-        <div class="qsh-inst">Choose the correct heading for sections <strong>A–F</strong> from the list:<br>
-          <strong>i</strong> An enterprise arising from success in other countries &nbsp;
-          <strong>ii</strong> The hope that storks will inspire a range of emotions &nbsp;
-          <strong>iii</strong> Support from some organisations but not others &nbsp;
-          <strong>iv</strong> Finding new types of habitats &nbsp;
-          <strong>v</strong> Opposition from the general public &nbsp;
-          <strong>vi</strong> A sign of hope in difficult times &nbsp;
-          <strong>vii</strong> Creatures representing both joy and opposition &nbsp;
-          <strong>viii</strong> Storks causing delight and revival of public events
-        </div>
-      </div>
-      <div id="qi28" class="qi" data-q="28"><div class="qi-head"><span class="qbadge">28</span><span class="qtext">Section A</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(28,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-      <div id="qi29" class="qi" data-q="29"><div class="qi-head"><span class="qbadge">29</span><span class="qtext">Section B</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(29,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-      <div id="qi30" class="qi" data-q="30"><div class="qi-head"><span class="qbadge">30</span><span class="qtext">Section C</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(30,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-      <div id="qi31" class="qi" data-q="31"><div class="qi-head"><span class="qbadge">31</span><span class="qtext">Section D</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(31,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-      <div id="qi32" class="qi" data-q="32"><div class="qi-head"><span class="qbadge">32</span><span class="qtext">Section E</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(32,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-      <div id="qi33" class="qi" data-q="33"><div class="qi-head"><span class="qbadge">33</span><span class="qtext">Section F</span></div><div class="qinp-wrap"><select class="qinp" onchange="pa(33,this.value)"><option value="">-- Heading --</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div></div>
-
-      <!-- Q34-37 Summary -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 34 – 37</div>
-        <div class="qsh-inst">Complete the summary. Choose <strong>ONE WORD ONLY</strong> from the text for each answer.</div>
-      </div>
-      <div class="summary-block">
-        <strong>Project to reintroduce white storks at Knepp Estate</strong><br><br>
-        Last spring, two white storks put <span id="b34" class="fb" style="display:inline-flex;vertical-align:middle;">34</span>
-        <input class="finp" id="q34" placeholder="…" style="width:80px;" oninput="pa(34,this.value)">
-        together high in a large oak. The female laid three eggs, which proved to be
-        <span id="b35" class="fb" style="display:inline-flex;vertical-align:middle;">35</span>
-        <input class="finp" id="q35" placeholder="…" style="width:85px;" oninput="pa(35,this.value)">.
-        The storks were bred in
-        <span id="b36" class="fb" style="display:inline-flex;vertical-align:middle;">36</span>
-        <input class="finp" id="q36" placeholder="…" style="width:75px;" oninput="pa(36,this.value)">
-        and kept for several years before being released. Other storks are developing a sense of
-        <span id="b37" class="fb" style="display:inline-flex;vertical-align:middle;">37</span>
-        <input class="finp" id="q37" placeholder="…" style="width:75px;" oninput="pa(37,this.value)">
-        to their new home.
-      </div>
-
-      <!-- Q38-40 MCQ -->
-      <div style="height:8px;"></div>
-      <div class="qsh"><div class="qsh-title">Questions 38 – 40</div>
-        <div class="qsh-inst">Choose the correct letter, <strong>A, B, C or D</strong>.</div>
-      </div>
-      <div id="qi38" class="qi" data-q="38"><div class="qi-head"><span class="qbadge">38</span><span class="qtext">In Section A, we learn that in the past people thought white storks</span></div>
-        <div class="ropts">
-          <label class="ropt"><input type="radio" name="q38" value="A" onchange="pa(38,'A')"><span class="rcircle"></span><span class="rtext">A. represented the deep snow and cold days of winter.</span></label>
-          <label class="ropt"><input type="radio" name="q38" value="B" onchange="pa(38,'B')"><span class="rcircle"></span><span class="rtext">B. had the power to ensure that babies were born safely.</span></label>
-          <label class="ropt"><input type="radio" name="q38" value="C" onchange="pa(38,'C')"><span class="rcircle"></span><span class="rtext">C. were a speciality that only the very rich were allowed to eat.</span></label>
-          <label class="ropt"><input type="radio" name="q38" value="D" onchange="pa(38,'D')"><span class="rcircle"></span><span class="rtext">D. might be used to encourage people to get rid of the monarchy.</span></label>
-        </div></div>
-      <div id="qi39" class="qi" data-q="39"><div class="qi-head"><span class="qbadge">39</span><span class="qtext">The Sussex Wildlife Trust committee was unwilling to support the reintroduction because they believed that</span></div>
-        <div class="ropts">
-          <label class="ropt"><input type="radio" name="q39" value="A" onchange="pa(39,'A')"><span class="rcircle"></span><span class="rtext">A. storks had never actually lived in Britain.</span></label>
-          <label class="ropt"><input type="radio" name="q39" value="B" onchange="pa(39,'B')"><span class="rcircle"></span><span class="rtext">B. the project would require too much funding.</span></label>
-          <label class="ropt"><input type="radio" name="q39" value="C" onchange="pa(39,'C')"><span class="rcircle"></span><span class="rtext">C. storks would not be able to find enough food.</span></label>
-          <label class="ropt"><input type="radio" name="q39" value="D" onchange="pa(39,'D')"><span class="rcircle"></span><span class="rtext">D. the birds would cause problems for local people.</span></label>
-        </div></div>
-      <div id="qi40" class="qi" data-q="40"><div class="qi-head"><span class="qbadge">40</span><span class="qtext">What does the writer suggest is the main aim of the reintroduction project?</span></div>
-        <div class="ropts">
-          <label class="ropt"><input type="radio" name="q40" value="A" onchange="pa(40,'A')"><span class="rcircle"></span><span class="rtext">A. To increase the overall number of storks in Europe.</span></label>
-          <label class="ropt"><input type="radio" name="q40" value="B" onchange="pa(40,'B')"><span class="rcircle"></span><span class="rtext">B. To help people feel more connected to the natural environment.</span></label>
-          <label class="ropt"><input type="radio" name="q40" value="C" onchange="pa(40,'C')"><span class="rcircle"></span><span class="rtext">C. To promote wildlife tourism in West Sussex.</span></label>
-          <label class="ropt"><input type="radio" name="q40" value="D" onchange="pa(40,'D')"><span class="rcircle"></span><span class="rtext">D. To demonstrate what private funding can achieve.</span></label>
-        </div></div>
-      </div><!-- /q data-section 3 -->
-      <div style="height:20px;"></div>
-    </div><!-- /q-scroll -->
-  </div><!-- /qpanel -->
+    </div>
+  </div>
 
   <!-- NOTE SIDEBAR -->
   <div class="notebar off" id="notebar">
@@ -430,10 +214,13 @@
 <div class="modal fade" id="subModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title fw-bold">Xác nhận nộp bài</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Xác nhận nộp bài</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
       <div class="modal-body">
         <div class="sub-sum">
-          <div class="sub-row"><span>Đã trả lời:</span><strong><span id="mA">0</span>/40</strong></div>
+          <div class="sub-row"><span>Đã trả lời:</span><strong><span id="mA">0</span>/<span id="mTotal">40</span></strong></div>
           <div class="sub-row"><span>Chưa trả lời:</span><strong id="mU">40</strong></div>
           <div class="sub-row"><span>Thời gian còn lại:</span><strong id="mT">—</strong></div>
         </div>
@@ -450,6 +237,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/reading.js"></script>
+<script src="js/reading.js"></script>
 </body>
 </html>

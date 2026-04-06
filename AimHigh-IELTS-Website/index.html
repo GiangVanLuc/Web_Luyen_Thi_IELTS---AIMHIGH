@@ -15,7 +15,7 @@
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
+                <span class="brand-name">AimHigh</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -26,25 +26,26 @@
                         <a class="nav-link active" href="index.html">Trang chủ</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
-                                <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
-                                <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
-                                <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
-                            </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="mock-test.html">Thi thử</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="ai-tutor.html">AI Tutor</a>
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Luyện thi</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Từ vựng</a>
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Từ vựng</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i> Flashcard</a></li>
                             <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">My Journal</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử làm bài</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -75,9 +76,6 @@
                     <a href="register.html" class="btn btn-hero-primary btn-lg">
                         Bắt đầu luyện tập
                         <i class="bi bi-arrow-right"></i>
-                    </a>
-                    <a href="listening.html" class="btn btn-hero-outline btn-lg">
-                        Làm bài test thử
                     </a>
                 </div>
                 <div class="hero-features">
@@ -176,94 +174,6 @@
                         </ul>
                         <a href="speaking.html" class="feature-link">
                             Luyện ngay <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- AI Section -->
-    <section class="ai-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="ai-demo">
-                        <div class="ai-chat-window">
-                            <div class="chat-header">
-                                <div class="chat-avatar">
-                                    <i class="bi bi-robot"></i>
-                                </div>
-                                <div class="chat-info">
-                                    <h4>AI Tutor</h4>
-                                    <span class="status online">Đang hoạt động</span>
-                                </div>
-                            </div>
-                            <div class="chat-messages">
-                                <div class="message user">
-                                    <p>Làm thế nào để cải thiện Writing Task 2?</p>
-                                </div>
-                                <div class="message bot">
-                                    <p>Để cải thiện Writing Task 2, bạn cần tập trung vào:</p>
-                                    <p><strong>1. Cấu trúc bài:</strong> Introduction → Body 1 → Body 2 → Conclusion</p>
-                                    <p><strong>2. Từ vựng:</strong> Sử dụng collocations và academic words</p>
-                                    <p><strong>3. Ngữ pháp:</strong> Đa dạng câu phức, câu điều kiện...</p>
-                                </div>
-                                <div class="message user">
-                                    <p>Cho tôi ví dụ về introduction hay</p>
-                                </div>
-                                <div class="message bot typing">
-                                    <span class="typing-dot"></span>
-                                    <span class="typing-dot"></span>
-                                    <span class="typing-dot"></span>
-                                </div>
-                            </div>
-                            <div class="chat-input">
-                                <input type="text" placeholder="Hỏi AI bất cứ điều gì về IELTS...">
-                                <button><i class="bi bi-send-fill"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="ai-content">
-                        <span class="section-badge">Powered by Gemini</span>
-                        <h2 class="section-title">AI Tutor <span class="gradient-text">thông minh</span></h2>
-                        <p class="section-description">
-                            Chatbot AI hỗ trợ học tập 24/7, giải đáp mọi thắc mắc về IELTS, 
-                            từ chiến lược làm bài đến ngữ pháp, từ vựng.
-                        </p>
-                        <div class="ai-features">
-                            <div class="ai-feature-item">
-                                <div class="ai-feature-icon">
-                                    <i class="bi bi-lightning-charge-fill"></i>
-                                </div>
-                                <div class="ai-feature-content">
-                                    <h4>Phản hồi tức thì</h4>
-                                    <p>Trả lời nhanh chóng, chính xác</p>
-                                </div>
-                            </div>
-                            <div class="ai-feature-item">
-                                <div class="ai-feature-icon">
-                                    <i class="bi bi-translate"></i>
-                                </div>
-                                <div class="ai-feature-content">
-                                    <h4>Song ngữ Anh-Việt</h4>
-                                    <p>Hỗ trợ cả tiếng Anh và tiếng Việt</p>
-                                </div>
-                            </div>
-                            <div class="ai-feature-item">
-                                <div class="ai-feature-icon">
-                                    <i class="bi bi-graph-up-arrow"></i>
-                                </div>
-                                <div class="ai-feature-content">
-                                    <h4>Cá nhân hóa</h4>
-                                    <p>Gợi ý phù hợp trình độ của bạn</p>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="ai-tutor.html" class="btn btn-primary btn-lg">
-                            Trò chuyện với AI <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -415,7 +325,7 @@
                     <div class="footer-brand">
                         <a href="index.html" class="navbar-brand">
                             <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                            <span class="brand-name">AIM HIGH</span>
+                            <span class="brand-name">AimHigh</span>
                         </a>
                         <p>Nền tảng luyện thi IELTS thông minh với công nghệ AI, giúp bạn đạt band điểm mơ ước.</p>
                         <div class="social-links">

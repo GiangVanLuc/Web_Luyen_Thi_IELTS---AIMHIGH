@@ -1,0 +1,594 @@
+{
+  "exam": {
+    "id": 1,
+    "title": "Cambridge IELTS 18 – Listening Test 1",
+    "skill": "LISTENING",
+    "type": "FULL",
+    "duration": 30,
+    "totalQuestions": 40,
+    "sourceName": "Cambridge IELTS 18",
+    "thumbnail": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=900"
+  },
+
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Section 1",
+      "audioUrl": "/audio/cam18-listening-sec1.mp3",
+      "audioDuration": 480,
+      "audioStart": 0,
+      "audioEnd": 480,
+
+      "groups": [
+        {
+          "groupTitle": "Questions 1–10",
+          "instruction": "Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.",
+          "displayType": "FILL_BLOCK",
+          "blockTitle": "Footlights Restaurant – Job Enquiry",
+
+          "questions": [
+            {
+              "questionNumber": 1,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Hours per week: ___ hours",
+              "blankPosition": "middle",
+              "inputWidth": 80,
+              "correctAnswer": "20",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 2,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Working: four evenings + occasional ___ lunchtime",
+              "blankPosition": "middle",
+              "inputWidth": 120,
+              "correctAnswer": "weekend",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 3,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Pay: £ ___ per hour (plus tips)",
+              "blankPosition": "middle",
+              "inputWidth": 70,
+              "correctAnswer": "8.50",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 4,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Supervisor: Mr ___",
+              "blankPosition": "end",
+              "inputWidth": 110,
+              "correctAnswer": "Henderson",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 5,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Address: 14 ___ Street",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "King",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 6,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Nearest car park: on ___ Street",
+              "blankPosition": "middle",
+              "inputWidth": 100,
+              "correctAnswer": "Duke",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 7,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Uniform: ___ provided; own black trousers & shoes required",
+              "blankPosition": "middle",
+              "inputWidth": 100,
+              "correctAnswer": "waistcoat",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 8,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Start date: no later than ___ of March",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "15th",
+              "alternateAnswers": ["fifteenth"],
+              "choices": []
+            },
+            {
+              "questionNumber": 9,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Apply by email to: ___",
+              "blankPosition": "end",
+              "inputWidth": 180,
+              "correctAnswer": "jobs@footlights-restaurant.co.uk",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 10,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Type of application: CV + covering ___",
+              "blankPosition": "end",
+              "inputWidth": 90,
+              "correctAnswer": "letter",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "sectionNumber": 2,
+      "label": "Section 2",
+      "audioUrl": "/audio/cam18-listening-sec2.mp3",
+      "audioDuration": 480,
+      "audioStart": 480,
+      "audioEnd": 960,
+
+      "groups": [
+        {
+          "groupTitle": "Questions 11–14",
+          "instruction": "Choose the correct answer, A, B or C.",
+          "displayType": "MULTIPLE_CHOICE",
+          "blockTitle": null,
+
+          "questions": [
+            {
+              "questionNumber": 11,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What is the population of Branley?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Around 24,000" },
+                { "label": "B", "text": "Around 42,000" },
+                { "label": "C", "text": "Around 62,000" }
+              ]
+            },
+            {
+              "questionNumber": 12,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "When is entry to the Heritage Museum free?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "On Mondays" },
+                { "label": "B", "text": "On Tuesdays" },
+                { "label": "C", "text": "On Wednesdays" }
+              ]
+            },
+            {
+              "questionNumber": 13,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "How long does the Nature Reserve trail take to complete?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "About 60 minutes" },
+                { "label": "B", "text": "About 90 minutes" },
+                { "label": "C", "text": "About 120 minutes" }
+              ]
+            },
+            {
+              "questionNumber": 14,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What time does the open-air concert start?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "7:00 pm" },
+                { "label": "B", "text": "7:30 pm" },
+                { "label": "C", "text": "8:00 pm" }
+              ]
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 15–20",
+          "instruction": "Complete the sentences below. Write NO MORE THAN TWO WORDS for each answer.",
+          "displayType": "FILL_BLOCK",
+          "blockTitle": "Branley – Key Facts",
+
+          "questions": [
+            {
+              "questionNumber": 15,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• The town originally developed as a ___ town.",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "market",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 16,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• The Heritage Museum is located on ___ Road.",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "Castle",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 17,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• The Craft Quarter is in converted ___ buildings.",
+              "blankPosition": "middle",
+              "inputWidth": 100,
+              "correctAnswer": "mill",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 18,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Dogs are welcome in the Nature Reserve if kept on a ___.",
+              "blankPosition": "end",
+              "inputWidth": 80,
+              "correctAnswer": "lead",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 19,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• The main bus station is on ___ Avenue.",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "Park",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 20,
+              "questionTypeId": 6,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Tonight's concert features a local ___ band.",
+              "blankPosition": "middle",
+              "inputWidth": 80,
+              "correctAnswer": "jazz",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "sectionNumber": 3,
+      "label": "Section 3",
+      "audioUrl": "/audio/cam18-listening-sec3.mp3",
+      "audioDuration": 480,
+      "audioStart": 960,
+      "audioEnd": 1440,
+
+      "groups": [
+        {
+          "groupTitle": "Questions 21–24",
+          "instruction": "Choose the correct answer, A, B or C.",
+          "displayType": "MULTIPLE_CHOICE",
+          "blockTitle": null,
+
+          "questions": [
+            {
+              "questionNumber": 21,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What is the focus of Maria and Tom's research project?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Social media advertising" },
+                { "label": "B", "text": "Online shopping behaviour" },
+                { "label": "C", "text": "In-store customer experience" }
+              ]
+            },
+            {
+              "questionNumber": 22,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "How many participants do they plan to survey?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "100" },
+                { "label": "B", "text": "200" },
+                { "label": "C", "text": "300" }
+              ]
+            },
+            {
+              "questionNumber": 23,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "According to research by Novak and Chen, what has the strongest influence on purchasing decisions?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Price" },
+                { "label": "B", "text": "Product reviews" },
+                { "label": "C", "text": "Brand reputation" }
+              ]
+            },
+            {
+              "questionNumber": 24,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What does Dr Ellis advise about the questionnaire?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Use paper format only" },
+                { "label": "B", "text": "Keep it short (max 15 questions)" },
+                { "label": "C", "text": "Survey people outside university" }
+              ]
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 25–30",
+          "instruction": "Complete the summary below. Write ONE WORD ONLY for each answer.",
+          "displayType": "FILL_BLOCK",
+          "blockTitle": "Research Project Summary",
+
+          "questions": [
+            {
+              "questionNumber": 25,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "The students are using a ___ to collect data.",
+              "blankPosition": "middle",
+              "inputWidth": 130,
+              "correctAnswer": "questionnaire",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 26,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "One limitation is that students may not be ___ of the general population.",
+              "blankPosition": "middle",
+              "inputWidth": 140,
+              "correctAnswer": "representative",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 27,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "Three variables: online reviews, ___ comparison, and free delivery.",
+              "blankPosition": "middle",
+              "inputWidth": 120,
+              "correctAnswer": "price",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 28,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "Consumers sometimes choose a pricier product because free delivery feels like getting something for ___.",
+              "blankPosition": "end",
+              "inputWidth": 100,
+              "correctAnswer": "nothing",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 29,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "The survey will be distributed ___ for ease of collection.",
+              "blankPosition": "middle",
+              "inputWidth": 90,
+              "correctAnswer": "online",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 30,
+              "questionTypeId": 7,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "Dr Ellis advises piloting it with five or six people to check questions are ___.",
+              "blankPosition": "end",
+              "inputWidth": 80,
+              "correctAnswer": "clear",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "sectionNumber": 4,
+      "label": "Section 4",
+      "audioUrl": "/audio/cam18-listening-sec4.mp3",
+      "audioDuration": 480,
+      "audioStart": 1440,
+      "audioEnd": 1800,
+
+      "groups": [
+        {
+          "groupTitle": "Questions 31–35",
+          "instruction": "Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.",
+          "displayType": "FILL_BLOCK",
+          "blockTitle": "Samarkand – Key Facts",
+
+          "questions": [
+            {
+              "questionNumber": 31,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Ancient name: ___",
+              "blankPosition": "end",
+              "inputWidth": 110,
+              "correctAnswer": "Marakanda",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 32,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Conquered by Alexander the Great in ___ BC",
+              "blankPosition": "middle",
+              "inputWidth": 80,
+              "correctAnswer": "329",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 33,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Made capital by ___ (Timur) in the 14th century",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "Tamerlane",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 34,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• The Registan features three magnificent ___ (Islamic schools)",
+              "blankPosition": "middle",
+              "inputWidth": 120,
+              "correctAnswer": "madrasahs",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 35,
+              "questionTypeId": 3,
+              "displayTypeId": "FILL_BLOCK",
+              "lineTemplate": "• Observatory built by ___ Beg in the 15th century",
+              "blankPosition": "middle",
+              "inputWidth": 110,
+              "correctAnswer": "Ulugh",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 36–40",
+          "instruction": "Choose the correct answer, A, B or C.",
+          "displayType": "MULTIPLE_CHOICE",
+          "blockTitle": null,
+
+          "questions": [
+            {
+              "questionNumber": 36,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What made Samarkand extraordinarily wealthy?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Gold mining in the surrounding region" },
+                { "label": "B", "text": "Its strategic location on trade routes" },
+                { "label": "C", "text": "The production of luxury silk goods" }
+              ]
+            },
+            {
+              "questionNumber": 37,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What did Tamerlane do to beautify Samarkand?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "He imported building materials from China" },
+                { "label": "B", "text": "He brought craftsmen from conquered territories" },
+                { "label": "C", "text": "He invited foreign architects to design the buildings" }
+              ]
+            },
+            {
+              "questionNumber": 38,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What was notable about Ulugh Beg's star catalogue?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "It was the first to use a telescope" },
+                { "label": "B", "text": "It was remarkably accurate for its time" },
+                { "label": "C", "text": "It was later proved to be completely incorrect" }
+              ]
+            },
+            {
+              "questionNumber": 39,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "Why did Samarkand decline as a trade centre?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "It was destroyed by war" },
+                { "label": "B", "text": "Sea routes became more important than overland routes" },
+                { "label": "C", "text": "A major earthquake damaged its infrastructure" }
+              ]
+            },
+            {
+              "questionNumber": 40,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What challenge do conservators face at Samarkand today?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "Lack of government funding" },
+                { "label": "B", "text": "Maintaining authenticity while ensuring visitor safety" },
+                { "label": "C", "text": "Finding skilled craftsmen to do restoration work" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

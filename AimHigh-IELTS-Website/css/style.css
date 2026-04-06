@@ -1209,3 +1209,11 @@ img {
             .filter-top { display: none !important; }
             .btn-show-sidebar { display: none !important; }
         }
+
+/* Auto open dropdowns on hover for desktop */
+@media (min-width: 992px) {
+    .navbar .dropdown:hover > .dropdown-menu {
+        display: block;
+        margin-top: 0;
+    }
+}

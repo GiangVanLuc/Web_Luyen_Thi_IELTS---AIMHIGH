@@ -12,19 +12,59 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030; background: white;">
+        <div class="container-fluid px-4">
             <a class="navbar-brand" href="index.html">
                 <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
+                <span class="brand-name">AimHigh</span>
             </a>
-            <div class="test-timer">
-                <i class="bi bi-clock"></i>
-                <span id="timer">40:00</span>
-            </div>
-            <button class="btn btn-outline-danger btn-sm" onclick="submitWriting()">
-                <i class="bi bi-send"></i> Nộp bài
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
             </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Luyện thi</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Từ vựng</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i> Flashcard</a></li>
+                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">My Journal</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử làm bài</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="nav-user">
+                    <div class="user-dropdown dropdown">
+                        <button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="user-avatar">NT</div>
+                            <span>Nguyễn Thảo</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 

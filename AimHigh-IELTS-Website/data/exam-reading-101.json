@@ -1,0 +1,655 @@
+{
+  "exam": {
+    "id": 101,
+    "title": "Cambridge IELTS 18 GT – Reading Test 1",
+    "skill": "READING",
+    "type": "FULL",
+    "duration": 60,
+    "totalQuestions": 40,
+    "sourceName": "Cambridge IELTS 18 GT",
+    "thumbnail": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900"
+  },
+
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Section 1",
+      "partLabel": "Part 1",
+      "questionRange": "Q1–14",
+      "questionFrom": 1,
+      "questionTo": 14,
+      "totalQuestions": 14,
+      "timeLimit": 1200,
+
+      "passages": [
+        {
+          "passageOrder": 1,
+          "title": "What to do if your clothes have been lost or damaged by a dry cleaner",
+          "content": "Dry cleaners are legally required to take reasonable care of anything left with them. You can claim compensation if your belongings are damaged or lost while in their care.\n\nEven if the dry-cleaning company has a sign saying they aren't responsible for items left with them, this isn't necessarily true. They can't opt out of this responsibility just by putting up a sign.\n\nAs soon as you realise there's a problem, contact them and explain the situation. They might offer you compensation straight away. If they don't, you should ask them to either cover the cost of repairing the item or to pay for a replacement (if it can't be repaired).\n\nIf they have to pay the cost of replacing a damaged or lost item, the maximum they're obliged to offer you is the value of the item when it was left with them, not what it would cost to replace as new. You'll probably be asked to provide evidence of how much it originally cost – for example, a receipt. The dry cleaner can then offer you a reduced amount depending on the condition of the item – you'll have to negotiate the cost with them.\n\nIf the dry cleaner is part of a national chain, you could get in touch with the customer services department of their head office and make the complaint to them directly.\n\nIf the dry cleaner refuses to compensate you or they offer you too little, try the following steps:\n• If the dry cleaner is a member of a trade association such as the UK Fashion and Textile Association, you can pass your complaint to them and they may be able to help you.\n• You could get an independent organisation to look at your issue and produce a report, but this could be expensive (often around £100).\n\nIf you've tried the options above and are still unhappy with the outcome, you could take your case to court. There's a time limit for going to court – from when you took the item to the dry cleaner, you have up to six years."
+        },
+        {
+          "passageOrder": 2,
+          "title": "Groups for readers and writers",
+          "content": "A. Teenvision — Reading group for teens aged 12–16, last Thursday monthly. Keen to talk about recent reads and suggest next books. Fans of action, fantasy and adventure but include a mix of genres.\n\nB. Creative writing workshops — Share your writing and hear constructive suggestions. Got a book inside you? Build confidence formulating ideas for storylines and characters. Open to all – beginners and established writers.\n\nC. Books for now — Meets second and fourth Mondays in members' homes. Open to men and women enjoying science fiction novels from the 1960s onwards, including feminist sci-fi, cyberpunk and scientific romance.\n\nD. Readers' book group — Open group for parents at the library; toddlers welcome in the children's library. Reads mainly fiction of different genres. Books supplied by library. Check the website for the next book.\n\nE. The book club — Monthly business book discussion. Network with like-minded businesswomen in a relaxed environment. Lots of ideas, refreshments and fun!\n\nF. Poetry writing group — For young poets aged 12–18 at the library. Explore imagination; poems displayed in library and online. Meets fortnightly Saturdays 12–2pm. Currently full – join the waiting list."
+        }
+      ],
+
+      "groups": [
+        {
+          "groupTitle": "Questions 1–6",
+          "instruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE if the statement agrees, FALSE if it contradicts, NOT GIVEN if there is no information.",
+          "displayType": "TRUE_FALSE_NG",
+          "questions": [
+            {
+              "questionNumber": 1,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "Dry cleaners are generally responsible for items left with them, even if there's a sign saying the opposite.",
+              "correctAnswer": "TRUE",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            },
+            {
+              "questionNumber": 2,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "If the dry cleaner loses an item, they should give you enough money to buy a completely new one.",
+              "correctAnswer": "FALSE",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            },
+            {
+              "questionNumber": 3,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "If you have the receipt, the company should refund the amount you originally paid.",
+              "correctAnswer": "NOT GIVEN",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            },
+            {
+              "questionNumber": 4,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "It may be possible to get support for your complaint from a dry cleaners' trade association.",
+              "correctAnswer": "TRUE",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            },
+            {
+              "questionNumber": 5,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "If offered too little compensation, you can request a free report from an independent organisation.",
+              "correctAnswer": "FALSE",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            },
+            {
+              "questionNumber": 6,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "Most people who take a case about a dry-cleaning company to court are satisfied with the outcome.",
+              "correctAnswer": "NOT GIVEN",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Question 7",
+          "instruction": "Write TRUE / FALSE / NOT GIVEN.",
+          "displayType": "TRUE_FALSE_NG",
+          "questions": [
+            {
+              "questionNumber": 7,
+              "questionTypeId": 2,
+              "displayTypeId": "TRUE_FALSE_NG",
+              "questionText": "If an item was lost nine months ago, you can still take the dry cleaner to court.",
+              "correctAnswer": "TRUE",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "TRUE",      "text": "TRUE" },
+                { "label": "FALSE",     "text": "FALSE" },
+                { "label": "NOT GIVEN", "text": "NOT GIVEN" }
+              ]
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 8–14",
+          "instruction": "Which paragraph A–F mentions the following? You may use any letter more than once.",
+          "displayType": "MATCHING",
+          "matchOptions": ["A", "B", "C", "D", "E", "F"],
+          "questions": [
+            {
+              "questionNumber": 8,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "Members share ideas for the books they would like to read.",
+              "correctAnswer": "A",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 9,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "It isn't possible for any new members to join this group at present.",
+              "correctAnswer": "F",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 10,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "You can get feedback on your own work from other members.",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 11,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "This group focuses on stories belonging to just one genre.",
+              "correctAnswer": "C",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 12,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "Work produced by members will be available to the public.",
+              "correctAnswer": "F",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 13,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "This group doesn't read or write either poetry or fiction.",
+              "correctAnswer": "E",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 14,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING",
+              "questionText": "This group would suit someone who thinks they could write a book.",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "sectionNumber": 2,
+      "label": "Section 2",
+      "partLabel": "Part 2",
+      "questionRange": "Q15–27",
+      "questionFrom": 15,
+      "questionTo": 27,
+      "totalQuestions": 13,
+      "timeLimit": 1200,
+
+      "passages": [
+        {
+          "passageOrder": 1,
+          "title": "Mechanical lifting equipment",
+          "content": "If some simple precautions are taken, lifting equipment that is essential for construction and engineering projects can be used safely. Forklift trucks, lifting trolleys, mobile and fixed cranes and all their parts are classed as lifting equipment.\n\nAll equipment used for lifting or moving heavy loads should be properly constructed. For example, equipment bearing a CE mark has been constructed to international standards. In addition, equipment that meets these standards will have documented instructions for tests that should be adhered to prior to using the equipment. Certain types of machinery, such as cranes, must be inspected by a qualified engineer on a six-monthly basis.\n\nFor operations that use cranes, a formal lift plan must be prepared. Lift plans are a type of risk assessment, whereby the possible dangers of the operation are carefully calculated, and control measures are identified and put in place. Before any lift proceeds, the plan should be talked over with the lifting crew during what is often referred to as a 'Tool Box Talk' (TBT). This is an important opportunity for them to ask questions about their role in the operation.\n\nWhen heavy loads are being moved around, there are some practical things that should be done to prevent accidents. Firstly, if a load needs to be moved where workers or members of the public are present, the area must have barriers or other means to ensure no one is allowed to walk under the load while it is moving. Secondly, someone called a banksman should always be used when moving heavy loads by crane. As a crane driver often cannot see the load, especially during touch-down, this person tells him or her which way to move it.\n\nIt is very unusual for machinery such as cranes to fail. However, it is all too easy to ignore the importance of the secondary equipment. This refers to those items that are attached between the mechanical lifting machine and the load that is being lifted. Chains, slings, shackles and rigging are all examples of secondary lifting equipment, and it is perhaps surprising to note that most injuries occur due to faults or weaknesses in these items. It is essential that a six-monthly visual inspection is carried out to ensure there are no signs of wear or damage to the slings and shackles."
+        },
+        {
+          "passageOrder": 2,
+          "title": "Dealing with customer complaints",
+          "content": "When a customer complains, it is usually for a good reason. Here are some strategies that will help you handle a customer complaint in a smooth and professional manner.\n\nWhen a customer presents you with a complaint, keep in mind that the issue is not personal. Aiming to win the confrontation accomplishes nothing. He or she has usually made a purchase that did not meet their expectations – a product, service, or maybe a combination of the two. A worker who remains in control of their emotions deals from a position of strength.\n\nLet the customer say what they need to. Respond with phrases such as, 'Hmm', 'I see', and 'Tell me more'. Then be quiet. As the customer expresses their annoyance yet sees you are not reacting, he or she will begin to relax. The customer needs to do this before being able to hear your solution.\n\nWhen the customer has calmed down and feels you have heard his or her side, start asking questions. Be careful not to give scripted replies but use this as an opportunity to start a genuine conversation, building a relationship of trust with your customer. To help you understand the situation, get as many details as possible.\n\nTake charge of the situation and let the customer know what you are going to do to solve the problem. One thing to keep in mind is that you should know what you can and cannot do within the policy of the business you work for. The cost could be minimal – maybe a simple upgrade on the customer's next purchase or a small gift certificate. A simple gesture like this could result in a word-of-mouth recommendation to others, while making a promise you cannot commit to will only set you back."
+        }
+      ],
+
+      "groups": [
+        {
+          "groupTitle": "Questions 15–22",
+          "instruction": "Complete the notes below. Choose NO MORE THAN TWO WORDS from the text for each answer.",
+          "displayType": "FILL_BLOCK",
+          "subBlocks": [
+            {
+              "blockTitle": "Lifting equipment",
+              "questions": [
+                {
+                  "questionNumber": 15,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• must be manufactured well, e.g., have a ___ on it",
+                  "blankPosition": "middle",
+                  "inputWidth": 100,
+                  "correctAnswer": "CE mark",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "questionNumber": 16,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• may need to undergo ___ before use",
+                  "blankPosition": "middle",
+                  "inputWidth": 100,
+                  "correctAnswer": "tests",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "questionNumber": 17,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• may need a regular check by a ___",
+                  "blankPosition": "end",
+                  "inputWidth": 130,
+                  "correctAnswer": "qualified engineer",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "blockTitle": "Lift plans",
+              "questions": [
+                {
+                  "questionNumber": 18,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• establish and carry out ___ for any risks",
+                  "blankPosition": "middle",
+                  "inputWidth": 120,
+                  "correctAnswer": "control measures",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "questionNumber": 19,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• a ___ consulted during 'Tool Box Talk'",
+                  "blankPosition": "middle",
+                  "inputWidth": 110,
+                  "correctAnswer": "lifting crew",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "blockTitle": "Preventing accidents",
+              "questions": [
+                {
+                  "questionNumber": 20,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• use ___ so load doesn't pass over anyone's head",
+                  "blankPosition": "middle",
+                  "inputWidth": 100,
+                  "correctAnswer": "barriers",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "questionNumber": 21,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• appoint a ___ to give verbal directions to crane driver",
+                  "blankPosition": "middle",
+                  "inputWidth": 100,
+                  "correctAnswer": "banksman",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "blockTitle": "Secondary equipment",
+              "questions": [
+                {
+                  "questionNumber": 22,
+                  "questionTypeId": 3,
+                  "displayTypeId": "FILL_BLOCK",
+                  "lineTemplate": "• more likely to cause ___",
+                  "blankPosition": "end",
+                  "inputWidth": 100,
+                  "correctAnswer": "injuries",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 23–27",
+          "instruction": "Complete the table below. Choose ONE WORD ONLY from the text for each answer.",
+          "displayType": "TABLE_COMPLETION",
+          "tableHeaders": ["Strategy", "Your approach", "The customer"],
+          "tableRows": [
+            {
+              "strategy": "Stay calm",
+              "cells": [
+                {
+                  "cellText": "Do not try to ___ the argument",
+                  "questionNumber": 23,
+                  "questionTypeId": 3,
+                  "displayTypeId": "TABLE_COMPLETION",
+                  "inputWidth": 75,
+                  "correctAnswer": "win",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "cellText": "Had ___ not fulfilled",
+                  "questionNumber": 24,
+                  "questionTypeId": 3,
+                  "displayTypeId": "TABLE_COMPLETION",
+                  "inputWidth": 95,
+                  "correctAnswer": "expectations",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "strategy": "Listen well",
+              "cells": [
+                {
+                  "cellText": "Use short phrases",
+                  "questionNumber": null,
+                  "inputWidth": null,
+                  "correctAnswer": null,
+                  "choices": []
+                },
+                {
+                  "cellText": "Cannot recognise a ___ until calm",
+                  "questionNumber": 25,
+                  "questionTypeId": 3,
+                  "displayTypeId": "TABLE_COMPLETION",
+                  "inputWidth": 75,
+                  "correctAnswer": "solution",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "strategy": "Get the facts",
+              "cells": [
+                {
+                  "cellText": "Start genuine conversation",
+                  "questionNumber": null,
+                  "inputWidth": null,
+                  "correctAnswer": null,
+                  "choices": []
+                },
+                {
+                  "cellText": "Will start to trust you",
+                  "questionNumber": null,
+                  "inputWidth": null,
+                  "correctAnswer": null,
+                  "choices": []
+                }
+              ]
+            },
+            {
+              "strategy": "Suggest action",
+              "cells": [
+                {
+                  "cellText": "Be sure of company's ___",
+                  "questionNumber": 26,
+                  "questionTypeId": 3,
+                  "displayTypeId": "TABLE_COMPLETION",
+                  "inputWidth": 75,
+                  "correctAnswer": "policy",
+                  "alternateAnswers": [],
+                  "choices": []
+                },
+                {
+                  "cellText": "May make a verbal ___",
+                  "questionNumber": 27,
+                  "questionTypeId": 3,
+                  "displayTypeId": "TABLE_COMPLETION",
+                  "inputWidth": 105,
+                  "correctAnswer": "recommendation",
+                  "alternateAnswers": [],
+                  "choices": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "sectionNumber": 3,
+      "label": "Section 3",
+      "partLabel": "Part 3",
+      "questionRange": "Q28–40",
+      "questionFrom": 28,
+      "questionTo": 40,
+      "totalQuestions": 13,
+      "timeLimit": 1200,
+
+      "passages": [
+        {
+          "passageOrder": 1,
+          "title": "White storks back in Britain after hundreds of years",
+          "subtitle": "These beautiful birds could be about to become a feature of the British landscape again",
+          "content": "A. The last definitive record of a pair of white storks successfully breeding in Britain was in 1416, from a nest on St Giles Cathedral in Edinburgh. No one knows why storks disappeared from our shores. They often featured on the menus of medieval banquets so we might, quite simply, have consumed them all. But there could be a more ominous reason. Storks are migrants arriving after the end of winter, nesting on rooftops and happily associating with humans, and because of this they have long been a symbol of hope and new life. Yet their association with rebirth also meant they became a symbol of rebellion. Shortly after the restoration of King Charles II in 1660, while storks were rare but surviving, parliament debated putting greater effort into destroying them entirely for fear they might inspire republicanism. Today, fortunately, that notion has disappeared, and the stork retains its association with new life, appearing on cards given to celebrate the arrival of a new child.\n\nB. So, after such a long absence, there was great excitement when in April of this year a pair of white storks built an untidy nest of sticks in the top branches of a huge oak in the middle of our rewilding project at Knepp Estate in West Sussex. Drone footage showed three large eggs. The fact that they were infertile and did not hatch was not too disappointing. The pair are only four years old, and storks can live to over thirty, with their first attempts to breed often failing. These young storks are part of a project to return the species to Britain, inspired by reintroductions in European countries. Imported from Poland, they have spent the best part of three years in a six-acre pen. Other birds have already shown strong loyalty to the site. Two years ago, a young bird from Knepp flew across the Channel to France and, this summer, returned to its companions.\n\nC. In the face of reports of unrelenting ecological loss (the UN estimates a million species are on the brink of extinction globally), the white stork's return is refreshing news. As tens of thousands of people demonstrate about the growing climate crisis and eco-anxiety besets us, these glimpses of restoration are important. The ecologist Chris Packham described the project as 'imaginative, intelligent, progressive and practical'.\n\nD. And yet its path to restoration in the UK has not been smooth. Support from conservation bodies has been surprisingly difficult to obtain; some were hard-pressed with their own initiatives, while others were simply reluctant to stick their necks out. The committee of the Sussex Wildlife Trust raised doubts about the stork ever having been a British bird. They also had concerns that English-bred birds would migrate across the Channel, and feared that their messy nests and closeness to humans would cause a hazard. The project has had to rely on private individuals building the introduction pens and feeding the birds at their own expense. The expertise of conservation charities such as the Roy Dennis Wildlife Foundation and the support of Cotswold Wildlife Park have proved invaluable.\n\nE. Across Europe, as stork populations have suffered from the draining of wetlands and disappearance of insect-rich pastures, their loss has been felt deeply. Where storks have been reintroduced, they are greeted with great happiness and some historical stork festivals have been restored. The Spanish erect poles for nests along their motorways, and in Alsace householders install cartwheels for storks to build nests on their roofs. During a cold snap in Bulgaria last March, villagers even gave white storks access to their homes.\n\nF. A driving motivation behind the project in the UK is the aspiration that the storks' return will spark feelings of empathy and affection from townspeople who see their nests on rooftops. White storks could be that charismatic species that connects urban communities directly with landscape restoration. The name of our local village, Storrington, was originally 'Estorcheton' or 'home of the storks'. The public response has been overwhelming, with crowds coming to see white storks flying free in England for the first time in hundreds of years, and private landowners queueing up to offer more introduction sites."
+        }
+      ],
+
+      "groups": [
+        {
+          "groupTitle": "Questions 28–33",
+          "instruction": "Choose the correct heading for sections A–F from the list.",
+          "displayType": "MATCHING_HEADINGS",
+          "headingList": [
+            { "label": "i",    "text": "An enterprise arising from success in other countries" },
+            { "label": "ii",   "text": "The hope that storks will inspire a range of emotions" },
+            { "label": "iii",  "text": "Support from some organisations but not others" },
+            { "label": "iv",   "text": "Finding new types of habitats" },
+            { "label": "v",    "text": "Opposition from the general public" },
+            { "label": "vi",   "text": "A sign of hope in difficult times" },
+            { "label": "vii",  "text": "Creatures representing both joy and opposition" },
+            { "label": "viii", "text": "Storks causing delight and revival of public events" }
+          ],
+          "questions": [
+            {
+              "questionNumber": 28,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section A",
+              "correctAnswer": "vii",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 29,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section B",
+              "correctAnswer": "i",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 30,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section C",
+              "correctAnswer": "vi",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 31,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section D",
+              "correctAnswer": "iii",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 32,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section E",
+              "correctAnswer": "viii",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 33,
+              "questionTypeId": 4,
+              "displayTypeId": "MATCHING_HEADINGS",
+              "questionText": "Section F",
+              "correctAnswer": "ii",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 34–37",
+          "instruction": "Complete the summary. Choose ONE WORD ONLY from the text for each answer.",
+          "displayType": "SUMMARY_COMPLETION",
+          "summaryTitle": "Project to reintroduce white storks at Knepp Estate",
+          "summaryTemplate": "Last spring, two white storks put [34] together high in a large oak. The female laid three eggs, which proved to be [35]. The storks were bred in [36] and kept for several years before being released. Other storks are developing a sense of [37] to their new home.",
+          "questions": [
+            {
+              "questionNumber": 34,
+              "questionTypeId": 7,
+              "displayTypeId": "SUMMARY_COMPLETION",
+              "questionText": "[34]",
+              "inputWidth": 80,
+              "correctAnswer": "sticks",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 35,
+              "questionTypeId": 7,
+              "displayTypeId": "SUMMARY_COMPLETION",
+              "questionText": "[35]",
+              "inputWidth": 85,
+              "correctAnswer": "infertile",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 36,
+              "questionTypeId": 7,
+              "displayTypeId": "SUMMARY_COMPLETION",
+              "questionText": "[36]",
+              "inputWidth": 75,
+              "correctAnswer": "Poland",
+              "alternateAnswers": [],
+              "choices": []
+            },
+            {
+              "questionNumber": 37,
+              "questionTypeId": 7,
+              "displayTypeId": "SUMMARY_COMPLETION",
+              "questionText": "[37]",
+              "inputWidth": 75,
+              "correctAnswer": "loyalty",
+              "alternateAnswers": [],
+              "choices": []
+            }
+          ]
+        },
+
+        {
+          "groupTitle": "Questions 38–40",
+          "instruction": "Choose the correct letter, A, B, C or D.",
+          "displayType": "MULTIPLE_CHOICE",
+          "questions": [
+            {
+              "questionNumber": 38,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "In Section A, we learn that in the past people thought white storks",
+              "correctAnswer": "D",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "represented the deep snow and cold days of winter." },
+                { "label": "B", "text": "had the power to ensure that babies were born safely." },
+                { "label": "C", "text": "were a speciality that only the very rich were allowed to eat." },
+                { "label": "D", "text": "might be used to encourage people to get rid of the monarchy." }
+              ]
+            },
+            {
+              "questionNumber": 39,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "The Sussex Wildlife Trust committee was unwilling to support the reintroduction because they believed that",
+              "correctAnswer": "D",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "storks had never actually lived in Britain." },
+                { "label": "B", "text": "the project would require too much funding." },
+                { "label": "C", "text": "storks would not be able to find enough food." },
+                { "label": "D", "text": "the birds would cause problems for local people." }
+              ]
+            },
+            {
+              "questionNumber": 40,
+              "questionTypeId": 1,
+              "displayTypeId": "MULTIPLE_CHOICE",
+              "questionText": "What does the writer suggest is the main aim of the reintroduction project?",
+              "correctAnswer": "B",
+              "alternateAnswers": [],
+              "choices": [
+                { "label": "A", "text": "To increase the overall number of storks in Europe." },
+                { "label": "B", "text": "To help people feel more connected to the natural environment." },
+                { "label": "C", "text": "To promote wildlife tourism in West Sussex." },
+                { "label": "D", "text": "To demonstrate what private funding can achieve." }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

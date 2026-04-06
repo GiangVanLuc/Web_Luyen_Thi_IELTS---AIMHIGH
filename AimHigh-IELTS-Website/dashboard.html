@@ -7,20 +7,104 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/test.css">
+    
+    <style>
+        /* =========================================
+           1. BIẾN CƠ BẢN & LAYOUT GỐC
+           ========================================= */
+        :root {
+            --primary-color: #d4a017;
+            --primary-dark: #8a6b00;
+            --text-primary: #3f3300;
+            --border-color: #eadca8;
+            --bg-theme: #fffaf0; 
+            --success-green: #52c41a;
+            --orange-main: #ff7a45;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-theme);
+            margin: 0;
+            padding-top: 72px;
+            color: var(--text-primary);
+        }
+
+        /* --- NAVBAR --- */
+        .navbar { z-index: 1030; background: white !important; border-bottom: 1px solid var(--border-color); height: 72px; }
+        .brand-name { font-size: 1.4rem; font-weight: 800; color: #5D4E00; letter-spacing: 1px; margin-left: 4px; }
+        .nav-link { font-weight: 500; color: var(--text-primary) !important; padding: 6px 16px !important; border-radius: 8px; }
+        .nav-link.active { color: var(--primary-color) !important; background: rgba(212, 160, 23, 0.12); }
+        
+        .dropdown-menu { border: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 8px; border-radius: 12px; min-width: 200px; }
+        .dropdown-item { padding: 10px 16px; border-radius: 8px; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .dropdown-item:hover { background: rgba(212, 160, 23, 0.12); color: var(--primary-color); }
+        
+        .user-btn { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; border: 1.5px solid var(--border-color); border-radius: 999px; padding: 5px 16px 5px 6px; background: none; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+        /* --- LAYOUT --- */
+        .dashboard-wrapper { display: flex; min-height: calc(100vh - 72px); position: relative; overflow-x: hidden; }
+        .dashboard-main { flex: 1; padding: 24px; }
+        
+        /* --- PANELS & GRID ĐIỂM --- */
+        .panel-box { background: #fff; border: 1px solid #e3e8ef; border-radius: 20px; padding: 20px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .target-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+        .target-item { border: 1px solid #b6c1d0; border-radius: 12px; padding: 12px 10px; text-align: left; background: #f9fafb; position: relative; min-height: 95px; display: flex; flex-direction: column; justify-content: space-between; }
+        .target-item.overall { background: #fcece5; border-color: #f2ddd3; }
+        .target-item p { font-size: 11px; color: #5e6f85; margin: 0; font-weight: 500; line-height: 1.3; }
+        .target-item h4 { font-size: 24px; font-weight: 800; margin: 0; color: #101828; }
+        .overall h4, .overall p { color: var(--orange-main); }
+        .edit-icon { position: absolute; bottom: 8px; right: 8px; color: #98a2b3; cursor: pointer; font-size: 15px; }
+
+        /* =========================================
+           2. TÍNH NĂNG MỚI (SCROLL CALENDAR, TABLE, MODAL)
+           ========================================= */
+
+        /* --- BIỂU ĐỒ CHĂM CHỈ (Cuộn) --- */
+        .calendar-container { max-height: 380px; overflow-y: auto; padding-right: 5px; }
+        .calendar-container::-webkit-scrollbar { width: 6px; }
+        .calendar-container::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
+        .month-label { font-weight: 700; font-size: 18px; margin: 20px 0 10px 60px; color: #111; }
+        .calendar-layout { display: flex; width: 100%; }
+        .week-label { display: flex; align-items: center; color: #8c8c8c; font-size: 13px; }
+        .day-matrix { flex: 1; display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 8px; }
+        .day-head { text-align: center; font-size: 13px; font-weight: 600; color: #888; margin-bottom: 5px; }
+        .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #f0f0f0; font-size: 14px; color: #555;}
+        .day-cell.submitted { background: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 700; }
+
+        /* --- THỐNG KÊ BẢNG --- */
+        .weekly-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        .weekly-table th { background: #fdf6e9; padding: 12px; font-size: 13px; font-weight: 600; text-align: center; color: var(--primary-dark); border-bottom: 2px solid var(--border-color); }
+        .weekly-table td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+        .total-row { font-weight: 700; background: rgba(212, 160, 23, 0.12); color: var(--text-primary); border-top: 2px solid var(--border-color); }
+
+        /* --- MODAL STYLE (Chung) --- */
+        .modal-content { border-radius: 16px; border: none; padding: 20px; }
+        .btn-submit-theme { background: var(--primary-color); color: white; border-radius: 999px; padding: 12px 40px; border: none; font-weight: 700; display: block; margin: 20px auto 0; width: fit-content; transition: 0.2s;}
+        .btn-submit-theme:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+        /* Modal Mục tiêu */
+        .goal-tag { background: var(--primary-color); color: white; padding: 2px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; width: fit-content; margin: 0 auto 10px; }
+        .modal-h2 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 25px; color: #111;}
+
+        /* Modal Lịch thi */
+        .modal-calendar-icon { width: 48px; height: 48px; background: rgba(212, 160, 23, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .modal-calendar-icon i { font-size: 24px; color: var(--primary-color); }
+        .date-select-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .date-select-col { flex: 1; position: relative; }
+        .date-select-col label { display: block; font-size: 12px; color: #888; margin-bottom: 8px; text-align: left; padding-left: 5px;}
+        .custom-select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid #eee; background: #f9f9f9; font-weight: 500; appearance: none; cursor: pointer; color: #333;}
+        .date-select-col::after { content: '\F282'; font-family: 'bootstrap-icons'; position: absolute; right: 12px; bottom: 12px; color: #999; font-size: 12px; pointer-events: none;}
+    </style>
 </head>
 <body>
-    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" aria-label="Thu gọn menu" title="Thu gọn menu">
-        <i class="bi bi-chevron-left"></i>
-    </button>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030; background: white;">
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="index.html">
                 <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
+                <span class="brand-name">AimHigh</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -28,10 +112,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Trang chủ</a>
+                        <a class="nav-link " href="index.html">Trang chủ</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Luyện thi</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
                             <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
@@ -39,8 +123,19 @@
                             <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.html">Dashboard</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Từ vựng</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i> Flashcard</a></li>
+                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">My Journal</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử làm bài</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <div class="nav-user">
@@ -53,7 +148,7 @@
                             <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
                             <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i> Cài đặt</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -62,92 +157,36 @@
     </nav>
 
     <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
-            <div class="sidebar-menu">
-                <div class="menu-label">Home</div>
-                <a href="dashboard.html" class="menu-item active">
-                    <i class="bi bi-grid-1x2"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="result.html" class="menu-item">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Lịch sử làm bài</span>
-                </a>
-
-                <div class="menu-divider"></div>
-
-                <div class="menu-label">Luyện thi</div>
-                <a href="listening.html" class="menu-item">
-                    <i class="bi bi-headphones"></i>
-                    <span>Listening</span>
-                </a>
-                <a href="reading.html" class="menu-item">
-                    <i class="bi bi-book"></i>
-                    <span>Reading</span>
-                </a>
-                <a href="writing.html" class="menu-item">
-                    <i class="bi bi-pencil"></i>
-                    <span>Writing</span>
-                </a>
-                <a href="speaking.html" class="menu-item">
-                    <i class="bi bi-mic"></i>
-                    <span>Speaking</span>
-                </a>
-
-                <div class="menu-divider"></div>
-
-                <div class="menu-label">Từ vựng</div>
-                <a href="vocabulary.html" class="menu-item">
-                    <i class="bi bi-collection"></i>
-                    <span>Kho từ vựng AimHigh</span>
-                </a>
-                <a href="flashcard.html" class="menu-item">
-                    <i class="bi bi-bookmark-heart"></i>
-                    <span>Your library</span>
-                </a>
-            </div>
-            
-        </aside>
-
-        <!-- Main Content -->
         <main class="dashboard-main">
-            <div class="dashboard-container">
+            <div class="container-fluid p-0">
                 <div class="row g-4 mb-4">
                     <div class="col-lg-6">
-                        <section class="panel-box target-panel">
-                            <header class="panel-head">
-                                <h3><i class="bi bi-bullseye me-2"></i>Mục tiêu của bạn</h3>
-                            </header>
+                        <section class="panel-box">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-bullseye text-danger me-2"></i>Mục tiêu của bạn</h5>
                             <div class="target-grid">
-                                <div class="target-item active overall-item">
-                                    <p>Overall score</p>
-                                    <h4 id="targetOverallValue">_</h4>
-                                    <button type="button" class="icon-btn open-goal-modal" aria-label="Mở popup đặt mục tiêu">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                </div>
-                                <div class="target-item skill-item"><p>Reading</p><h4 id="targetReadingValue">_</h4></div>
-                                <div class="target-item skill-item"><p>Listening</p><h4 id="targetListeningValue">_</h4></div>
-                                <div class="target-item skill-item"><p>Writing</p><h4 id="targetWritingValue">_</h4></div>
-                                <div class="target-item skill-item"><p>Speaking</p><h4 id="targetSpeakingValue">_</h4></div>
+                                <div class="target-item overall"><p>Overall<br>score</p><h4 id="ovDisplay">7.5</h4><i class="bi bi-pencil edit-icon" data-bs-toggle="modal" data-bs-target="#goalModal"></i></div>
+                                <div class="target-item"><p>Reading</p><h4 id="rDisplay">8.0</h4></div>
+                                <div class="target-item"><p>Listening</p><h4 id="lDisplay">7.5</h4></div>
+                                <div class="target-item"><p>Writing</p><h4 id="wDisplay">6.5</h4></div>
+                                <div class="target-item"><p>Speaking</p><h4 id="sDisplay">7.0</h4></div>
                             </div>
                         </section>
                     </div>
                     <div class="col-lg-6">
                         <section class="panel-box">
-                            <header class="panel-head">
-                                <h3><i class="bi bi-calendar-event me-2"></i>Lịch thi</h3>
-                            </header>
-                            <div class="exam-grid">
-                                <div class="exam-item">
-                                    <p>Ngày dự thi</p>
-                                    <h4>_ / _ / _</h4>
-                                    <i class="bi bi-pencil"></i>
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="fw-bold m-0"><i class="bi bi-calendar-event text-primary me-2"></i>Lịch thi</h5>
+                            </div>
+                            <div class="d-flex justify-content-around text-center py-3">
+                                <div style="position:relative">
+                                    <p class="text-muted small mb-1">Ngày dự thi</p>
+                                    <h4 class="fw-bold" id="examDateText">23 / 6 / 2027</h4>
+                                    <i class="bi bi-pencil edit-icon" style="top: 25px; right: -25px; bottom: auto;" data-bs-toggle="modal" data-bs-target="#dateModal"></i>
                                 </div>
-                                <div class="exam-item">
-                                    <p>Số ngày còn lại</p>
-                                    <h4>_ ngày</h4>
+                                <div class="vr"></div>
+                                <div>
+                                    <p class="text-muted small mb-1">Số ngày còn lại</p>
+                                    <h4 class="fw-bold text-danger" id="daysLeftText">447 ngày</h4>
                                 </div>
                             </div>
                         </section>
@@ -156,60 +195,29 @@
 
                 <div class="row g-4">
                     <div class="col-lg-6">
-                        <section class="panel-box calendar-box">
-                            <header class="panel-head panel-head-between">
-                                <div>
-                                    <h3>Biểu đồ “chăm chỉ” của bạn</h3>
-                                    <p>Bấm vào ngày/tuần để xem thống kê chi tiết số bài đã làm</p>
-                                </div>
-                                <span class="submit-flag"><i class="bi bi-circle-fill"></i> Có nộp bài</span>
-                            </header>
-                            <div class="calendar-grid">
-                                <div class="week-labels">
-                                    <span>Tuần 1</span>
-                                    <span>Tuần 2</span>
-                                    <span>Tuần 3</span>
-                                    <span>Tuần 4</span>
-                                    <span>Tuần 5</span>
-                                </div>
-                                <div class="day-matrix">
-                                    <div class="day-head">T2</div><div class="day-head">T3</div><div class="day-head">T4</div><div class="day-head">T5</div><div class="day-head">T6</div><div class="day-head">T7</div><div class="day-head">CN</div>
-                                    <div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell">1</div><div class="day-cell">2</div>
-                                    <div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div><div class="day-cell">8</div><div class="day-cell">9</div>
-                                    <div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div><div class="day-cell">15</div><div class="day-cell">16</div>
-                                    <div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div><div class="day-cell">20</div><div class="day-cell">21</div><div class="day-cell">22</div><div class="day-cell">23</div>
-                                    <div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div><div class="day-cell">27</div><div class="day-cell">28</div><div class="day-cell">29</div><div class="day-cell">30</div>
-                                </div>
+                        <section class="panel-box" style="background:#fcfcfd">
+                            <h5 class="fw-bold mb-1">Biểu đồ “chăm chỉ” của bạn</h5>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <p class="text-muted small m-0">Bấm vào ngày/tuần để xem thống kê chi tiết</p>
+                                <span class="small text-muted"><i class="bi bi-circle-fill me-1" style="color:var(--primary-color)"></i> Có nộp bài</span>
                             </div>
+                            <div class="calendar-container" id="calendarScroll">
+                                </div>
                         </section>
                     </div>
+
                     <div class="col-lg-6">
-                        <section class="panel-box table-box">
-                            <header class="panel-head">
-                                <h3>Thống kê số bài đã làm trong tuần</h3>
-                            </header>
+                        <section class="panel-box">
+                            <h5 class="fw-bold mb-4">Thống kê số bài đã làm trong tuần</h5>
                             <div class="table-responsive">
-                                <table class="table weekly-table mb-0">
+                                <table class="weekly-table">
                                     <thead>
-                                        <tr>
-                                            <th>Ngày</th>
-                                            <th>Reading</th>
-                                            <th>Listening</th>
-                                            <th>Writing</th>
-                                            <th>Speaking</th>
-                                            <th>Thời gian học</th>
-                                        </tr>
+                                        <tr><th>Ngày</th><th>Reading</th><th>Listening</th><th>Writing</th><th>Speaking</th><th>Thời gian học</th></tr>
                                     </thead>
-                                    <tbody>
-                                        <tr><td>09/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>10/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>11/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>12/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>13/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>14/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr><td>15/03/2026</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>
-                                        <tr class="total-row"><td>Tổng cộng</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0m</td></tr>
-                                    </tbody>
+                                    <tbody id="weekStats"></tbody>
+                                    <tfoot>
+                                        <tr class="total-row" id="totalStats"></tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </section>
@@ -219,750 +227,242 @@
         </main>
     </div>
 
-    <div class="modal fade" id="goalModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered goal-modal-dialog">
-            <div class="modal-content goal-modal-content">
-                <div class="goal-modal-head">
-                    <span class="goal-tag">IELTS</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="goalModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="d-flex justify-content-end"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="goal-tag">IELTS</div>
+                <h2 class="modal-h2">Điểm IELTS mong muốn</h2>
+                
+                <div class="row g-3 px-3">
+                    <div class="col-6"><label class="small fw-bold text-muted mb-1">Điểm Reading</label><select class="form-select py-3 bg-light" id="inR"></select></div>
+                    <div class="col-6"><label class="small fw-bold text-muted mb-1">Điểm Listening</label><select class="form-select py-3 bg-light" id="inL"></select></div>
+                    <div class="col-6"><label class="small fw-bold text-muted mb-1">Điểm Writing</label><select class="form-select py-3 bg-light" id="inW"></select></div>
+                    <div class="col-6"><label class="small fw-bold text-muted mb-1">Điểm Speaking</label><select class="form-select py-3 bg-light" id="inS"></select></div>
                 </div>
-                <div class="goal-modal-body">
-                    <h2>Điểm IELTS mong muốn</h2>
-                    <div class="goal-input-grid">
-                        <div class="goal-field">
-                            <label for="goalReading">Điểm Reading</label>
-                            <select id="goalReading" class="form-select goal-select"></select>
-                        </div>
-                        <div class="goal-field">
-                            <label for="goalListening">Điểm Listening</label>
-                            <select id="goalListening" class="form-select goal-select"></select>
-                        </div>
-                        <div class="goal-field">
-                            <label for="goalWriting">Điểm Writing</label>
-                            <select id="goalWriting" class="form-select goal-select"></select>
-                        </div>
-                        <div class="goal-field">
-                            <label for="goalSpeaking">Điểm Speaking</label>
-                            <select id="goalSpeaking" class="form-select goal-select"></select>
-                        </div>
-                    </div>
-
-                    <div class="goal-overall-row">
-                        <span>*Overall score:</span>
-                        <strong id="goalOverallPreview">_ /9.0</strong>
-                    </div>
-
-                    <div class="goal-modal-actions">
-                        <button type="button" class="btn-save-goal" id="saveGoalBtn">Lưu thông tin</button>
-                    </div>
+                
+                <div class="d-flex justify-content-between mt-4 px-3 pt-3 border-top fw-bold fs-5 text-muted">
+                    <span>*Overall score:</span>
+                    <span style="color: var(--primary-color)">7.5/9.0</span>
                 </div>
+                <button class="btn-submit-theme" id="saveGoalBtn">Lưu thông tin</button>
             </div>
         </div>
     </div>
 
-    <style>
-        .dashboard-wrapper {
-            display: flex;
-            padding-top: 72px;
-            min-height: 100vh;
-            background: #f3f5f9;
-        }
-
-        .dashboard-sidebar {
-            width: 260px;
-            background: #fff;
-            border-right: 1px solid #e3e8ef;
-            padding: 24px 16px;
-            position: fixed;
-            top: 72px;
-            bottom: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.25s ease;
-        }
-
-        .sidebar-menu {
-            flex: 1;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: #667085;
-            font-weight: 500;
-            margin-bottom: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .menu-item:hover,
-        .menu-item.active {
-            background: #edf1f7;
-            color: #1d2939;
-        }
-
-        .menu-divider {
-            height: 1px;
-            background: #e3e8ef;
-            margin: 16px 0;
-        }
-
-        .menu-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #98a2b3;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 8px 16px;
-        }
-
-        .target-widget {
-            background: #161b26;
-            border-radius: 16px;
-            padding: 20px;
-            color: #fff;
-            text-align: center;
-        }
-
-        .target-score {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin: 8px 0;
-        }
-
-        .target-score .current,
-        .target-score .target {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .dashboard-main {
-            flex: 1;
-            margin-left: 260px;
-            min-height: 100vh;
-            transition: margin-left 0.25s ease;
-        }
-
-        .sidebar-toggle-btn {
-            position: fixed;
-            top: 94px;
-            left: 244px;
-            width: 34px;
-            height: 34px;
-            border: 1px solid #cfd6e1;
-            border-radius: 999px;
-            background: #ffffff;
-            color: #344054;
-            z-index: 1041;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(16, 24, 40, 0.12);
-            transition: left 0.25s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-
-        .sidebar-toggle-btn:hover {
-            background: #eef2f7;
-            color: #1d2939;
-            transform: translateX(1px);
-        }
-
-        body.sidebar-collapsed .dashboard-sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .dashboard-main {
-            margin-left: 0;
-        }
-
-        body.sidebar-collapsed .sidebar-toggle-btn {
-            left: 12px;
-        }
-
-        body.sidebar-collapsed .dashboard-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding-left: 52px;
-            padding-right: 52px;
-        }
-
-        .dashboard-container {
-            padding: 28px;
-            max-width: 1380px;
-            margin: 0 auto;
-        }
-
-        .panel-box {
-            background: #fff;
-            border: 1px solid #e3e8ef;
-            border-radius: 18px;
-            padding: 20px;
-            height: 100%;
-        }
-
-        .panel-head {
-            margin-bottom: 16px;
-        }
-
-        .target-panel {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .target-panel .panel-head {
-            margin: 0;
-            padding: 15px 20px;
-            border-bottom: 1px solid #d7dde8;
-        }
-
-        .target-panel .target-grid {
-            padding: 14px;
-        }
-
-        .panel-head h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #101828;
-            margin: 0;
-        }
-
-        .panel-head p {
-            margin: 6px 0 0;
-            color: #667085;
-            font-size: 14px;
-        }
-
-        .panel-head-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .target-grid {
-            display: grid;
-            grid-template-columns: 1.05fr repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .overall-item,
-        .skill-item {
-            min-height: 96px;
-        }
-
-        .target-item,
-        .exam-item {
-            background: #f9fafb;
-            border: 1px solid #b6c1d0;
-            border-radius: 14px;
-            padding: 16px 14px 14px;
-            min-height: 88px;
-        }
-
-        .target-item.active {
-            border-color: #f2ddd3;
-            background: #fcece5;
-        }
-
-        .target-item p,
-        .exam-item p {
-            margin: 0;
-            color: #5e6f85;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .target-item h4,
-        .exam-item h4 {
-            margin: 10px 0 0;
-            font-size: 26px;
-            font-weight: 700;
-            color: #101828;
-        }
-
-        .target-item {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 156px;
-            min-width: 0;
-        }
-
-        .target-item h4 {
-            margin-top: auto;
-            line-height: 1;
-            letter-spacing: 0.01em;
-            white-space: nowrap;
-        }
-
-        .overall-item p,
-        .overall-item h4 {
-            color: #ff6b38;
-        }
-
-        .overall-item h4 {
-            font-size: clamp(42px, 3.8vw, 56px);
-            font-weight: 700;
-        }
-
-        .skill-item h4 {
-            font-size: clamp(24px, 2.2vw, 38px);
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .target-item i,
-        .exam-item i {
-            color: #98a2b3;
-            margin-top: 8px;
-            display: inline-block;
-        }
-
-        .icon-btn {
-            border: 0;
-            background: transparent;
-            color: #8f9db3;
-            padding: 0;
-            margin-top: 0;
-            align-self: flex-end;
-            font-size: 34px;
-            line-height: 1;
-        }
-
-        .icon-btn:hover {
-            color: #6f819d;
-        }
-
-        .exam-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .calendar-box {
-            background: #eef2f8;
-            border-color: #dbe2ee;
-        }
-
-        .submit-flag {
-            font-size: 12px;
-            color: #667085;
-            white-space: nowrap;
-        }
-
-        .submit-flag i {
-            font-size: 8px;
-            color: #98a2b3;
-            margin-right: 4px;
-        }
-
-        .calendar-grid {
-            background: #f8fafc;
-            border: 1px solid #dde3ee;
-            border-radius: 14px;
-            padding: 14px;
-        }
-
-        .week-labels {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
-            font-size: 12px;
-            color: #667085;
-        }
-
-        .day-matrix {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-        }
-
-        .day-head {
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: #475467;
-        }
-
-        .day-cell {
-            height: 36px;
-            border-radius: 10px;
-            border: 1px solid #e4e7ec;
-            background: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 13px;
-            color: #667085;
-        }
-
-        .table-box {
-            background: #f5f7fc;
-            border-color: #dde3ee;
-        }
-
-        .weekly-table {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e4e7ec;
-            width: 100%;
-        }
-
-        .weekly-table th {
-            background: #eef2f8;
-            color: #344054;
-            font-size: 13px;
-            border: none;
-            padding: 12px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .weekly-table td {
-            font-size: 13px;
-            color: #475467;
-            border-color: #f0f2f5;
-            padding: 10px 12px;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .total-row td {
-            font-weight: 700;
-            color: #1d2939;
-            background: #f8f9fc;
-        }
-
-        .goal-modal-content {
-            border: 0;
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        .goal-modal-dialog {
-            max-width: 780px;
-        }
-
-        .goal-modal-head {
-            padding: 18px 22px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .goal-tag {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            color: #fff;
-            background: #ff7a45;
-            border-radius: 4px;
-            padding: 2px 10px;
-        }
-
-        .goal-modal-body {
-            padding: 8px 24px 22px;
-        }
-
-        .goal-modal-body h2 {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 700;
-            margin: 4px 0 18px;
-            color: #111827;
-        }
-
-        .goal-input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px 22px;
-        }
-
-        .goal-field label {
-            display: block;
-            font-size: 20px;
-            font-weight: 500;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-
-        .goal-select {
-            font-size: 24px;
-            font-weight: 600;
-            height: 68px;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            padding-left: 16px;
-        }
-
-        .goal-overall-row {
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: #6b7280;
-        }
-
-        .goal-overall-row strong {
-            color: #ff6b38;
-        }
-
-        .goal-modal-actions {
-            margin-top: 14px;
-            border-top: 1px solid #e5e7eb;
-            padding-top: 16px;
-            text-align: center;
-        }
-
-        .btn-save-goal {
-            border: 0;
-            border-radius: 999px;
-            background: #ff6b38;
-            color: #fff;
-            font-size: 22px;
-            font-weight: 600;
-            padding: 10px 32px;
-            line-height: 1.2;
-        }
-
-        .btn-save-goal:hover {
-            background: #f15b27;
-        }
-
-        @media (max-width: 1199px) {
-            .target-grid {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 10px;
-            }
-
-            .target-item {
-                min-height: 146px;
-            }
-
-            .skill-item h4 {
-                font-size: 32px;
-            }
-        }
-
-        @media (max-width: 991px) {
-            .dashboard-sidebar {
-                display: none;
-            }
-
-            .dashboard-main {
-                margin-left: 0;
-            }
-
-            .sidebar-toggle-btn {
-                display: none;
-            }
-
-            .dashboard-container {
-                padding: 18px;
-            }
-
-            body.sidebar-collapsed .dashboard-container {
-                padding-left: 18px;
-                padding-right: 18px;
-            }
-
-            .target-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .target-item {
-                min-height: 156px;
-            }
-
-            .overall-item h4,
-            .skill-item h4 {
-                font-size: 44px;
-            }
-        }
-
-        @media (max-width: 575px) {
-            .exam-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-head-between {
-                flex-direction: column;
-            }
-
-            .goal-modal-body h2 {
-                font-size: 21px;
-            }
-
-            .goal-input-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .goal-field label {
-                font-size: 16px;
-            }
-
-            .goal-select {
-                font-size: 18px;
-                height: 56px;
-            }
-
-            .goal-overall-row {
-                font-size: 20px;
-            }
-
-            .btn-save-goal {
-                font-size: 18px;
-                width: 100%;
-            }
-        }
-    </style>
+    <div class="modal fade" id="dateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="d-flex justify-content-end"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-calendar-icon"><i class="bi bi-calendar3"></i></div>
+                <h2 class="modal-h2">Ngày dự thi</h2>
+                
+                <div class="date-select-row px-3">
+                    <div class="date-select-col">
+                        <label>Năm</label>
+                        <select class="custom-select" id="pickYear"></select>
+                    </div>
+                    <div class="date-select-col">
+                        <label>Tháng</label>
+                        <select class="custom-select" id="pickMonth"></select>
+                    </div>
+                    <div class="date-select-col">
+                        <label>Ngày</label>
+                        <select class="custom-select" id="pickDay"></select>
+                    </div>
+                </div>
+
+                <button class="btn-submit-theme" id="saveDateBtn">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function () {
-            const key = 'aimhigh_dashboard_sidebar_collapsed';
-            const button = document.getElementById('sidebarToggleBtn');
-            if (!button) return;
+        // 1. LỊCH CHĂM CHỈ (Infinite Scroll)
+        const calContainer = document.getElementById('calendarScroll');
+        
+        let currentDate = new Date();
+        let loadedMonths = 0;
+        const MAX_MONTHS = 24;
 
-            const icon = button.querySelector('i');
-            const updateIcon = () => {
-                const collapsed = document.body.classList.contains('sidebar-collapsed');
-                if (!icon) return;
-                icon.className = collapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
-                button.setAttribute('aria-label', collapsed ? 'Mở menu' : 'Thu gọn menu');
-                button.setAttribute('title', collapsed ? 'Mở menu' : 'Thu gọn menu');
-            };
-
-            if (localStorage.getItem(key) === '1') {
-                document.body.classList.add('sidebar-collapsed');
+        function renderMonth(dateObj, prepend = false) {
+            let year = dateObj.getFullYear();
+            let month = dateObj.getMonth();
+            
+            let firstDay = new Date(year, month, 1);
+            let startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            
+            let lastDay = new Date(year, month + 1, 0);
+            let daysInMonth = lastDay.getDate();
+            
+            let submissions = [];
+            for (let d = 1; d <= daysInMonth; d++) {
+                if (Math.random() > 0.85) submissions.push(d); // Demo data
             }
-            updateIcon();
 
-            button.addEventListener('click', function () {
-                document.body.classList.toggle('sidebar-collapsed');
-                const collapsed = document.body.classList.contains('sidebar-collapsed');
-                localStorage.setItem(key, collapsed ? '1' : '0');
-                updateIcon();
-            });
-        })();
+            let monthStr = `${(month + 1).toString().padStart(2, '0')} / ${year}`;
+            
+            let html = `<div class="month-label">Tháng ${monthStr}</div>
+                        <div class="calendar-layout">
+                            <div class="day-matrix">`;
+            
+            html += `<div class="day-head"></div><div class="day-head">T2</div><div class="day-head">T3</div><div class="day-head">T4</div><div class="day-head">T5</div><div class="day-head">T6</div><div class="day-head">T7</div><div class="day-head">CN</div>`;
 
-        (function () {
-            const storageKey = 'aimhigh_goal_scores';
-            const goalModalElement = document.getElementById('goalModal');
-            const openBtn = document.querySelector('.open-goal-modal');
-            const saveBtn = document.getElementById('saveGoalBtn');
-
-            const readingSelect = document.getElementById('goalReading');
-            const listeningSelect = document.getElementById('goalListening');
-            const writingSelect = document.getElementById('goalWriting');
-            const speakingSelect = document.getElementById('goalSpeaking');
-            const overallPreview = document.getElementById('goalOverallPreview');
-
-            const targetReading = document.getElementById('targetReadingValue');
-            const targetListening = document.getElementById('targetListeningValue');
-            const targetWriting = document.getElementById('targetWritingValue');
-            const targetSpeaking = document.getElementById('targetSpeakingValue');
-            const targetOverall = document.getElementById('targetOverallValue');
-
-            if (!goalModalElement || !openBtn || !saveBtn) return;
-
-            const goalModal = new bootstrap.Modal(goalModalElement);
-
-            const formatScore = (value) => Number(value).toFixed(1);
-
-            const buildScoreOptions = (select) => {
-                for (let s = 4.0; s <= 9.0; s += 0.5) {
-                    const option = document.createElement('option');
-                    option.value = s.toFixed(1);
-                    option.textContent = s.toFixed(1);
-                    select.appendChild(option);
+            let currentWeek = 1;
+            html += `<div class="week-label">Tuần ${currentWeek}</div>`;
+            
+            let currentDayOfWeek = 0;
+            for (let i = 0; i < startOffset; i++) {
+                html += `<div class="day-cell border-0"></div>`;
+                currentDayOfWeek++;
+            }
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                if (currentDayOfWeek === 7) {
+                    currentWeek++;
+                    html += `<div class="week-label">Tuần ${currentWeek}</div>`;
+                    currentDayOfWeek = 0;
                 }
-            };
-
-            [readingSelect, listeningSelect, writingSelect, speakingSelect].forEach(buildScoreOptions);
-
-            const calculateOverall = () => {
-                const r = Number(readingSelect.value);
-                const l = Number(listeningSelect.value);
-                const w = Number(writingSelect.value);
-                const s = Number(speakingSelect.value);
-                const overall = (r + l + w + s) / 4;
-                return Number(overall.toFixed(1));
-            };
-
-            const updatePreview = () => {
-                overallPreview.textContent = formatScore(calculateOverall()) + '/9.0';
-            };
-
-            const renderTargets = (data) => {
-                targetReading.textContent = formatScore(data.reading);
-                targetListening.textContent = formatScore(data.listening);
-                targetWriting.textContent = formatScore(data.writing);
-                targetSpeaking.textContent = formatScore(data.speaking);
-                targetOverall.textContent = formatScore(data.overall);
-            };
-
-            const setSelectValues = (data) => {
-                readingSelect.value = formatScore(data.reading);
-                listeningSelect.value = formatScore(data.listening);
-                writingSelect.value = formatScore(data.writing);
-                speakingSelect.value = formatScore(data.speaking);
-                updatePreview();
-            };
-
-            const defaultData = {
-                reading: 7.0,
-                listening: 7.0,
-                writing: 7.0,
-                speaking: 7.0,
-                overall: 7.0
-            };
-
-            let saved = defaultData;
-            try {
-                const raw = localStorage.getItem(storageKey);
-                if (raw) saved = JSON.parse(raw);
-            } catch (err) {
-                saved = defaultData;
+                
+                let isToday = (d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear());
+                let styleToday = isToday ? 'background-color: var(--bg-theme); border: 2px solid var(--primary-color); box-shadow: 0 0 8px rgba(212, 160, 23, 0.4); font-weight: 800; color: var(--primary-dark); transform: scale(1.1); z-index: 1;' : '';
+                html += `<div class="day-cell ${submissions.includes(d) ? 'submitted' : ''}" style="${styleToday}">${d}</div>`;
+                
+                currentDayOfWeek++;
             }
+            
+            html += `</div></div>`;
+            
+            let wrap = document.createElement('div');
+            wrap.innerHTML = html;
+            
+            if (prepend) {
+                let oldScrollHeight = calContainer.scrollHeight;
+                calContainer.insertBefore(wrap, calContainer.firstChild);
+                calContainer.scrollTop = calContainer.scrollHeight - oldScrollHeight;
+            } else {
+                calContainer.appendChild(wrap);
+            }
+        }
 
-            setSelectValues(saved);
-            renderTargets(saved);
+        // Render initial months
+        let renderDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 2, 1);
+        let tempDate = new Date(renderDate);
+        for (let i = 0; i <= 2; i++) {
+            renderMonth(tempDate);
+            loadedMonths++;
+            tempDate.setMonth(tempDate.getMonth() + 1);
+        }
+        calContainer.scrollTop = calContainer.scrollHeight;
 
-            [readingSelect, listeningSelect, writingSelect, speakingSelect].forEach((select) => {
-                select.addEventListener('change', updatePreview);
-            });
+        let currentOldestDate = new Date(renderDate);
 
-            openBtn.addEventListener('click', function () {
-                setSelectValues(saved);
-                goalModal.show();
-            });
+        calContainer.addEventListener('scroll', () => {
+            if (calContainer.scrollTop === 0 && loadedMonths < MAX_MONTHS) {
+                currentOldestDate.setMonth(currentOldestDate.getMonth() - 1);
+                renderMonth(currentOldestDate, true);
+                loadedMonths++;
+            }
+        });
 
-            saveBtn.addEventListener('click', function () {
-                saved = {
-                    reading: Number(readingSelect.value),
-                    listening: Number(listeningSelect.value),
-                    writing: Number(writingSelect.value),
-                    speaking: Number(speakingSelect.value),
-                    overall: calculateOverall()
-                };
+        // 2. BẢNG THỐNG KÊ (Có dòng tổng cộng)
+        const weekDays = ['30/03/2026','31/03/2026','01/04/2026','02/04/2026','03/04/2026','04/04/2026','05/04/2026'];
+        const tbody = document.getElementById('weekStats');
+        weekDays.forEach(d => {
+            tbody.innerHTML += `<tr><td>${d}</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0m</td></tr>`;
+        });
+        document.getElementById('totalStats').innerHTML = `<td>Tổng cộng</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0m</td>`;
 
-                localStorage.setItem(storageKey, JSON.stringify(saved));
-                renderTargets(saved);
-                goalModal.hide();
-            });
-        })();
+        // 3. LOGIC LỊCH THI DYNAMIC
+        const pickYear = document.getElementById('pickYear');
+        const pickMonth = document.getElementById('pickMonth');
+        const pickDay = document.getElementById('pickDay');
+        
+        let currY = new Date().getFullYear();
+        for (let y = currY; y <= currY + 5; y++) {
+            pickYear.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+        for (let m = 1; m <= 12; m++) {
+            pickMonth.innerHTML += `<option value="${m}">Tháng ${m}</option>`;
+        }
+        
+        function updateDays() {
+            let y = parseInt(pickYear.value);
+            let m = parseInt(pickMonth.value);
+            let days = new Date(y, m, 0).getDate();
+            pickDay.innerHTML = '';
+            for (let d = 1; d <= days; d++) {
+                pickDay.innerHTML += `<option value="${d}">${d}</option>`;
+            }
+        }
+        
+        pickYear.addEventListener('change', updateDays);
+        pickMonth.addEventListener('change', updateDays);
+        
+        // Init with current date + 1 month as demo test date
+        let initTarget = new Date();
+        initTarget.setMonth(initTarget.getMonth() + 1);
+        pickYear.value = initTarget.getFullYear();
+        pickMonth.value = initTarget.getMonth() + 1;
+        updateDays();
+        pickDay.value = initTarget.getDate();
+
+        document.getElementById('saveDateBtn').onclick = () => {
+            const y = parseInt(pickYear.value);
+            const m = parseInt(pickMonth.value);
+            const d = parseInt(pickDay.value);
+            
+            document.getElementById('examDateText').innerText = `${d} / ${m} / ${y}`;
+            
+            const target = new Date(y, m - 1, d);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('daysLeftText').innerText = (diff > 0 ? diff : 0) + " ngày";
+            
+            bootstrap.Modal.getInstance(document.getElementById('dateModal')).hide();
+        };
+
+        // 4. LOGIC MỤC TIÊU ĐIỂM
+        const goalSelects = ['inR', 'inL', 'inW', 'inS'];
+        goalSelects.forEach(id => {
+            const select = document.getElementById(id);
+            for (let i = 1.0; i <= 9.0; i += 0.5) {
+                let val = i.toFixed(1);
+                select.innerHTML += `<option value="${val}">${val}</option>`;
+            }
+            select.value = "7.0"; // default fallback
+        });
+        document.getElementById('inR').value = "8.0";
+        document.getElementById('inL').value = "7.5";
+        document.getElementById('inW').value = "6.5";
+        document.getElementById('inS').value = "7.0";
+
+        document.getElementById('saveGoalBtn').onclick = () => {
+            let r = parseFloat(document.getElementById('inR').value);
+            let l = parseFloat(document.getElementById('inL').value);
+            let w = parseFloat(document.getElementById('inW').value);
+            let s = parseFloat(document.getElementById('inS').value);
+            
+            document.getElementById('rDisplay').innerText = r.toFixed(1);
+            document.getElementById('lDisplay').innerText = l.toFixed(1);
+            document.getElementById('wDisplay').innerText = w.toFixed(1);
+            document.getElementById('sDisplay').innerText = s.toFixed(1);
+            
+            let avg = (r + l + w + s) / 4;
+            let remainder = avg % 1;
+            let ov = 0;
+            if (remainder >= 0.75) ov = Math.floor(avg) + 1;
+            else if (remainder >= 0.25) ov = Math.floor(avg) + 0.5;
+            else ov = Math.floor(avg);
+            ov = ov.toFixed(1);
+
+            document.getElementById('ovDisplay').innerText = ov;
+            document.querySelector('.modal-content .fs-5 span:last-child').innerText = ov + "/9.0";
+            
+            bootstrap.Modal.getInstance(document.getElementById('goalModal')).hide();
+        };
     </script>
 </body>
 </html>

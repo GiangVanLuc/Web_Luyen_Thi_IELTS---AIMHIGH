@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcard - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
@@ -18,7 +21,8 @@
                 <span class="brand-name">AIM HIGH</span>
             </a>
             <div class="d-flex align-items-center gap-3">
-                <span class="text-muted small"><i class="bi bi-keyboard"></i> F: Lật thẻ &nbsp;|&nbsp; 1-4: Đánh giá</span>
+                <span class="text-muted small"><i class="bi bi-keyboard"></i> F: Lật thẻ &nbsp;|&nbsp; 1-4: Đánh
+                    giá</span>
                 <a href="dashboard.html" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-grid-1x2"></i> Dashboard
                 </a>
@@ -124,7 +128,8 @@
                         <span id="currentCardNum">1</span> / <span id="totalCards">12</span> thẻ
                     </div>
                     <div class="progress" style="height:8px;flex:1;">
-                        <div class="progress-bar" id="progressBar" style="width:8%;background:var(--primary-color);border-radius:4px;"></div>
+                        <div class="progress-bar" id="progressBar"
+                            style="width:8%;background:var(--primary-color);border-radius:4px;"></div>
                     </div>
                     <span id="progressPercent" class="text-muted small">8%</span>
                 </div>
@@ -136,7 +141,8 @@
                             <div class="fc-word-type" id="wordType">noun</div>
                             <div class="fc-word" id="wordFront">ubiquitous</div>
                             <div class="fc-phonetic" id="phonetic">/juːˈbɪk.wɪ.təs/</div>
-                            <button class="fc-audio-btn" onclick="event.stopPropagation(); playAudio()" title="Nghe phát âm">
+                            <button class="fc-audio-btn" onclick="event.stopPropagation(); playAudio()"
+                                title="Nghe phát âm">
                                 <i class="bi bi-volume-up-fill"></i>
                             </button>
                             <div class="fc-hint">Click để xem nghĩa</div>
@@ -161,7 +167,8 @@
                     <div class="rating-buttons">
                         <button class="btn-rate again" onclick="rateCard(1)">
                             <span class="rate-label">Quên</span>
-                            <span class="rate-time">< 1 phút</span>
+                            <span class="rate-time">
+                                < 1 phút</span>
                         </button>
                         <button class="btn-rate hard" onclick="rateCard(2)">
                             <span class="rate-label">Khó</span>
@@ -230,6 +237,7 @@
             min-height: 100vh;
             background: var(--bg-secondary);
         }
+
         .flashcard-sidebar {
             width: 300px;
             background: white;
@@ -243,6 +251,7 @@
             flex-direction: column;
             gap: 24px;
         }
+
         .flashcard-main {
             flex: 1;
             margin-left: 300px;
@@ -252,36 +261,81 @@
             min-height: calc(100vh - 72px);
             padding: 24px;
         }
+
         .flashcard-study-area {
             width: 100%;
             max-width: 600px;
         }
 
         /* Stats */
-        .fc-stats { }
-        .fc-stats h5 { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 16px; }
-        .fc-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .fc-stats h5 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .fc-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
         .fc-stat {
             background: var(--bg-secondary);
             border-radius: var(--radius-md);
             padding: 12px 8px;
             text-align: center;
         }
-        .fc-stat-num { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
-        .fc-stat-lbl { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
-        .streak-bar { display: flex; gap: 6px; }
+
+        .fc-stat-num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .fc-stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .streak-bar {
+            display: flex;
+            gap: 6px;
+        }
+
         .streak-day {
             flex: 1;
             height: 8px;
             border-radius: 4px;
             background: var(--border-color);
         }
-        .streak-day.done { background: var(--primary-color); }
-        .streak-day.today { background: var(--accent-color); }
+
+        .streak-day.done {
+            background: var(--primary-color);
+        }
+
+        .streak-day.today {
+            background: var(--accent-color);
+        }
 
         /* Decks */
-        .fc-decks-section { flex: 1; }
-        .fc-decks-section h5 { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+        .fc-decks-section {
+            flex: 1;
+        }
+
+        .fc-decks-section h5 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
         .fc-deck {
             display: flex;
             align-items: center;
@@ -292,10 +346,17 @@
             transition: var(--transition);
             margin-bottom: 4px;
         }
-        .fc-deck:hover, .fc-deck.active {
-            background: rgba(37,99,235,0.05);
+
+        .fc-deck:hover,
+        .fc-deck.active {
+            background: rgba(37, 99, 235, 0.05);
         }
-        .fc-deck.active { border-left: 3px solid var(--primary-color); padding-left: 9px; }
+
+        .fc-deck.active {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 9px;
+        }
+
         .deck-icon {
             width: 40px;
             height: 40px;
@@ -306,9 +367,21 @@
             font-size: 1.125rem;
             flex-shrink: 0;
         }
-        .deck-name { font-weight: 600; font-size: 0.9rem; }
-        .deck-count { font-size: 0.8rem; color: var(--text-secondary); }
-        .add-deck-form { margin-top: 8px; }
+
+        .deck-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .deck-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .add-deck-form {
+            margin-top: 8px;
+        }
+
         .profile-input {
             width: 100%;
             padding: 10px 14px;
@@ -318,7 +391,10 @@
             font-family: var(--font-primary);
             outline: none;
         }
-        .profile-input:focus { border-color: var(--primary-color); }
+
+        .profile-input:focus {
+            border-color: var(--primary-color);
+        }
 
         /* Progress Bar */
         .fc-progress-bar {
@@ -327,13 +403,20 @@
             gap: 12px;
             margin-bottom: 32px;
         }
-        .fc-progress-info { font-size: 0.875rem; font-weight: 600; white-space: nowrap; color: var(--text-secondary); }
+
+        .fc-progress-info {
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--text-secondary);
+        }
 
         /* Flashcard */
         .fc-card-wrapper {
             perspective: 1200px;
             margin-bottom: 32px;
         }
+
         .fc-card {
             width: 100%;
             height: 340px;
@@ -343,9 +426,17 @@
             cursor: pointer;
             border-radius: var(--radius-xl);
         }
-        .fc-card:focus { outline: none; }
-        .fc-card.flipped { transform: rotateY(180deg); }
-        .fc-front, .fc-back {
+
+        .fc-card:focus {
+            outline: none;
+        }
+
+        .fc-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .fc-front,
+        .fc-back {
             position: absolute;
             inset: 0;
             border-radius: var(--radius-xl);
@@ -357,26 +448,30 @@
             padding: 40px;
             box-shadow: var(--shadow-xl);
         }
+
         .fc-front {
             background: white;
             border: 2px solid var(--border-color);
         }
+
         .fc-back {
             background: var(--gradient-primary);
             color: white;
             transform: rotateY(180deg);
         }
+
         .fc-word-type {
             font-size: 0.8125rem;
             font-weight: 600;
             color: var(--primary-color);
-            background: rgba(37,99,235,0.1);
+            background: rgba(37, 99, 235, 0.1);
             padding: 4px 12px;
             border-radius: 50px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 16px;
         }
+
         .fc-word {
             font-size: 3rem;
             font-weight: 800;
@@ -384,15 +479,17 @@
             margin-bottom: 8px;
             text-align: center;
         }
+
         .fc-phonetic {
             font-size: 1.125rem;
             color: var(--text-secondary);
             margin-bottom: 24px;
         }
+
         .fc-audio-btn {
             width: 48px;
             height: 48px;
-            background: rgba(37,99,235,0.1);
+            background: rgba(37, 99, 235, 0.1);
             border: none;
             border-radius: 50%;
             color: var(--primary-color);
@@ -401,14 +498,24 @@
             transition: var(--transition);
             margin-bottom: 16px;
         }
-        .fc-audio-btn:hover { background: var(--primary-color); color: white; }
-        .fc-hint { font-size: 0.8125rem; color: var(--text-light); }
+
+        .fc-audio-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .fc-hint {
+            font-size: 0.8125rem;
+            color: var(--text-light);
+        }
+
         .fc-meaning {
             font-size: 1.75rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 16px;
         }
+
         .fc-example {
             font-size: 1rem;
             text-align: center;
@@ -417,18 +524,39 @@
             margin-bottom: 20px;
             font-style: italic;
         }
-        .fc-synonyms { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .fc-synonyms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
         .synonym-tag {
             padding: 4px 12px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 50px;
             font-size: 0.875rem;
         }
 
         /* Rating Buttons */
-        .fc-rating { text-align: center; }
-        .rating-label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px; }
-        .rating-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 12px; }
+        .fc-rating {
+            text-align: center;
+        }
+
+        .rating-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
         .btn-rate {
             flex: 1;
             max-width: 120px;
@@ -442,18 +570,63 @@
             align-items: center;
             gap: 4px;
         }
-        .btn-rate.again { background: rgba(239,68,68,0.1); color: var(--error-color); }
-        .btn-rate.hard { background: rgba(245,158,11,0.1); color: var(--writing-color); }
-        .btn-rate.good { background: rgba(37,99,235,0.1); color: var(--primary-color); }
-        .btn-rate.easy { background: rgba(16,185,129,0.1); color: var(--success-color); }
-        .btn-rate:hover { transform: translateY(-2px); filter: brightness(0.95); }
-        .btn-rate.again:hover { background: rgba(239,68,68,0.2); }
-        .btn-rate.hard:hover { background: rgba(245,158,11,0.2); }
-        .btn-rate.good:hover { background: rgba(37,99,235,0.2); }
-        .btn-rate.easy:hover { background: rgba(16,185,129,0.2); }
-        .rate-label { font-weight: 700; font-size: 0.9375rem; }
-        .rate-time { font-size: 0.75rem; opacity: 0.8; }
-        .rating-shortcut { font-size: 0.8125rem; color: var(--text-secondary); }
+
+        .btn-rate.again {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .btn-rate.hard {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--writing-color);
+        }
+
+        .btn-rate.good {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .btn-rate.easy {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .btn-rate:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.95);
+        }
+
+        .btn-rate.again:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-rate.hard:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-rate.good:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-rate.easy:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .rate-label {
+            font-weight: 700;
+            font-size: 0.9375rem;
+        }
+
+        .rate-time {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .rating-shortcut {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
         .rating-shortcut kbd {
             padding: 2px 8px;
             background: var(--bg-secondary);
@@ -463,7 +636,13 @@
         }
 
         /* Flip Hint */
-        .fc-flip-hint { display: flex; align-items: center; gap: 16px; justify-content: center; }
+        .fc-flip-hint {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            justify-content: center;
+        }
+
         .btn-flip {
             padding: 14px 32px;
             background: var(--primary-color);
@@ -478,7 +657,11 @@
             gap: 8px;
             transition: var(--transition);
         }
-        .btn-flip:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .btn-flip:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
 
         /* Complete Screen */
         .fc-complete {
@@ -488,9 +671,24 @@
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-xl);
         }
-        .complete-icon { font-size: 4rem; margin-bottom: 16px; }
-        .fc-complete h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-        .fc-complete p { color: var(--text-secondary); font-size: 1.125rem; margin-bottom: 24px; }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .fc-complete h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .fc-complete p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 24px;
+        }
+
         .complete-stats {
             display: flex;
             gap: 24px;
@@ -499,13 +697,29 @@
             background: var(--bg-secondary);
             border-radius: var(--radius-lg);
         }
-        .cs-item { text-align: center; }
-        .cs-num { font-size: 2rem; font-weight: 800; }
-        .cs-lbl { font-size: 0.875rem; color: var(--text-secondary); }
+
+        .cs-item {
+            text-align: center;
+        }
+
+        .cs-num {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .cs-lbl {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
 
         @media (max-width: 991px) {
-            .flashcard-sidebar { display: none; }
-            .flashcard-main { margin-left: 0; }
+            .flashcard-sidebar {
+                display: none;
+            }
+
+            .flashcard-main {
+                margin-left: 0;
+            }
         }
     </style>
 
@@ -641,7 +855,7 @@
                 e.preventDefault();
                 flipCard();
             }
-            if (isFlipped && ['1','2','3','4'].includes(e.key)) {
+            if (isFlipped && ['1', '2', '3', '4'].includes(e.key)) {
                 rateCard(parseInt(e.key));
             }
         });
@@ -650,4 +864,5 @@
         showCard();
     </script>
 </body>
+
 </html>
