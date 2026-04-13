@@ -1,376 +1,25 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Từ vựng - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .vocab-page { padding-top: 100px; padding-bottom: 60px; background: var(--bg-secondary); min-height: 100vh; }
-
-        /* ===== HEATMAP (GitHub-style) ===== */
-        .heatmap-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 28px;
-            margin-bottom: 28px;
-        }
-        .heatmap-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .heatmap-header h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .heatmap-header h3 i { color: var(--success-color); }
-        .heatmap-stats {
-            display: flex;
-            gap: 24px;
-        }
-        .heatmap-stat {
-            text-align: center;
-        }
-        .heatmap-stat .stat-val {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: block;
-        }
-        .heatmap-stat .stat-lbl {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .heatmap-wrapper {
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-        .heatmap-grid {
-            display: flex;
-            gap: 3px;
-        }
-        .heatmap-week {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-        .heatmap-cell {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-            background: #ebedf0;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.15s;
-        }
-        .heatmap-cell:hover {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 1px;
-        }
-        .heatmap-cell[data-level="1"] { background: #9be9a8; }
-        .heatmap-cell[data-level="2"] { background: #40c463; }
-        .heatmap-cell[data-level="3"] { background: #30a14e; }
-        .heatmap-cell[data-level="4"] { background: #216e39; }
-
-        .heatmap-cell .tooltip-text {
-            display: none;
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-dark);
-            color: white;
-            font-size: 0.6875rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
-        }
-        .heatmap-cell:hover .tooltip-text { display: block; }
-
-        .heatmap-months {
-            display: flex;
-            margin-bottom: 6px;
-            padding-left: 32px;
-        }
-        .heatmap-month-label {
-            font-size: 0.6875rem;
-            color: var(--text-light);
-            flex: 1;
-            min-width: 50px;
-        }
-        .heatmap-days {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            margin-right: 6px;
-            justify-content: space-between;
-            padding: 0;
-        }
-        .heatmap-day-label {
-            font-size: 0.625rem;
-            color: var(--text-light);
-            height: 14px;
-            line-height: 14px;
-            width: 26px;
-            text-align: right;
-        }
-        .heatmap-body {
-            display: flex;
-        }
-        .heatmap-legend {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 12px;
-            justify-content: flex-end;
-        }
-        .heatmap-legend span { font-size: 0.6875rem; color: var(--text-light); }
-        .legend-cell {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-        }
-
-        /* ===== VOCAB OVERVIEW CARDS ===== */
-        .overview-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .overview-card {
-            background: white;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: 20px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        .overview-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .overview-card .ov-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 1.25rem;
-        }
-        .overview-card .ov-icon.blue { background: rgba(37,99,235,0.1); color: var(--primary-color); }
-        .overview-card .ov-icon.green { background: rgba(16,185,129,0.1); color: var(--success-color); }
-        .overview-card .ov-icon.orange { background: rgba(245,158,11,0.1); color: var(--accent-color); }
-        .overview-card .ov-icon.purple { background: rgba(139,92,246,0.1); color: var(--listening-color); }
-        .overview-card .ov-val { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); }
-        .overview-card .ov-lbl { font-size: 0.8125rem; color: var(--text-secondary); }
-
-        /* ===== VOCAB GROUPS LIST ===== */
-        .vocab-section-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 28px;
-            margin-bottom: 28px;
-        }
-        .vocab-section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .vocab-section-header h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        .group-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        .group-card {
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .group-card:hover { border-color: var(--primary-color); box-shadow: var(--shadow-sm); }
-        .group-card.active { border-color: var(--primary-color); background: rgba(37,99,235,0.03); }
-        .group-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .group-card-header h4 { font-size: 1rem; font-weight: 700; margin: 0; }
-        .group-word-count {
-            padding: 3px 10px;
-            background: var(--bg-secondary);
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .group-card p { font-size: 0.8125rem; color: var(--text-secondary); margin: 0; }
-
-        /* ===== WORD TABLE ===== */
-        .word-table-container { margin-top: 20px; }
-        .word-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-        .word-table th {
-            background: var(--bg-secondary);
-            padding: 12px 16px;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-align: left;
-            border-bottom: 2px solid var(--border-color);
-        }
-        .word-table td {
-            padding: 14px 16px;
-            font-size: 0.9375rem;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-        .word-table tr:hover td { background: var(--bg-secondary); }
-        .word-cell { font-weight: 700; color: var(--text-primary); }
-        .word-source {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 50px;
-            background: rgba(6,182,212,0.1);
-            color: var(--reading-color);
-            font-weight: 600;
-        }
-        .word-date { font-size: 0.8125rem; color: var(--text-secondary); }
-        .word-actions { display: flex; gap: 6px; }
-        .word-actions button {
-            background: none; border: none; cursor: pointer; font-size: 1rem;
-            padding: 4px 8px; border-radius: var(--radius-sm); transition: var(--transition);
-        }
-        .word-actions .btn-delete { color: var(--text-light); }
-        .word-actions .btn-delete:hover { color: var(--error-color); background: rgba(239,68,68,0.1); }
-
-        /* ===== FLASHCARD REVIEW ===== */
-        .review-section { display: none; }
-        .review-section.active { display: block; }
-        .flashcard-area {
-            display: flex;
-            justify-content: center;
-            margin: 32px 0;
-        }
-        .flashcard {
-            width: 400px;
-            height: 250px;
-            perspective: 800px;
-            cursor: pointer;
-        }
-        .flashcard-inner {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transition: transform 0.5s;
-            transform-style: preserve-3d;
-        }
-        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-lg);
-            backface-visibility: hidden;
-            padding: 32px;
-        }
-        .flashcard-front {
-            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
-            color: white;
-        }
-        .flashcard-front .fc-word { font-size: 2rem; font-weight: 800; }
-        .flashcard-front .fc-hint { font-size: 0.875rem; opacity: 0.7; margin-top: 12px; }
-        .flashcard-back {
-            background: white;
-            border: 2px solid var(--primary-color);
-            transform: rotateY(180deg);
-        }
-        .flashcard-back .fc-group { font-size: 0.875rem; color: var(--primary-color); font-weight: 600; margin-bottom: 8px; }
-        .flashcard-back .fc-word { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
-        .flashcard-back .fc-source { font-size: 0.8125rem; color: var(--text-secondary); margin-top: 8px; }
-
-        .review-controls {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-        }
-        .review-controls button {
-            padding: 12px 28px;
-            border-radius: var(--radius-md);
-            border: 2px solid var(--border-color);
-            background: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .review-controls .btn-know { color: var(--success-color); }
-        .review-controls .btn-know:hover { background: rgba(16,185,129,0.1); border-color: var(--success-color); }
-        .review-controls .btn-dunno { color: var(--error-color); }
-        .review-controls .btn-dunno:hover { background: rgba(239,68,68,0.1); border-color: var(--error-color); }
-
-        .review-progress {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.9375rem;
-            color: var(--text-secondary);
-        }
-        .review-progress strong { color: var(--text-primary); }
-
-        /* ===== CREATE GROUP MODAL ===== */
-        .add-group-inline {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        .add-group-inline input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            outline: none;
-            font-size: 0.9375rem;
-        }
-        .add-group-inline input:focus { border-color: var(--primary-color); }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 767px) {
-            .heatmap-stats { gap: 12px; }
-            .flashcard { width: 100%; height: 200px; }
-            .overview-cards { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+    <link rel="stylesheet" href="css/vocabulary.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="assets/AimHigh.png" alt="AimHigh Logo" style="height: 40px; margin-left: 8px;">
+                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
+                <span class="brand-name">AimHigh</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -383,24 +32,32 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">Luyện thi</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i class="bi bi-headphones"></i> Listening</a></li>
-                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i> Reading</a></li>
-                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i> Writing</a></li>
-                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=listening"><i
+                                        class="bi bi-headphones"></i> Listening</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i>
+                                    Reading</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i>
+                                    Writing</a></li>
+                            <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i>
+                                    Speaking</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Từ vựng</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i> Flashcard</a></li>
-                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh</a></li>
+                            <li><a class="dropdown-item" href="flashcard.html"><i class="bi bi-card-text"></i>
+                                    Flashcard</a></li>
+                            <li><a class="dropdown-item" href="vocabulary.html"><i class="bi bi-book-half"></i> Kho từ
+                                    vựng AimHigh</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle " href="#" data-bs-toggle="dropdown">My Journal</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
-                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử làm bài</a></li>
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i>
+                                    Dashboard</a></li>
+                            <li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử
+                                    làm bài</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -502,9 +159,16 @@
                 <div class="vocab-section-card">
                     <div class="vocab-section-header">
                         <h3><i class="bi bi-folder2-open"></i> Nhóm từ vựng</h3>
+                        <div class="d-flex gap-2" id="categoryTabs">
+                            <button class="btn btn-primary btn-sm" onclick="setCategoryTab('basic')">Basic</button>
+                            <button class="btn btn-outline-primary btn-sm"
+                                onclick="setCategoryTab('advanced')">Advanced</button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="setCategoryTab('custom')">Sổ từ
+                                vựng</button>
+                        </div>
                     </div>
-                    <div class="group-cards" id="groupCards"></div>
-                    <div class="add-group-inline">
+                    <div id="groupsContainer"></div>
+                    <div class="add-group-inline mt-4" id="addGroupContainer" style="display: none;">
                         <input type="text" id="newGroupInput" placeholder="Tên nhóm mới...">
                         <button class="btn btn-primary" onclick="addGroupFromPage()">
                             <i class="bi bi-plus-lg"></i> Thêm nhóm
@@ -516,18 +180,27 @@
                 <div class="vocab-section-card">
                     <div class="vocab-section-header">
                         <h3 id="wordTableTitle"><i class="bi bi-card-text"></i> Tất cả từ vựng</h3>
-                        <span id="wordTableCount" style="font-size: 0.875rem; color: var(--text-secondary);"></span>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <span id="wordTableCount" style="font-size: 0.875rem; color: var(--text-secondary);"></span>
+                            <button class="btn btn-sm btn-primary" id="addWordBtn" style="display: none;"
+                                onclick="openWordModal()">
+                                <i class="bi bi-plus"></i> Thêm từ
+                            </button>
+                        </div>
                     </div>
                     <div class="word-table-container">
                         <table class="word-table" id="wordTable">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width: 40px;"><i class="bi bi-check-square"></i></th>
+                                    <th id="statusColHeader" style="display: none; width: 140px;">Trạng thái</th>
                                     <th>Từ vựng</th>
-                                    <th>Nhóm</th>
-                                    <th>Nguồn</th>
-                                    <th>Ngày thêm</th>
-                                    <th></th>
+                                    <th>Loại từ</th>
+                                    <th>Nghĩa của từ</th>
+                                    <th>Collocation/Công thức</th>
+                                    <th>Ví dụ</th>
+                                    <th style="width: 80px;"></th>
                                 </tr>
                             </thead>
                             <tbody id="wordTableBody">
@@ -579,12 +252,14 @@
                         </div>
                         <div class="review-progress">
                             <strong id="reviewCurrent">0</strong> / <span id="reviewTotal">0</span> từ
-                            &nbsp;&bull;&nbsp; Đã nhớ: <strong id="reviewKnown" style="color: var(--success-color);">0</strong>
+                            &nbsp;&bull;&nbsp; Đã nhớ: <strong id="reviewKnown"
+                                style="color: var(--success-color);">0</strong>
                         </div>
                     </div>
 
                     <div id="reviewDone" style="display: none; text-align: center; padding: 48px;">
-                        <i class="bi bi-trophy" style="font-size: 4rem; color: var(--accent-color); display: block; margin-bottom: 16px;"></i>
+                        <i class="bi bi-trophy"
+                            style="font-size: 4rem; color: var(--accent-color); display: block; margin-bottom: 16px;"></i>
                         <h3>Hoàn thành ôn tập!</h3>
                         <p style="color: var(--text-secondary); margin: 12px 0 24px;">
                             Bạn đã nhớ <strong id="reviewResult">0</strong>/<span id="reviewResultTotal">0</span> từ
@@ -593,6 +268,51 @@
                             <i class="bi bi-arrow-clockwise"></i> Ôn lại
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Form Modal -->
+    <div class="modal fade" id="wordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wordModalTitle">Thêm từ mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="wordForm">
+                        <input type="hidden" id="wordEditIndex" value="-1">
+                        <div class="mb-3">
+                            <label class="form-label">Từ vựng *</label>
+                            <input type="text" class="form-control" id="wordInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phát âm</label>
+                            <input type="text" class="form-control" id="pronunciationInput" placeholder="/ˈwɜːrd/">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Loại từ</label>
+                            <input type="text" class="form-control" id="typeInput" placeholder="noun, verb...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nghĩa của từ *</label>
+                            <input type="text" class="form-control" id="meaningInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Collocation/Công thức</label>
+                            <div id="formulaContainer"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ví dụ</label>
+                            <div id="exampleContainer"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveWord()">Lưu</button>
                 </div>
             </div>
         </div>
@@ -608,330 +328,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    // ===== STORAGE KEYS =====
-    const VOCAB_KEY = 'aimhigh_vocab';
-    const GROUPS_KEY = 'aimhigh_vocab_groups';
-    const ACTIVITY_KEY = 'aimhigh_vocab_activity';
-
-    function getData() { return JSON.parse(localStorage.getItem(VOCAB_KEY) || '[]'); }
-    function saveData(d) { localStorage.setItem(VOCAB_KEY, JSON.stringify(d)); }
-    function getGroups() {
-        const g = JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]');
-        if (!g.length) {
-            const defaults = ['IELTS Reading', 'Academic Words', 'Collocations'];
-            localStorage.setItem(GROUPS_KEY, JSON.stringify(defaults));
-            return defaults;
-        }
-        return g;
-    }
-    function saveGroups(g) { localStorage.setItem(GROUPS_KEY, JSON.stringify(g)); }
-    function getActivity() { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '{}'); }
-
-    // ===== HEATMAP =====
-    function renderHeatmap() {
-        const activity = getActivity();
-        const grid = document.getElementById('heatmapGrid');
-        const monthsEl = document.getElementById('heatmapMonths');
-
-        const today = new Date();
-        const totalWeeks = 52;
-        const totalDays = totalWeeks * 7;
-
-        // Find the starting date (totalDays ago, aligned to Monday)
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - totalDays + 1);
-        // Align to Monday
-        const dayOfWeek = startDate.getDay();
-        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        startDate.setDate(startDate.getDate() + diff);
-
-        grid.innerHTML = '';
-        monthsEl.innerHTML = '';
-
-        let totalActivity = 0;
-        let currentStreak = 0;
-        let maxStreak = 0;
-        let tempStreak = 0;
-        let todayActivity = 0;
-
-        const allDates = [];
-        const currentDate = new Date(startDate);
-
-        // Generate weeks
-        let lastMonth = -1;
-        for (let w = 0; w < totalWeeks; w++) {
-            const weekDiv = document.createElement('div');
-            weekDiv.className = 'heatmap-week';
-
-            for (let d = 0; d < 7; d++) {
-                const dateStr = currentDate.toISOString().slice(0, 10);
-                const count = activity[dateStr] || 0;
-                const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 10 ? 3 : 4;
-
-                const cell = document.createElement('div');
-                cell.className = 'heatmap-cell';
-                cell.setAttribute('data-level', level);
-
-                const tooltip = document.createElement('span');
-                tooltip.className = 'tooltip-text';
-                const dateDisplay = currentDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                tooltip.textContent = count + ' hoạt động - ' + dateDisplay;
-                cell.appendChild(tooltip);
-
-                if (currentDate <= today) {
-                    totalActivity += count;
-                    allDates.push({ date: dateStr, count });
-
-                    const todayStr = today.toISOString().slice(0, 10);
-                    if (dateStr === todayStr) todayActivity = count;
-                }
-
-                weekDiv.appendChild(cell);
-
-                // Month label
-                if (currentDate.getMonth() !== lastMonth && d === 0) {
-                    const monthLabel = document.createElement('span');
-                    monthLabel.className = 'heatmap-month-label';
-                    monthLabel.textContent = currentDate.toLocaleDateString('vi-VN', { month: 'short' });
-                    monthLabel.style.marginLeft = (w * 17) + 'px';
-                    monthLabel.style.position = 'absolute';
-                    monthsEl.appendChild(monthLabel);
-                    lastMonth = currentDate.getMonth();
-                }
-
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            grid.appendChild(weekDiv);
-        }
-
-        monthsEl.style.position = 'relative';
-        monthsEl.style.height = '18px';
-
-        // Calculate streaks
-        const sortedDates = allDates.filter(d => new Date(d.date) <= today).sort((a, b) => a.date.localeCompare(b.date));
-        tempStreak = 0;
-        for (const entry of sortedDates) {
-            if (entry.count > 0) {
-                tempStreak++;
-                if (tempStreak > maxStreak) maxStreak = tempStreak;
-            } else {
-                tempStreak = 0;
-            }
-        }
-
-        // Current streak (from today backwards)
-        currentStreak = 0;
-        for (let i = sortedDates.length - 1; i >= 0; i--) {
-            if (sortedDates[i].count > 0) currentStreak++;
-            else break;
-        }
-
-        document.getElementById('heatmapTotal').textContent = totalActivity;
-        document.getElementById('heatmapMaxStreak').textContent = maxStreak;
-        document.getElementById('streakDays').textContent = currentStreak;
-        document.getElementById('todayCount').textContent = todayActivity;
-    }
-
-    // ===== OVERVIEW =====
-    function renderOverview() {
-        const data = getData();
-        const groups = getGroups();
-        document.getElementById('totalWords').textContent = data.length;
-        document.getElementById('totalGroups').textContent = groups.length;
-    }
-
-    // ===== GROUPS =====
-    let activeGroupFilter = 'all';
-
-    function renderGroups() {
-        const groups = getGroups();
-        const data = getData();
-        const container = document.getElementById('groupCards');
-
-        let html = '<div class="group-card ' + (activeGroupFilter === 'all' ? 'active' : '') +
-            '" onclick="selectGroup(\'all\')">' +
-            '<div class="group-card-header"><h4>Tất cả</h4>' +
-            '<span class="group-word-count">' + data.length + ' từ</span></div>' +
-            '<p>Hiển thị tất cả từ vựng</p></div>';
-
-        groups.forEach(g => {
-            const count = data.filter(v => v.group === g).length;
-            html += '<div class="group-card ' + (activeGroupFilter === g ? 'active' : '') +
-                '" onclick="selectGroup(\'' + g.replace(/'/g, "\\'") + '\')">' +
-                '<div class="group-card-header"><h4>' + g + '</h4>' +
-                '<span class="group-word-count">' + count + ' từ</span></div>' +
-                '<p>Nhóm từ vựng</p></div>';
-        });
-
-        container.innerHTML = html;
-    }
-
-    function selectGroup(group) {
-        activeGroupFilter = group;
-        renderGroups();
-        renderWordTable();
-    }
-
-    function addGroupFromPage() {
-        const input = document.getElementById('newGroupInput');
-        const name = input.value.trim();
-        if (!name) return;
-        const groups = getGroups();
-        if (groups.includes(name)) { alert('Nhóm đã tồn tại!'); return; }
-        groups.push(name);
-        saveGroups(groups);
-        input.value = '';
-        renderGroups();
-        renderOverview();
-    }
-
-    // ===== WORD TABLE =====
-    function renderWordTable() {
-        const data = getData();
-        const filtered = activeGroupFilter === 'all' ? data : data.filter(v => v.group === activeGroupFilter);
-        const tbody = document.getElementById('wordTableBody');
-        const title = document.getElementById('wordTableTitle');
-        const countEl = document.getElementById('wordTableCount');
-
-        title.innerHTML = '<i class="bi bi-card-text"></i> ' +
-            (activeGroupFilter === 'all' ? 'Tất cả từ vựng' : activeGroupFilter);
-        countEl.textContent = filtered.length + ' từ';
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:32px;">' +
-                'Chưa có từ vựng nào. Bôi đen từ trong trang Reading để thêm!</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = filtered.map((v, i) => {
-            const date = new Date(v.addedAt).toLocaleDateString('vi-VN');
-            return '<tr>' +
-                '<td>' + (i + 1) + '</td>' +
-                '<td class="word-cell">' + v.word + '</td>' +
-                '<td>' + v.group + '</td>' +
-                '<td><span class="word-source">' + (v.source || 'reading') + '</span></td>' +
-                '<td class="word-date">' + date + '</td>' +
-                '<td class="word-actions">' +
-                '<button class="btn-delete" onclick="deleteWord(' + i + ')" title="Xóa">' +
-                '<i class="bi bi-trash"></i></button></td></tr>';
-        }).join('');
-    }
-
-    function deleteWord(index) {
-        const data = getData();
-        const filtered = activeGroupFilter === 'all' ? data : data.filter(v => v.group === activeGroupFilter);
-        const toRemove = filtered[index];
-        if (!toRemove) return;
-        const realIndex = data.findIndex(v => v.word === toRemove.word && v.group === toRemove.group);
-        if (realIndex !== -1) {
-            data.splice(realIndex, 1);
-            saveData(data);
-            renderAll();
-        }
-    }
-
-    // ===== TABS =====
-    function showTab(tab) {
-        const listBtn = document.getElementById('tabList');
-        const reviewBtn = document.getElementById('tabReview');
-
-        if (tab === 'list') {
-            document.getElementById('listSection').style.display = 'block';
-            document.getElementById('reviewSection').classList.remove('active');
-            listBtn.className = 'btn btn-primary';
-            reviewBtn.className = 'btn btn-outline-primary';
-        } else {
-            document.getElementById('listSection').style.display = 'none';
-            document.getElementById('reviewSection').classList.add('active');
-            listBtn.className = 'btn btn-outline-primary';
-            reviewBtn.className = 'btn btn-primary';
-            startReview();
-        }
-    }
-
-    // ===== FLASHCARD REVIEW =====
-    let reviewCards = [];
-    let reviewIndex = 0;
-    let knownCount = 0;
-
-    function startReview() {
-        const data = getData();
-        if (data.length === 0) {
-            document.getElementById('reviewEmpty').style.display = 'block';
-            document.getElementById('reviewActive').style.display = 'none';
-            document.getElementById('reviewDone').style.display = 'none';
-            return;
-        }
-
-        // Shuffle
-        reviewCards = [...data].sort(() => Math.random() - 0.5);
-        reviewIndex = 0;
-        knownCount = 0;
-
-        document.getElementById('reviewEmpty').style.display = 'none';
-        document.getElementById('reviewActive').style.display = 'block';
-        document.getElementById('reviewDone').style.display = 'none';
-        document.getElementById('reviewTotal').textContent = reviewCards.length;
-
-        showCurrentCard();
-
-        // Record review activity
-        recordReviewActivity();
-    }
-
-    function showCurrentCard() {
-        if (reviewIndex >= reviewCards.length) {
-            finishReview();
-            return;
-        }
-
-        const card = reviewCards[reviewIndex];
-        document.getElementById('fcWord').textContent = card.word;
-        document.getElementById('fcWordBack').textContent = card.word;
-        document.getElementById('fcGroup').textContent = card.group;
-        document.getElementById('fcSource').textContent = 'Nguồn: ' + (card.source || 'reading');
-        document.getElementById('reviewCurrent').textContent = reviewIndex + 1;
-        document.getElementById('reviewKnown').textContent = knownCount;
-
-        // Reset flip
-        document.getElementById('flashcard').classList.remove('flipped');
-    }
-
-    function flipCard() {
-        document.getElementById('flashcard').classList.toggle('flipped');
-    }
-
-    function markCard(known) {
-        if (known) knownCount++;
-        reviewIndex++;
-        showCurrentCard();
-    }
-
-    function finishReview() {
-        document.getElementById('reviewActive').style.display = 'none';
-        document.getElementById('reviewDone').style.display = 'block';
-        document.getElementById('reviewResult').textContent = knownCount;
-        document.getElementById('reviewResultTotal').textContent = reviewCards.length;
-    }
-
-    function recordReviewActivity() {
-        const activity = getActivity();
-        const today = new Date().toISOString().slice(0, 10);
-        activity[today] = (activity[today] || 0) + 1;
-        localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
-        renderHeatmap();
-    }
-
-    // ===== RENDER ALL =====
-    function renderAll() {
-        renderOverview();
-        renderGroups();
-        renderWordTable();
-        renderHeatmap();
-    }
-
-    document.addEventListener('DOMContentLoaded', renderAll);
-    </script>
+    <script src="js/vocabulary.js"></script>
 </body>
+
 </html>
