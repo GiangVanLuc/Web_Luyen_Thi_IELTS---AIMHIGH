@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thong bao - AimHigh IELTS</title>
+    <title>Thông báo - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -15,71 +15,72 @@
         <aside class="admin-sidebar" id="adminSidebar">
             <a href="dashboard.html" class="sidebar-brand"><img src="../assets/logo.png" alt="AimHigh"><span class="sidebar-brand-text">AIM HIGH</span></a>
             <nav class="sidebar-nav">
-                <div class="sidebar-nav-label">Tong quan</div>
+                <div class="sidebar-nav-label">Tổng quan</div>
                 <a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
-                <div class="sidebar-nav-label">Quan ly hoc tap</div>
-                <a href="users.html" class="sidebar-link"><i class="bi bi-people"></i><span>Nguoi dung</span></a>
-                <a href="test-manager.html" class="sidebar-link"><i class="bi bi-collection"></i><span>Danh sach de thi</span></a>
-                <a href="test-builder.html" class="sidebar-link"><i class="bi bi-plus-square"></i><span>Tao de thi</span></a>
-                <div class="sidebar-nav-label">Cham diem & Bao cao</div>
-                <a href="grading.html" class="sidebar-link"><i class="bi bi-pencil-square"></i><span>Cham bai</span><span class="sidebar-badge">12</span></a>
-                <a href="reports.html" class="sidebar-link"><i class="bi bi-bar-chart-line"></i><span>Bao cao hoc tap</span></a>
-                <div class="sidebar-nav-label">Van hanh</div>
-                <a href="notifications.html" class="sidebar-link active"><i class="bi bi-megaphone"></i><span>Thong bao</span></a>
-                <a href="roles.html" class="sidebar-link"><i class="bi bi-shield-check"></i><span>Phan quyen</span></a>
-                <a href="audit-log.html" class="sidebar-link"><i class="bi bi-journal-check"></i><span>Nhat ky he thong</span></a>
-                <div class="sidebar-nav-label">He thong</div>
-                <a href="settings.html" class="sidebar-link"><i class="bi bi-gear"></i><span>Cai dat</span></a>
-                <div class="sidebar-nav-label">Khac</div>
+                <div class="sidebar-nav-label">Quản lý học tập</div>
+                <a href="users.html" class="sidebar-link"><i class="bi bi-people"></i><span>Người dùng</span></a>
+                <a href="test-manager.html" class="sidebar-link"><i class="bi bi-collection"></i><span>Danh sách đề thi</span></a>
+                <a href="test-builder.html" class="sidebar-link"><i class="bi bi-plus-square"></i><span>Tạo đề thi</span></a>
+                <a href="vocabulary-manager.html" class="sidebar-link"><i class="bi bi-journal-richtext"></i><span>Kho từ vựng</span></a>
+                <div class="sidebar-nav-label">Chấm điểm & Báo cáo</div>
+                <a href="grading.html" class="sidebar-link"><i class="bi bi-pencil-square"></i><span>Chấm bài</span><span class="sidebar-badge">12</span></a>
+                <a href="reports.html" class="sidebar-link"><i class="bi bi-bar-chart-line"></i><span>Báo cáo học tập</span></a>
+                <div class="sidebar-nav-label">Vận hành</div>
+                <a href="notifications.html" class="sidebar-link active"><i class="bi bi-megaphone"></i><span>Thông báo</span></a>
+                <a href="roles.html" class="sidebar-link"><i class="bi bi-shield-check"></i><span>Phân quyền</span></a>
+                <a href="audit-log.html" class="sidebar-link"><i class="bi bi-journal-check"></i><span>Nhật ký hệ thống</span></a>
+                <div class="sidebar-nav-label">Hệ thống</div>
+                <a href="settings.html" class="sidebar-link"><i class="bi bi-gear"></i><span>Cài đặt</span></a>
+                <div class="sidebar-nav-label">Khác</div>
                 <a href="../index.html" class="sidebar-link"><i class="bi bi-box-arrow-up-right"></i><span>Xem Website</span></a>
             </nav>
-            <div class="sidebar-footer"><button class="sidebar-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-chevron-bar-left" id="sidebarToggleIcon"></i><span> Thu gon</span></button></div>
+            <div class="sidebar-footer"><button class="sidebar-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-chevron-bar-left" id="sidebarToggleIcon"></i><span> Thu gọn</span></button></div>
         </aside>
 
         <div class="admin-main">
             <header class="admin-topbar">
-                <div class="topbar-left"><button class="topbar-btn d-lg-none" onclick="toggleMobileSidebar()"><i class="bi bi-list"></i></button><h1 class="topbar-title">Trung tam thong bao</h1></div>
-                <div class="topbar-right"><button class="btn-admin-primary"><i class="bi bi-send"></i> Gui ngay</button></div>
+                <div class="topbar-left"><button class="topbar-btn d-lg-none" onclick="toggleMobileSidebar()"><i class="bi bi-list"></i></button><h1 class="topbar-title">Trung tâm thông báo</h1></div>
+                <div class="topbar-right"><button class="btn-admin-primary"><i class="bi bi-send"></i> Gửi ngay</button></div>
             </header>
 
             <main class="admin-content">
                 <div class="row g-4">
                     <div class="col-lg-5">
                         <div class="admin-card">
-                            <div class="admin-card-header"><h3 class="admin-card-title">Tao thong bao moi</h3></div>
+                            <div class="admin-card-header"><h3 class="admin-card-title">Tạo thông báo mới</h3></div>
                             <div class="mb-3">
-                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Kenh gui</label>
+                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Kênh gửi</label>
                                 <select class="form-select"><option>In-app</option><option>Email</option><option>Push Notification</option></select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Doi tuong</label>
-                                <select class="form-select"><option>Toan bo hoc vien</option><option>Hoc vien moi</option><option>Nhom dang cham tien do</option><option>Theo band muc tieu</option></select>
+                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Đối tượng</label>
+                                <select class="form-select"><option>Toàn bộ học viên</option><option>Học viên mới</option><option>Nhóm đang chậm tiến độ</option><option>Theo band mục tiêu</option></select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Tieu de</label>
-                                <input class="form-control" placeholder="Nhap tieu de thong bao...">
+                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Tiêu đề</label>
+                                <input class="form-control" placeholder="Nhập tiêu đề thông báo...">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Noi dung</label>
-                                <textarea class="form-control" rows="5" placeholder="Noi dung gui den hoc vien..."></textarea>
+                                <label class="form-label" style="font-size:0.85rem;font-weight:600;">Nội dung</label>
+                                <textarea class="form-control" rows="5" placeholder="Nội dung gửi đến học viên..."></textarea>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn-admin-outline"><i class="bi bi-clock"></i> Hen gio gui</button>
-                                <button class="btn-admin-primary"><i class="bi bi-send"></i> Gui thong bao</button>
+                                <button class="btn-admin-outline"><i class="bi bi-clock"></i> Hẹn giờ gửi</button>
+                                <button class="btn-admin-primary"><i class="bi bi-send"></i> Gửi thông báo</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-7">
                         <div class="admin-card">
-                            <div class="admin-card-header"><h3 class="admin-card-title">Lich su chien dich thong bao</h3></div>
+                            <div class="admin-card-header"><h3 class="admin-card-title">Lịch sử chiến dịch thông báo</h3></div>
                             <div class="admin-table-wrapper">
                                 <table class="admin-table">
-                                    <thead><tr><th>Tieu de</th><th>Kenh</th><th>Doi tuong</th><th>Thoi gian</th><th>Trang thai</th><th>Ty le mo</th></tr></thead>
+                                    <thead><tr><th>Tiêu đề</th><th>Kênh</th><th>Đối tượng</th><th>Thời gian</th><th>Trạng thái</th><th>Tỷ lệ mở</th></tr></thead>
                                     <tbody>
-                                        <tr><td>Nhac lich thi thu cuoi tuan</td><td>Push</td><td>Toan bo hoc vien</td><td>02/04/2026 08:00</td><td><span class="status-badge published">Da gui</span></td><td>64%</td></tr>
-                                        <tr><td>Mo khoa Writing Task 2 moi</td><td>In-app</td><td>Nhom band 6.0+</td><td>01/04/2026 19:15</td><td><span class="status-badge published">Da gui</span></td><td>58%</td></tr>
-                                        <tr><td>Canh bao qua han nop bai</td><td>Email</td><td>Nhom cham tien do</td><td>01/04/2026 09:00</td><td><span class="status-badge draft">Dang cho</span></td><td>--</td></tr>
-                                        <tr><td>Tong ket ket qua thang 3</td><td>Email</td><td>Toan bo hoc vien</td><td>31/03/2026 20:30</td><td><span class="status-badge archived">Luu tru</span></td><td>71%</td></tr>
+                                        <tr><td>Nhắc lịch thi thử cuối tuần</td><td>Push</td><td>Toàn bộ học viên</td><td>02/04/2026 08:00</td><td><span class="status-badge published">Đã gửi</span></td><td>64%</td></tr>
+                                        <tr><td>Mở khóa Writing Task 2 mới</td><td>In-app</td><td>Nhóm band 6.0+</td><td>01/04/2026 19:15</td><td><span class="status-badge published">Đã gửi</span></td><td>58%</td></tr>
+                                        <tr><td>Cảnh báo quá hạn nộp bài</td><td>Email</td><td>Nhóm chậm tiến độ</td><td>01/04/2026 09:00</td><td><span class="status-badge draft">Đang chờ</span></td><td>--</td></tr>
+                                        <tr><td>Tổng kết kết quả tháng 3</td><td>Email</td><td>Toàn bộ học viên</td><td>31/03/2026 20:30</td><td><span class="status-badge archived">Lưu trữ</span></td><td>71%</td></tr>
                                     </tbody>
                                 </table>
                             </div>

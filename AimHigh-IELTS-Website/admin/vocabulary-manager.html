@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý kho từ vựng - AimHigh IELTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar" id="adminSidebar">
+            <a href="dashboard.html" class="sidebar-brand">
+                <img src="../assets/logo.png" alt="AimHigh">
+                <span class="sidebar-brand-text">AIM HIGH</span>
+            </a>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-label">Tổng quan</div>
+                <a href="dashboard.html" class="sidebar-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="sidebar-nav-label">Quản lý học tập</div>
+                <a href="users.html" class="sidebar-link">
+                    <i class="bi bi-people"></i>
+                    <span>Người dùng</span>
+                </a>
+                <a href="test-manager.html" class="sidebar-link">
+                    <i class="bi bi-collection"></i>
+                    <span>Danh sách đề thi</span>
+                </a>
+                <a href="test-builder.html" class="sidebar-link">
+                    <i class="bi bi-plus-square"></i>
+                    <span>Tạo đề thi</span>
+                </a>
+                <a href="vocabulary-manager.html" class="sidebar-link active">
+                    <i class="bi bi-journal-richtext"></i>
+                    <span>Kho từ vựng</span>
+                </a>
+
+                <div class="sidebar-nav-label">Chấm điểm & Báo cáo</div>
+                <a href="grading.html" class="sidebar-link">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Chấm bài</span>
+                    <span class="sidebar-badge">12</span>
+                </a>
+                <a href="reports.html" class="sidebar-link">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span>Báo cáo học tập</span>
+                </a>
+
+                <div class="sidebar-nav-label">Vận hành</div>
+                <a href="notifications.html" class="sidebar-link">
+                    <i class="bi bi-megaphone"></i>
+                    <span>Thông báo</span>
+                </a>
+                <a href="roles.html" class="sidebar-link">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Phân quyền</span>
+                </a>
+                <a href="audit-log.html" class="sidebar-link">
+                    <i class="bi bi-journal-check"></i>
+                    <span>Nhật ký hệ thống</span>
+                </a>
+
+                <div class="sidebar-nav-label">Hệ thống</div>
+                <a href="settings.html" class="sidebar-link">
+                    <i class="bi bi-gear"></i>
+                    <span>Cài đặt</span>
+                </a>
+
+                <div class="sidebar-nav-label">Khác</div>
+                <a href="../index.html" class="sidebar-link">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Xem Website</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+                    <i class="bi bi-chevron-bar-left" id="sidebarToggleIcon"></i>
+                    <span> Thu gọn</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="topbar-btn d-lg-none" onclick="toggleMobileSidebar()">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h1 class="topbar-title">Kho từ vựng</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="dropdown">
+                        <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <main class="admin-content">
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-8">
+                        <div class="admin-card h-100">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title mb-0"><i class="bi bi-cloud-arrow-up me-2"></i>Import kho từ vựng</h3>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">JSON thủ công</label>
+                                    <textarea id="jsonPayloadInput" class="form-control" rows="8" placeholder='Ví dụ: [{"word":"acquire","partOfSpeech":"verb","meaning":"to get"}]'></textarea>
+                                    <button id="importJsonTextBtn" class="btn-admin-primary mt-3">
+                                        <i class="bi bi-filetype-json"></i> Import từ JSON text
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">File JSON</label>
+                                    <input id="jsonFileInput" type="file" class="form-control" accept="application/json,.json">
+
+                                    <label class="form-label fw-semibold mt-3">File Excel (.xlsx)</label>
+                                    <input id="excelFileInput" type="file" class="form-control" accept=".xlsx,.xlsm">
+
+                                    <button id="importJsonFileBtn" class="btn btn-outline-primary mt-3 me-2">
+                                        <i class="bi bi-upload"></i> Import file JSON
+                                    </button>
+                                    <button id="importExcelBtn" class="btn btn-outline-success mt-3">
+                                        <i class="bi bi-file-earmark-spreadsheet"></i> Import file Excel
+                                    </button>
+
+                                    <p class="text-muted mt-3 mb-0" style="font-size: 0.875rem;">
+                                        Header Excel tối thiểu cần cột <strong>word</strong>. Các cột hỗ trợ: ipa, partOfSpeech, meaning, viMeaning, audioUrl, imageUrl, related, exampleEn, exampleVi.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="admin-card h-100">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title mb-0"><i class="bi bi-info-circle me-2"></i>Kết quả import gần nhất</h3>
+                            </div>
+                            <div id="importSummary" class="small text-muted">Chưa có dữ liệu import.</div>
+                            <hr>
+                            <form id="quickAddForm" class="d-grid gap-2">
+                                <h6 class="mb-1">Thêm nhanh 1 từ</h6>
+                                <input id="quickWord" class="form-control" placeholder="Word" required>
+                                <input id="quickPartOfSpeech" class="form-control" placeholder="Part of speech (noun, verb...)">
+                                <input id="quickMeaning" class="form-control" placeholder="Meaning (EN)">
+                                <input id="quickViMeaning" class="form-control" placeholder="Nghĩa tiếng Việt" required>
+                                <button class="btn-admin-primary" type="submit">
+                                    <i class="bi bi-plus-circle"></i> Lưu từ mới
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="filter-bar">
+                            <input id="vocabSearchInput" class="form-control" placeholder="Tìm theo từ hoặc nghĩa...">
+                            <select id="vocabPartFilter" class="form-select">
+                                <option value="">Tất cả loại từ</option>
+                                <option value="noun">noun</option>
+                                <option value="verb">verb</option>
+                                <option value="adjective">adjective</option>
+                                <option value="adverb">adverb</option>
+                                <option value="phrasal verb">phrasal verb</option>
+                            </select>
+                        </div>
+                        <button id="reloadVocabularyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-repeat"></i> Làm mới
+                        </button>
+                    </div>
+
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Từ</th>
+                                    <th>Loại từ</th>
+                                    <th>Nghĩa (VI)</th>
+                                    <th>Nghĩa (EN)</th>
+                                    <th>Ví dụ</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="vocabularyTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="admin-pagination">
+                        <div id="vocabTableInfo" class="admin-pagination-info">Đang tải...</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        let vocabPage = 0;
+        const vocabSize = 50;
+
+        function requireAdminSession() {
+            const token = localStorage.getItem('aimhigh_token');
+            const currentUser = JSON.parse(localStorage.getItem('aimhigh_currentUser') || '{}');
+            const role = String(currentUser?.role || '').toUpperCase();
+            if (!token || role !== 'ADMIN') {
+                showToast('Bạn cần đăng nhập ADMIN để sử dụng trang này.', 'danger');
+                setTimeout(() => {
+                    window.location.href = '../login.html';
+                }, 900);
+                return false;
+            }
+            return true;
+        }
+
+        function normalizeList(response) {
+            const data = response?.data ?? response;
+            return Array.isArray(data) ? data : [];
+        }
+
+        function renderImportSummary(result) {
+            const summary = document.getElementById('importSummary');
+            if (!summary) return;
+
+            if (!result) {
+                summary.textContent = 'Chưa có dữ liệu import.';
+                return;
+            }
+
+            const errors = Array.isArray(result.errors) ? result.errors : [];
+            summary.innerHTML = `
+                <div class="mb-1"><strong>Tổng dòng:</strong> ${result.totalRows ?? 0}</div>
+                <div class="mb-1 text-success"><strong>Tạo mới:</strong> ${result.createdCount ?? 0}</div>
+                <div class="mb-1 text-primary"><strong>Cập nhật:</strong> ${result.updatedCount ?? 0}</div>
+                <div class="mb-2 text-warning"><strong>Bỏ qua:</strong> ${result.skippedCount ?? 0}</div>
+                ${errors.length ? `<details><summary>Lỗi (${errors.length})</summary><ul class="ps-3 mb-0">${errors.slice(0, 15).map((err) => `<li>${err}</li>`).join('')}</ul></details>` : '<span class="text-success">Không có lỗi import.</span>'}
+            `;
+        }
+
+        function renderVocabularyRows(rows) {
+            const tbody = document.getElementById('vocabularyTableBody');
+            const info = document.getElementById('vocabTableInfo');
+            if (!tbody) return;
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu từ vựng.</td></tr>';
+                if (info) info.textContent = 'Hiển thị 0 từ';
+                return;
+            }
+
+            tbody.innerHTML = rows.map((item, index) => `
+                <tr>
+                    <td>${vocabPage * vocabSize + index + 1}</td>
+                    <td><strong>${item.word || '-'}</strong></td>
+                    <td>${item.partOfSpeech || '-'}</td>
+                    <td>${item.viMeaning || '-'}</td>
+                    <td>${item.meaning || '-'}</td>
+                    <td>${Array.isArray(item.examples) ? item.examples.length : 0}</td>
+                    <td>
+                        <button class="btn-icon-sm danger" data-action="delete" data-id="${item.id}" title="Xóa từ này">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (info) info.textContent = `Hiển thị ${rows.length} từ (trang ${vocabPage + 1})`;
+        }
+
+        async function loadVocabulary() {
+            if (!requireAdminSession()) return;
+
+            const q = document.getElementById('vocabSearchInput')?.value?.trim() || '';
+            const partOfSpeech = document.getElementById('vocabPartFilter')?.value || '';
+
+            try {
+                const response = await adminGetVocabulary({ q, partOfSpeech, page: vocabPage, size: vocabSize });
+                renderVocabularyRows(normalizeList(response));
+            } catch (error) {
+                renderVocabularyRows([]);
+                showToast(`Không tải được dữ liệu: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        async function importJsonText() {
+            const text = document.getElementById('jsonPayloadInput')?.value?.trim() || '';
+            if (!text) {
+                showToast('Vui lòng nhập JSON trước khi import.', 'danger');
+                return;
+            }
+
+            try {
+                const payload = JSON.parse(text);
+                const response = await adminImportVocabularyJson(payload);
+                const result = response?.data || response;
+                renderImportSummary(result);
+                showToast('Import JSON thành công.');
+                await loadVocabulary();
+            } catch (error) {
+                showToast(`Import JSON thất bại: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        async function importJsonFile() {
+            const input = document.getElementById('jsonFileInput');
+            const file = input?.files?.[0];
+            if (!file) {
+                showToast('Vui lòng chọn file JSON.', 'danger');
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const payload = JSON.parse(text);
+                const response = await adminImportVocabularyJson(payload);
+                const result = response?.data || response;
+                renderImportSummary(result);
+                showToast('Import file JSON thành công.');
+                await loadVocabulary();
+            } catch (error) {
+                showToast(`Không thể đọc/import file JSON: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        async function importExcelFile() {
+            const input = document.getElementById('excelFileInput');
+            const file = input?.files?.[0];
+            if (!file) {
+                showToast('Vui lòng chọn file Excel.', 'danger');
+                return;
+            }
+
+            try {
+                const response = await adminImportVocabularyExcel(file);
+                const result = response?.data || response;
+                renderImportSummary(result);
+                showToast('Import file Excel thành công.');
+                await loadVocabulary();
+            } catch (error) {
+                showToast(`Import Excel thất bại: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        async function createQuickVocabulary(event) {
+            event.preventDefault();
+            const word = document.getElementById('quickWord')?.value?.trim() || '';
+            const partOfSpeech = document.getElementById('quickPartOfSpeech')?.value?.trim() || '';
+            const meaning = document.getElementById('quickMeaning')?.value?.trim() || '';
+            const viMeaning = document.getElementById('quickViMeaning')?.value?.trim() || '';
+
+            if (!word || !viMeaning) {
+                showToast('Word và nghĩa tiếng Việt là bắt buộc.', 'danger');
+                return;
+            }
+
+            try {
+                await adminUpsertVocabulary({ word, partOfSpeech, meaning, viMeaning });
+                showToast('Đã lưu từ mới thành công.');
+                document.getElementById('quickAddForm')?.reset();
+                await loadVocabulary();
+            } catch (error) {
+                showToast(`Không thể lưu từ: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!requireAdminSession()) return;
+
+            document.getElementById('importJsonTextBtn')?.addEventListener('click', importJsonText);
+            document.getElementById('importJsonFileBtn')?.addEventListener('click', importJsonFile);
+            document.getElementById('importExcelBtn')?.addEventListener('click', importExcelFile);
+            document.getElementById('quickAddForm')?.addEventListener('submit', createQuickVocabulary);
+            document.getElementById('reloadVocabularyBtn')?.addEventListener('click', () => loadVocabulary());
+            document.getElementById('vocabSearchInput')?.addEventListener('input', () => {
+                vocabPage = 0;
+                loadVocabulary();
+            });
+            document.getElementById('vocabPartFilter')?.addEventListener('change', () => {
+                vocabPage = 0;
+                loadVocabulary();
+            });
+
+            document.getElementById('vocabularyTableBody')?.addEventListener('click', async (event) => {
+                const button = event.target.closest('button[data-action="delete"]');
+                if (!button) return;
+
+                const id = Number(button.dataset.id);
+                if (!Number.isFinite(id) || id <= 0) return;
+
+                if (!confirm('Bạn có chắc muốn xóa từ vựng này khỏi kho?')) return;
+
+                try {
+                    await adminDeleteVocabulary(id);
+                    showToast('Đã xóa từ vựng.');
+                    await loadVocabulary();
+                } catch (error) {
+                    showToast(`Không thể xóa từ: ${error.message || 'Unknown error'}`, 'danger');
+                }
+            });
+
+            loadVocabulary();
+        });
+    </script>
+</body>
+</html>

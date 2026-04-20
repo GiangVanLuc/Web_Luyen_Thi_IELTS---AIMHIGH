@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface VocabularyExampleRepository extends JpaRepository<VocabularyExample, Long> {
     List<VocabularyExample> findByVocabularyId(Long vocabId);
+
+    void deleteByVocabularyId(Long vocabId);
 }

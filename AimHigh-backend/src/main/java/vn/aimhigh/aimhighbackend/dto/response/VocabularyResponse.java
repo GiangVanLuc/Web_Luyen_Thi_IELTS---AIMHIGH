@@ -22,7 +22,12 @@ public class VocabularyResponse {
     private Boolean isSaved;
     private Long userVocabularyId;
     private Boolean learned;
+    private Integer learnLevel;
     private String note;
+    private Long groupId;
+    private String groupName;
+    private LocalDateTime lastReviewedAt;
+    private Integer reviewCount;
     private LocalDateTime savedAt;
 
     @Data

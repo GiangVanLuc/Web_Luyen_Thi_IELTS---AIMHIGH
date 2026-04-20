@@ -2,36 +2,254 @@
 const VOCAB_KEY = 'aimhigh_vocab';
 const GROUPS_KEY = 'aimhigh_vocab_groups';
 const ACTIVITY_KEY = 'aimhigh_vocab_activity';
+const GROUP_META_KEY = 'aimhigh_vocab_group_meta';
 
-function getData() { return JSON.parse(localStorage.getItem(VOCAB_KEY) || '[]'); }
-function saveData(d) { localStorage.setItem(VOCAB_KEY, JSON.stringify(d)); }
-function getGroups() {
-    const g = JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]');
-    if (!g.length) {
-        const defaults = ['IELTS Reading', 'Academic Words', 'Collocations', 'Sổ từ vựng'];
-        localStorage.setItem(GROUPS_KEY, JSON.stringify(defaults));
-        return defaults;
+const LEARN_LEVEL_TO_STATUS = {
+    0: 'Chưa thuộc',
+    1: 'Nhớ sơ sơ',
+    2: 'Đã thuộc'
+};
+
+const STATUS_TO_LEARN_LEVEL = {
+    'Chưa thuộc': 0,
+    'Nhớ sơ sơ': 1,
+    'Đã thuộc': 2
+};
+
+function safeParseJson(rawValue, fallbackValue) {
+    if (rawValue == null || rawValue === '') return fallbackValue;
+    try {
+        const parsed = JSON.parse(rawValue);
+        return parsed == null ? fallbackValue : parsed;
+    } catch (_) {
+        return fallbackValue;
     }
-    return g;
 }
-function saveGroups(g) { localStorage.setItem(GROUPS_KEY, JSON.stringify(g)); }
-function getActivity() { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '{}'); }
 
-function getBackendGroupFromNote(noteValue) {
-    const text = String(noteValue || '').trim();
+function hasBackendAuthToken() {
+    return !!localStorage.getItem('aimhigh_token');
+}
+
+function getStoredCurrentUser() {
+    const raw = localStorage.getItem('aimhigh_currentUser') || localStorage.getItem('aimhigh_user') || '{}';
+    try {
+        return JSON.parse(raw) || {};
+    } catch (_) {
+        return {};
+    }
+}
+
+function isVocabularyLoggedIn() {
+    const hasFlag = localStorage.getItem('aimhigh_loggedIn') === 'true';
+    const hasToken = !!localStorage.getItem('aimhigh_token');
+    const currentUser = getStoredCurrentUser();
+    const hasUser = !!(currentUser && (currentUser.email || currentUser.name));
+    return hasFlag || hasToken || hasUser;
+}
+
+function getUserInitials(nameValue) {
+    const name = String(nameValue || '').trim();
+    if (!name) return 'U';
+
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (!parts.length) return 'U';
+    if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function initVocabularyHeaderAuth() {
+    const guestActions = document.getElementById('guestActions');
+    const userActions = document.getElementById('userActions');
+    const nameEl = document.getElementById('homeHeaderName');
+    const avatarEl = document.getElementById('homeHeaderAvatar');
+    const logoutLink = document.getElementById('homeLogoutLink');
+
+    const currentUser = getStoredCurrentUser();
+    const loggedIn = isVocabularyLoggedIn();
+
+    if (loggedIn && guestActions && userActions) {
+        guestActions.classList.add('d-none');
+        userActions.classList.remove('d-none');
+        if (nameEl) nameEl.textContent = currentUser.name || currentUser.email || 'Người dùng';
+        if (avatarEl) avatarEl.textContent = getUserInitials(currentUser.name || currentUser.email || 'U');
+    } else if (guestActions && userActions) {
+        guestActions.classList.remove('d-none');
+        userActions.classList.add('d-none');
+    }
+
+    if (logoutLink && !logoutLink.dataset.bound) {
+        logoutLink.dataset.bound = 'true';
+        logoutLink.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (typeof apiLogout === 'function') {
+                try {
+                    await apiLogout();
+                    return;
+                } catch (_) {
+                    // Fallback local logout below.
+                }
+            }
+
+            localStorage.removeItem('aimhigh_token');
+            localStorage.removeItem('aimhigh_refreshToken');
+            localStorage.removeItem('aimhigh_loggedIn');
+            localStorage.removeItem('aimhigh_currentUser');
+            window.location.href = 'login.html';
+        });
+    }
+}
+
+function getData() {
+    const parsed = safeParseJson(localStorage.getItem(VOCAB_KEY), []);
+    return Array.isArray(parsed) ? parsed : [];
+}
+
+function saveData(d) {
+    const data = Array.isArray(d) ? d : [];
+    localStorage.setItem(VOCAB_KEY, JSON.stringify(data));
+}
+
+function getGroups() {
+    const parsed = safeParseJson(localStorage.getItem(GROUPS_KEY), []);
+    const normalized = (Array.isArray(parsed) ? parsed : [])
+        .map((item) => String(item || '').trim())
+        .filter(Boolean);
+
+    const unique = [...new Set(normalized)];
+    const hasCustomGroup = unique.some((groupName) => !groupName.startsWith('Basic') && !groupName.startsWith('Adv'));
+
+    if (!unique.length || !hasCustomGroup) {
+        const defaults = [...unique, 'Sổ từ vựng'];
+        const fixed = [...new Set(defaults)];
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(fixed));
+        return fixed;
+    }
+
+    if (unique.length !== normalized.length) {
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(unique));
+    }
+
+    return unique;
+}
+
+function saveGroups(g) {
+    const groups = Array.isArray(g) ? [...new Set(g.map((item) => String(item || '').trim()).filter(Boolean))] : [];
+    localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+
+    const metaMap = getGroupMetaMap();
+    const nextMeta = {};
+    groups.forEach((groupName) => {
+        if (metaMap[groupName]) {
+            nextMeta[groupName] = metaMap[groupName];
+        }
+    });
+    saveGroupMetaMap(nextMeta);
+}
+
+function getActivity() {
+    const parsed = safeParseJson(localStorage.getItem(ACTIVITY_KEY), {});
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+}
+
+function getGroupMetaMap() {
+    const parsed = safeParseJson(localStorage.getItem(GROUP_META_KEY), {});
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+}
+
+function saveGroupMetaMap(metaMap) {
+    const map = metaMap && typeof metaMap === 'object' && !Array.isArray(metaMap) ? metaMap : {};
+    localStorage.setItem(GROUP_META_KEY, JSON.stringify(map));
+}
+
+function getGroupMetaByName(groupName) {
+    if (!groupName) return null;
+    const map = getGroupMetaMap();
+    return map[groupName] || null;
+}
+
+function setGroupMeta(groupName, metadata) {
+    const name = String(groupName || '').trim();
+    if (!name || !metadata || typeof metadata !== 'object') return;
+
+    const backendId = Number(metadata.id);
+    if (!Number.isFinite(backendId) || backendId <= 0) return;
+
+    const map = getGroupMetaMap();
+    map[name] = {
+        id: backendId,
+        name: String(metadata.name || name)
+    };
+    saveGroupMetaMap(map);
+}
+
+function removeGroupMeta(groupName) {
+    const name = String(groupName || '').trim();
+    if (!name) return;
+    const map = getGroupMetaMap();
+    if (map[name]) {
+        delete map[name];
+        saveGroupMetaMap(map);
+    }
+}
+
+function getBackendGroupName(item) {
+    const text = String(item?.groupName || item?.note || '').trim();
     return text || 'Sổ từ vựng';
 }
 
+function normalizeLearnLevel(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return 0;
+    if (numeric <= 0) return 0;
+    if (numeric >= 2) return 2;
+    return 1;
+}
+
+function toStatusFromLearnLevel(learnLevel, learnedFlag) {
+    const level = normalizeLearnLevel(learnLevel);
+    if (level === 0 && learnedFlag === true) return 'Đã thuộc';
+    return LEARN_LEVEL_TO_STATUS[level] || 'Chưa thuộc';
+}
+
+function toLearnLevelFromStatus(status) {
+    const key = String(status || '').trim();
+    if (Object.prototype.hasOwnProperty.call(STATUS_TO_LEARN_LEVEL, key)) {
+        return STATUS_TO_LEARN_LEVEL[key];
+    }
+    return 0;
+}
+
 function getBackendWordStatus(item) {
-    if (item?.learned === true) return 'Đã thuộc';
-    return 'Chưa thuộc';
+    return toStatusFromLearnLevel(item?.learnLevel, item?.learned === true);
 }
 
 async function syncUserVocabularyFromBackend() {
-    if (typeof apiGetUserVocab !== 'function') return;
+    if (!hasBackendAuthToken() || typeof apiGetUserVocab !== 'function') return;
 
     try {
-        const response = await apiGetUserVocab();
+        const [groupsResponse, response] = await Promise.all([
+            typeof apiGetUserVocabGroups === 'function' ? apiGetUserVocabGroups() : Promise.resolve([]),
+            apiGetUserVocab({ size: 500, sort: 'newest' })
+        ]);
+
+        const remoteGroups = groupsResponse?.data || groupsResponse || [];
+        const localGroups = getGroups();
+        if (Array.isArray(remoteGroups)) {
+            remoteGroups.forEach((groupItem) => {
+                const groupName = String(groupItem?.name || '').trim();
+                const groupId = Number(groupItem?.id);
+                if (!groupName) return;
+                if (!localGroups.includes(groupName)) {
+                    localGroups.push(groupName);
+                }
+                if (Number.isFinite(groupId) && groupId > 0) {
+                    setGroupMeta(groupName, { id: groupId, name: groupName });
+                }
+            });
+            saveGroups(localGroups);
+        }
+
         const remoteList = response?.data || response || [];
         if (!Array.isArray(remoteList)) return;
 
@@ -40,13 +258,19 @@ async function syncUserVocabularyFromBackend() {
 
         remoteList.forEach((item) => {
             const backendVocabId = Number(item?.id);
+            const backendUserVocabularyId = Number(item?.userVocabularyId);
+            const backendGroupId = Number(item?.groupId);
             if (!Number.isFinite(backendVocabId) || backendVocabId <= 0) return;
 
-            const targetGroup = getBackendGroupFromNote(item?.note);
+            const targetGroup = getBackendGroupName(item);
             if (!groups.includes(targetGroup)) groups.push(targetGroup);
+            if (Number.isFinite(backendGroupId) && backendGroupId > 0) {
+                setGroupMeta(targetGroup, { id: backendGroupId, name: targetGroup });
+            }
 
             const existing = data.find((w) =>
-                Number(w?.backendVocabId) === backendVocabId
+                (Number.isFinite(backendUserVocabularyId) && Number(w?.backendUserVocabularyId) === backendUserVocabularyId)
+                || Number(w?.backendVocabId) === backendVocabId
                 || (
                     String(w?.word || '').toLowerCase() === String(item?.word || '').toLowerCase()
                     && String(w?.group || '') === targetGroup
@@ -60,7 +284,14 @@ async function syncUserVocabularyFromBackend() {
                 existing.meaning = item?.viMeaning || item?.meaning || existing.meaning;
                 existing.group = targetGroup;
                 existing.status = getBackendWordStatus(item);
+                existing.learnLevel = normalizeLearnLevel(item?.learnLevel);
                 existing.backendVocabId = backendVocabId;
+                existing.backendUserVocabularyId = Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0
+                    ? backendUserVocabularyId
+                    : existing.backendUserVocabularyId || null;
+                existing.backendGroupId = Number.isFinite(backendGroupId) && backendGroupId > 0
+                    ? backendGroupId
+                    : existing.backendGroupId || null;
                 existing.addedAt = existing.addedAt || new Date().toISOString();
                 return;
             }
@@ -75,7 +306,10 @@ async function syncUserVocabularyFromBackend() {
                 group: targetGroup,
                 source: 'Đồng bộ backend',
                 status: getBackendWordStatus(item),
+                learnLevel: normalizeLearnLevel(item?.learnLevel),
                 backendVocabId,
+                backendUserVocabularyId: Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0 ? backendUserVocabularyId : null,
+                backendGroupId: Number.isFinite(backendGroupId) && backendGroupId > 0 ? backendGroupId : null,
                 addedAt: item?.savedAt || new Date().toISOString()
             }));
         });
@@ -88,28 +322,105 @@ async function syncUserVocabularyFromBackend() {
 }
 
 async function saveWordToBackend(item, groupName) {
-    if (typeof apiLookupVocab !== 'function' || typeof apiSaveUserVocab !== 'function') return null;
+    if (!hasBackendAuthToken() || typeof apiLookupVocab !== 'function' || typeof apiSaveUserVocab !== 'function') return null;
 
     const lookupRes = await apiLookupVocab(item.word);
     const vocabData = lookupRes?.data || lookupRes;
     const vocabId = Number(vocabData?.id);
     if (!Number.isFinite(vocabId) || vocabId <= 0) return null;
 
-    await apiSaveUserVocab(vocabId, groupName || item.group || 'Sổ từ vựng');
-    return vocabId;
+    const targetGroupName = String(groupName || item.group || 'Sổ từ vựng').trim() || 'Sổ từ vựng';
+    const groupMeta = getGroupMetaByName(targetGroupName);
+    const saveRes = await apiSaveUserVocab(vocabId, {
+        groupId: Number.isFinite(Number(groupMeta?.id)) ? Number(groupMeta.id) : undefined,
+        groupName: targetGroupName,
+        note: item?.note || null
+    });
+    const savedData = saveRes?.data || saveRes || {};
+
+    const backendUserVocabularyId = Number(savedData?.userVocabularyId);
+    const backendGroupId = Number(savedData?.groupId);
+    if (Number.isFinite(backendGroupId) && backendGroupId > 0) {
+        setGroupMeta(targetGroupName, { id: backendGroupId, name: savedData?.groupName || targetGroupName });
+    }
+
+    return {
+        backendVocabId: vocabId,
+        backendUserVocabularyId: Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0
+            ? backendUserVocabularyId
+            : null,
+        backendGroupId: Number.isFinite(backendGroupId) && backendGroupId > 0 ? backendGroupId : null,
+        learnLevel: normalizeLearnLevel(savedData?.learnLevel),
+        status: toStatusFromLearnLevel(savedData?.learnLevel, savedData?.learned === true)
+    };
 }
 
 // ===== AUTO INIT VOCAB DATA =====
 function initData() {
+    normalizeVocabularyStorage();
+
     let initialized = localStorage.getItem('aimhigh_vocab_init');
-    if (!initialized) {
+    const groups = getGroups();
+    const hasBasicGroup = groups.some((name) => name.startsWith('Basic'));
+    const hasAdvancedGroup = groups.some((name) => name.startsWith('Adv'));
+
+    if (!initialized || !hasBasicGroup || !hasAdvancedGroup) {
         seedPresetVocabularies();
         localStorage.setItem('aimhigh_vocab_init', 'true');
     }
+
     let customSeeded = localStorage.getItem('aimhigh_custom_seeded_v3');
-    if (!customSeeded) {
+    const hasCustomWords = getData().some((item) => item?.group && !String(item.group).startsWith('Basic') && !String(item.group).startsWith('Adv'));
+    if (!customSeeded || !hasCustomWords) {
         seedCustomVocabularies();
         localStorage.setItem('aimhigh_custom_seeded_v3', 'true');
+    }
+
+    normalizeVocabularyStorage();
+}
+
+function normalizeVocabularyStorage() {
+    const groups = getGroups();
+    let data = getData();
+    let changed = false;
+
+    if (!Array.isArray(data)) {
+        data = [];
+        changed = true;
+    }
+
+    const normalizedData = data
+        .filter((item) => item && typeof item === 'object')
+        .map((item) => {
+            const normalized = getDefaultWordObject(item);
+            const groupName = String(item.group || normalized.group || 'Sổ từ vựng').trim() || 'Sổ từ vựng';
+            normalized.group = groupName;
+            normalized.status = ['Chưa thuộc', 'Nhớ sơ sơ', 'Đã thuộc'].includes(item.status)
+                ? item.status
+                : 'Chưa thuộc';
+            normalized.learnLevel = toLearnLevelFromStatus(normalized.status);
+            return normalized;
+        });
+
+    if (normalizedData.length !== data.length) changed = true;
+
+    const mergedGroups = [...groups];
+    normalizedData.forEach((item) => {
+        if (item.group && !mergedGroups.includes(item.group)) {
+            mergedGroups.push(item.group);
+            changed = true;
+        }
+    });
+
+    const hasCustomGroup = mergedGroups.some((name) => !name.startsWith('Basic') && !name.startsWith('Adv'));
+    if (!hasCustomGroup) {
+        mergedGroups.push('Sổ từ vựng');
+        changed = true;
+    }
+
+    if (changed) {
+        saveGroups(mergedGroups);
+        saveData(normalizedData);
     }
 }
 
@@ -147,6 +458,9 @@ function seedCustomVocabularies() {
 }
 
 function getDefaultWordObject(w) {
+    const learnLevel = normalizeLearnLevel(w?.learnLevel);
+    const status = w?.status || toStatusFromLearnLevel(learnLevel, w?.learned === true);
+
     return {
         word: w.word || '',
         pronunciation: w.pronunciation || '/ˈwɜːrd/',
@@ -157,9 +471,12 @@ function getDefaultWordObject(w) {
         example: w.example || 'This is an example sentence using the word.',
         group: w.group,
         source: w.source,
-        status: w.status || 'Chưa thuộc',
+        status,
+        learnLevel,
         addedAt: w.addedAt || new Date().toISOString(),
-        backendVocabId: Number.isFinite(Number(w.backendVocabId)) ? Number(w.backendVocabId) : null
+        backendVocabId: Number.isFinite(Number(w.backendVocabId)) ? Number(w.backendVocabId) : null,
+        backendUserVocabularyId: Number.isFinite(Number(w.backendUserVocabularyId)) ? Number(w.backendUserVocabularyId) : null,
+        backendGroupId: Number.isFinite(Number(w.backendGroupId)) ? Number(w.backendGroupId) : null
     };
 }
 
@@ -332,18 +649,112 @@ let activeGroupFilter = '';
 let wordSearchQuery = '';
 let wordStatusFilter = 'all';
 let wordSortFilter = 'newest';
+let wordPosFilter = 'all';
+let wordDateFromFilter = '';
+let wordDateToFilter = '';
+let currentVocabularyPage = 'vault';
+
+function detectVocabularyPageMode() {
+    const path = window.location.pathname.toLowerCase();
+    return path.includes('vocabulary-notebook') ? 'notebook' : 'vault';
+}
+
+function redirectLegacyVocabularyRoutes() {
+    const params = new URLSearchParams(window.location.search);
+    const view = (params.get('view') || '').trim().toLowerCase();
+    if (!view) return false;
+
+    const isNotebookView = view === 'custom' || view === 'notebook' || view === 'so-tu-vung' || view === 'review';
+    const isVaultView = view === 'list';
+
+    const mode = detectVocabularyPageMode();
+    if (isNotebookView && mode === 'vault') {
+        window.location.replace('Vocabulary-notebook.html');
+        return true;
+    }
+
+    if (isVaultView && mode === 'notebook') {
+        window.location.replace('Vocabulary.html');
+        return true;
+    }
+
+    return false;
+}
+
+function normalizePosValue(value) {
+    const text = String(value || '').trim().toLowerCase();
+    if (!text) return '';
+
+    const map = {
+        adjective: 'adj',
+        adverb: 'adv',
+        noun: 'noun',
+        verb: 'verb'
+    };
+
+    return map[text] || text;
+}
+
+function getPosLabel(value) {
+    const pos = normalizePosValue(value);
+    const labelMap = {
+        noun: 'Noun',
+        verb: 'Verb',
+        adj: 'Adjective',
+        adv: 'Adverb'
+    };
+    return labelMap[pos] || (pos ? pos.charAt(0).toUpperCase() + pos.slice(1) : 'Khác');
+}
+
+function extractAddedDate(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toISOString().slice(0, 10);
+}
+
+function renderPosFilterOptions(scopedWords) {
+    const posSelect = document.getElementById('wordPosFilter');
+    if (!posSelect) return;
+
+    const current = wordPosFilter;
+    const posValues = [...new Set(scopedWords
+        .map((item) => normalizePosValue(item.type))
+        .filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+    const options = ['<option value="all">Mọi từ loại</option>'];
+    posValues.forEach((pos) => {
+        options.push(`<option value="${pos}">${getPosLabel(pos)}</option>`);
+    });
+
+    posSelect.innerHTML = options.join('');
+    posSelect.value = posValues.includes(current) ? current : 'all';
+    wordPosFilter = posSelect.value || 'all';
+}
 
 function setCategoryTab(tab) {
+    if (currentVocabularyPage === 'vault' && tab === 'custom') {
+        tab = 'basic';
+    }
+    if (currentVocabularyPage === 'notebook') {
+        tab = 'custom';
+    }
+
     activeCategoryTab = tab;
     // Update button styles
-    const tabs = document.getElementById('categoryTabs').children;
+    const categoryTabs = document.getElementById('categoryTabs');
+    const tabs = categoryTabs ? categoryTabs.children : [];
     if (tabs.length >= 2) {
         tabs[0].className = tab === 'basic' ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm';
         tabs[1].className = tab === 'advanced' ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm';
     }
 
-    document.getElementById('addGroupContainer').style.display = tab === 'custom' ? 'flex' : 'none';
-    document.getElementById('addWordBtn').style.display = tab === 'custom' ? 'inline-block' : 'none';
+    const addGroupContainer = document.getElementById('addGroupContainer');
+    if (addGroupContainer) addGroupContainer.style.display = tab === 'custom' ? 'flex' : 'none';
+
+    const addWordBtn = document.getElementById('addWordBtn');
+    if (addWordBtn) addWordBtn.style.display = tab === 'custom' ? 'inline-block' : 'none';
+
     const flContainer = document.getElementById('flashcardDropdownContainer');
     if (flContainer) flContainer.style.display = tab === 'custom' ? 'block' : 'none';
 
@@ -428,10 +839,10 @@ function startRenameGroup(event, oldName) {
     headerDiv.appendChild(input);
     input.focus();
     
-    const saveFunc = () => {
+    const saveFunc = async () => {
         const newName = input.value.trim();
         if (newName && newName !== oldName) {
-            commitRenameGroup(oldName, newName);
+            await commitRenameGroup(oldName, newName);
         } else {
             renderGroups();
         }
@@ -448,12 +859,32 @@ function startRenameGroup(event, oldName) {
     });
 }
 
-function commitRenameGroup(oldName, newName) {
+async function commitRenameGroup(oldName, newName) {
     const groups = getGroups();
-    if (groups.includes(newName)) {
+    const duplicate = groups.some((name) => name.toLowerCase() === newName.toLowerCase() && name !== oldName);
+    if (duplicate) {
         alert("Tên nhóm này đã tồn tại!");
         renderGroups();
         return;
+    }
+
+    if (hasBackendAuthToken() && typeof apiRenameUserVocabGroup === 'function') {
+        const groupMeta = getGroupMetaByName(oldName);
+        if (groupMeta?.id) {
+            try {
+                const response = await apiRenameUserVocabGroup(groupMeta.id, newName);
+                const payload = response?.data || response || {};
+                setGroupMeta(newName, {
+                    id: payload?.id || groupMeta.id,
+                    name: payload?.name || newName
+                });
+                removeGroupMeta(oldName);
+            } catch (error) {
+                alert(`Không thể đổi tên nhóm trên backend: ${error?.message || 'Lỗi không xác định'}`);
+                renderGroups();
+                return;
+            }
+        }
     }
 
     const idx = groups.indexOf(oldName);
@@ -472,9 +903,21 @@ function commitRenameGroup(oldName, newName) {
     renderWordTable();
 }
 
-function deleteGroup(event, name) {
+async function deleteGroup(event, name) {
     event.stopPropagation();
     if (!confirm(`Bạn có chắc muốn xóa nhóm "${name}" và toàn bộ từ vựng trong nhóm này không?`)) return;
+
+    if (hasBackendAuthToken() && typeof apiDeleteUserVocabGroup === 'function') {
+        const groupMeta = getGroupMetaByName(name);
+        if (groupMeta?.id) {
+            try {
+                await apiDeleteUserVocabGroup(groupMeta.id);
+            } catch (error) {
+                alert(`Không thể xóa nhóm trên backend: ${error?.message || 'Lỗi không xác định'}`);
+                return;
+            }
+        }
+    }
     
     const groups = getGroups();
     const idx = groups.indexOf(name);
@@ -482,6 +925,7 @@ function deleteGroup(event, name) {
         groups.splice(idx, 1);
         saveGroups(groups);
     }
+    removeGroupMeta(name);
     
     const data = getData();
     const newData = data.filter(w => w.group !== name);
@@ -499,12 +943,28 @@ function selectGroup(group) {
     renderWordTable();
 }
 
-function addGroupFromPage() {
+async function addGroupFromPage() {
     const input = document.getElementById('newGroupInput');
+    if (!input) return;
     const name = input.value.trim();
     if (!name) return;
     const groups = getGroups();
-    if (groups.includes(name)) { alert('Nhóm đã tồn tại!'); return; }
+    const duplicate = groups.some((groupName) => groupName.toLowerCase() === name.toLowerCase());
+    if (duplicate) { alert('Nhóm đã tồn tại!'); return; }
+
+    if (hasBackendAuthToken() && typeof apiCreateUserVocabGroup === 'function') {
+        try {
+            const response = await apiCreateUserVocabGroup(name);
+            const payload = response?.data || response || {};
+            if (payload?.id) {
+                setGroupMeta(name, { id: payload.id, name: payload.name || name });
+            }
+        } catch (error) {
+            alert(`Không thể tạo nhóm trên backend: ${error?.message || 'Lỗi không xác định'}`);
+            return;
+        }
+    }
+
     groups.push(name);
     saveGroups(groups);
     input.value = '';
@@ -523,13 +983,24 @@ function normalizeSearchValue(value) {
 
 function initWordTableControls() {
     const searchInput = document.getElementById('wordSearchInput');
+    const posSelect = document.getElementById('wordPosFilter');
     const statusSelect = document.getElementById('wordStatusFilter');
     const sortSelect = document.getElementById('wordSortFilter');
+    const dateFromInput = document.getElementById('wordDateFrom');
+    const dateToInput = document.getElementById('wordDateTo');
 
     if (searchInput && !searchInput.dataset.bound) {
         searchInput.dataset.bound = 'true';
         searchInput.addEventListener('input', (event) => {
             wordSearchQuery = (event.target.value || '').trim().toLowerCase();
+            renderWordTable();
+        });
+    }
+
+    if (posSelect && !posSelect.dataset.bound) {
+        posSelect.dataset.bound = 'true';
+        posSelect.addEventListener('change', (event) => {
+            wordPosFilter = normalizePosValue(event.target.value || 'all') || 'all';
             renderWordTable();
         });
     }
@@ -549,6 +1020,22 @@ function initWordTableControls() {
             renderWordTable();
         });
     }
+
+    if (dateFromInput && !dateFromInput.dataset.bound) {
+        dateFromInput.dataset.bound = 'true';
+        dateFromInput.addEventListener('change', (event) => {
+            wordDateFromFilter = event.target.value || '';
+            renderWordTable();
+        });
+    }
+
+    if (dateToInput && !dateToInput.dataset.bound) {
+        dateToInput.dataset.bound = 'true';
+        dateToInput.addEventListener('change', (event) => {
+            wordDateToFilter = event.target.value || '';
+            renderWordTable();
+        });
+    }
 }
 
 // ===== WORD TABLE & MODAL =====
@@ -562,6 +1049,13 @@ function renderWordTable() {
             }
             return item.group === activeGroupFilter;
         });
+
+    renderPosFilterOptions(scopedWords);
+
+    const dateFrom = wordDateFromFilter;
+    const dateTo = wordDateToFilter;
+    const normalizedDateFrom = dateFrom && dateTo && dateFrom > dateTo ? dateTo : dateFrom;
+    const normalizedDateTo = dateFrom && dateTo && dateFrom > dateTo ? dateFrom : dateTo;
 
     let filtered = [...scopedWords];
     const isCustom = activeCategoryTab === 'custom';
@@ -577,6 +1071,22 @@ function renderWordTable() {
                 item.pronunciation
             ].join(' ').toLowerCase();
             return joined.includes(wordSearchQuery);
+        });
+    }
+
+    if (wordPosFilter !== 'all') {
+        filtered = filtered.filter((item) => normalizePosValue(item.type) === wordPosFilter);
+    }
+
+    if (normalizedDateFrom || normalizedDateTo) {
+        filtered = filtered.filter((item) => {
+            const addedDate = extractAddedDate(item.addedAt);
+            if (!addedDate) return false;
+
+            if (normalizedDateFrom && addedDate < normalizedDateFrom) return false;
+            if (normalizedDateTo && addedDate > normalizedDateTo) return false;
+
+            return true;
         });
     }
 
@@ -615,6 +1125,7 @@ function renderWordTable() {
     const tbody = document.getElementById('wordTableBody');
     const title = document.getElementById('wordTableTitle');
     const countEl = document.getElementById('wordTableCount');
+    if (!tbody || !title || !countEl) return;
 
     let titleText = activeGroupFilter;
     if (activeGroupFilter === 'all_custom') titleText = 'Sổ từ vựng của bạn';
@@ -624,7 +1135,13 @@ function renderWordTable() {
         ? filtered.length + ' từ'
         : (filtered.length + '/' + scopedWords.length + ' từ');
 
-    document.getElementById('statusColHeader').style.display = isCustom ? 'table-cell' : 'none';
+    const statusColHeader = document.getElementById('statusColHeader');
+    if (statusColHeader) statusColHeader.style.display = isCustom ? 'table-cell' : 'none';
+
+    const dateFromInput = document.getElementById('wordDateFrom');
+    if (dateFromInput) dateFromInput.value = wordDateFromFilter;
+    const dateToInput = document.getElementById('wordDateTo');
+    if (dateToInput) dateToInput.value = wordDateToFilter;
 
     const statusFilterEl = document.getElementById('wordStatusFilter');
     if (statusFilterEl) {
@@ -730,13 +1247,38 @@ function renderWordTable() {
     if (typeof updateFlashcardCount === 'function') updateFlashcardCount();
 }
 
-function updateWordStatus(event, realIndex, newStatus) {
+async function updateWordStatus(event, realIndex, newStatus) {
     event.preventDefault();
     const data = getData();
     if (!Number.isInteger(realIndex) || !data[realIndex]) return;
+
+    const oldStatus = data[realIndex].status || 'Chưa thuộc';
     data[realIndex].status = newStatus;
+    data[realIndex].learnLevel = toLearnLevelFromStatus(newStatus);
     saveData(data);
     renderWordTable();
+
+    const backendId = Number(data[realIndex]?.backendUserVocabularyId || data[realIndex]?.backendVocabId);
+    if (hasBackendAuthToken() && Number.isFinite(backendId) && backendId > 0 && typeof apiUpdateUserVocabStatus === 'function') {
+        try {
+            const response = await apiUpdateUserVocabStatus(backendId, toLearnLevelFromStatus(newStatus));
+            const payload = response?.data || response || {};
+            data[realIndex].status = toStatusFromLearnLevel(payload?.learnLevel, payload?.learned === true);
+            data[realIndex].learnLevel = normalizeLearnLevel(payload?.learnLevel);
+            data[realIndex].backendVocabId = Number.isFinite(Number(payload?.id)) ? Number(payload.id) : data[realIndex].backendVocabId || null;
+            data[realIndex].backendUserVocabularyId = Number.isFinite(Number(payload?.userVocabularyId))
+                ? Number(payload.userVocabularyId)
+                : data[realIndex].backendUserVocabularyId || null;
+            saveData(data);
+            renderWordTable();
+        } catch (error) {
+            data[realIndex].status = oldStatus;
+            data[realIndex].learnLevel = toLearnLevelFromStatus(oldStatus);
+            saveData(data);
+            renderWordTable();
+            alert(`Không thể cập nhật trạng thái trên backend: ${error?.message || 'Lỗi không xác định'}`);
+        }
+    }
 }
 
 function toggleAllWords() {
@@ -751,7 +1293,7 @@ function toggleAllCustomWords() {
     checkboxes.forEach(cb => cb.checked = checkAll.checked);
 }
 
-function massUpdateStatus(newStatus) {
+async function massUpdateStatus(newStatus) {
     const checkboxes = document.querySelectorAll('.word-checkbox:checked');
     if (checkboxes.length === 0) {
         alert('Vui lòng chọn ít nhất 1 từ để đổi trạng thái!');
@@ -760,10 +1302,16 @@ function massUpdateStatus(newStatus) {
     
     const data = getData();
     let updatedCount = 0;
+    const backendIds = [];
     checkboxes.forEach(cb => {
         const realIndex = parseInt(cb.value, 10);
         if (Number.isInteger(realIndex) && data[realIndex] && data[realIndex].status !== newStatus) {
             data[realIndex].status = newStatus;
+            data[realIndex].learnLevel = toLearnLevelFromStatus(newStatus);
+            const backendId = Number(data[realIndex].backendUserVocabularyId || data[realIndex].backendVocabId);
+            if (Number.isFinite(backendId) && backendId > 0) {
+                backendIds.push(backendId);
+            }
             updatedCount++;
         }
     });
@@ -771,6 +1319,19 @@ function massUpdateStatus(newStatus) {
     if (updatedCount > 0) {
         saveData(data);
         renderWordTable();
+
+        if (hasBackendAuthToken() && backendIds.length > 0) {
+            const uniqueIds = [...new Set(backendIds)];
+            try {
+                if (typeof apiBatchUpdateUserVocabStatus === 'function') {
+                    await apiBatchUpdateUserVocabStatus(uniqueIds, toLearnLevelFromStatus(newStatus));
+                } else if (typeof apiUpdateUserVocabStatus === 'function') {
+                    await Promise.all(uniqueIds.map((id) => apiUpdateUserVocabStatus(id, toLearnLevelFromStatus(newStatus))));
+                }
+            } catch (error) {
+                console.warn('Không thể đồng bộ trạng thái hàng loạt lên backend:', error?.message || error);
+            }
+        }
     }
 }
 
@@ -780,7 +1341,7 @@ function populateSaveDropdown() {
     
     const data = getData();
     const customGroups = [...new Set(data.filter(w => w.group && !w.group.startsWith('Basic') && !w.group.startsWith('Adv')).map(w => w.group))];
-    const groups = JSON.parse(localStorage.getItem(GROUPS_KEY)) || [];
+    const groups = getGroups();
     const mergedGroups = [...new Set([...customGroups, ...groups])].filter(g => 
         g !== 'Tất cả' && 
         !g.startsWith('Basic') && 
@@ -788,8 +1349,13 @@ function populateSaveDropdown() {
     );
     
     if (mergedGroups.length === 0) {
-         list.innerHTML = `<li class="p-2 text-muted text-center" style="font-size:0.85rem;">Chưa có nhóm nào trong sổ</li>`;
-         return;
+        const fallbackGroup = 'Sổ từ vựng';
+        if (!groups.includes(fallbackGroup)) {
+            groups.push(fallbackGroup);
+            saveGroups(groups);
+        }
+        list.innerHTML = `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${fallbackGroup}')"><i class="bi bi-folder2 text-primary me-2"></i>${fallbackGroup}</a></li>`;
+        return;
     }
     
     list.innerHTML = mergedGroups.map(g => `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${g}')"><i class="bi bi-folder2 text-primary me-2"></i>${g}</a></li>`).join('');
@@ -818,8 +1384,13 @@ async function saveSelectedWords(groupName) {
                     ...item,
                     group: groupName,
                     status: 'Chưa thuộc',
+                    learnLevel: 0,
                     fcStatus: 'Chưa học', // Reset flashcard status if it exists
-                    backendVocabId: item.backendVocabId || null
+                    backendVocabId: null,
+                    backendUserVocabularyId: null,
+                    backendGroupId: Number.isFinite(Number(getGroupMetaByName(groupName)?.id))
+                        ? Number(getGroupMetaByName(groupName).id)
+                        : null
                 };
                 data.push(newItem);
                 addedCount++;
@@ -830,9 +1401,13 @@ async function saveSelectedWords(groupName) {
     const newItems = addedCount > 0 ? data.slice(data.length - addedCount) : [];
     for (const item of newItems) {
         try {
-            const backendId = await saveWordToBackend(item, groupName);
-            if (backendId) {
-                item.backendVocabId = backendId;
+            const backendSync = await saveWordToBackend(item, groupName);
+            if (backendSync?.backendVocabId) {
+                item.backendVocabId = backendSync.backendVocabId;
+                item.backendUserVocabularyId = backendSync.backendUserVocabularyId || null;
+                item.backendGroupId = backendSync.backendGroupId || item.backendGroupId || null;
+                item.learnLevel = normalizeLearnLevel(backendSync.learnLevel);
+                item.status = backendSync.status || item.status;
                 backendSyncedCount++;
             }
         } catch (error) {
@@ -847,10 +1422,10 @@ async function saveSelectedWords(groupName) {
         renderOverview();
         
         // Ensure the groups are loaded properly in LHS
-        const groups = JSON.parse(localStorage.getItem(GROUPS_KEY)) || [];
+        const groups = getGroups();
         if (!groups.includes(groupName)) {
             groups.push(groupName);
-            localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+            saveGroups(groups);
             renderGroups();
         }
         
@@ -1007,7 +1582,10 @@ async function saveWord() {
         item.addedAt = old.addedAt;
         item.group = old.group;
         item.status = old.status || 'Chưa thuộc';
+        item.learnLevel = normalizeLearnLevel(old.learnLevel ?? toLearnLevelFromStatus(item.status));
         item.backendVocabId = old.backendVocabId || null;
+        item.backendUserVocabularyId = old.backendUserVocabularyId || null;
+        item.backendGroupId = old.backendGroupId || null;
         data[realIdx] = item;
     } else {
         let targetGroup = activeGroupFilter;
@@ -1018,8 +1596,14 @@ async function saveWord() {
         item.group = targetGroup;
 
         try {
-            const backendId = await saveWordToBackend(item, targetGroup);
-            if (backendId) item.backendVocabId = backendId;
+            const backendSync = await saveWordToBackend(item, targetGroup);
+            if (backendSync?.backendVocabId) {
+                item.backendVocabId = backendSync.backendVocabId;
+                item.backendUserVocabularyId = backendSync.backendUserVocabularyId || null;
+                item.backendGroupId = backendSync.backendGroupId || null;
+                item.learnLevel = normalizeLearnLevel(backendSync.learnLevel);
+                item.status = backendSync.status || item.status;
+            }
         } catch (error) {
             console.warn('Không thể lưu từ mới lên backend:', error?.message || error);
         }
@@ -1039,10 +1623,10 @@ async function deleteWord(realIndex) {
     if (!Number.isInteger(realIndex) || !data[realIndex]) return;
 
     const target = data[realIndex];
-    const backendVocabId = Number(target?.backendVocabId);
-    if (Number.isFinite(backendVocabId) && backendVocabId > 0 && typeof apiDeleteUserVocab === 'function') {
+    const backendDeleteId = Number(target?.backendUserVocabularyId || target?.backendVocabId);
+    if (hasBackendAuthToken() && Number.isFinite(backendDeleteId) && backendDeleteId > 0 && typeof apiDeleteUserVocab === 'function') {
         try {
-            await apiDeleteUserVocab(backendVocabId);
+            await apiDeleteUserVocab(backendDeleteId);
         } catch (error) {
             console.warn('Không thể xóa từ vựng trên backend:', error?.message || error);
         }
@@ -1057,46 +1641,23 @@ async function deleteWord(realIndex) {
 
 // ===== TABS =====
 function showTab(tab) {
-    const listBtn = document.getElementById('tabList');
-    const customBtn = document.getElementById('tabCustom');
-    const reviewBtn = document.getElementById('tabReview');
-    const categoryTabs = document.getElementById('categoryTabs');
+    if (tab === 'list' && currentVocabularyPage !== 'vault') {
+        window.location.href = 'Vocabulary.html';
+        return;
+    }
 
-    listBtn.className = 'btn btn-outline-primary';
-    if (customBtn) customBtn.className = 'btn btn-outline-primary';
-    reviewBtn.className = 'btn btn-outline-primary';
+    if ((tab === 'custom' || tab === 'review') && currentVocabularyPage !== 'notebook') {
+        window.location.href = 'Vocabulary-notebook.html';
+        return;
+    }
 
-    if (tab === 'list') {
-        document.getElementById('listSection').style.display = 'block';
-        document.getElementById('reviewSection').classList.remove('active');
-        listBtn.className = 'btn btn-primary';
-        
-        categoryTabs.style.display = 'flex';
-        if (activeCategoryTab === 'custom') {
-            setCategoryTab('basic');
-        } else {
-            setCategoryTab(activeCategoryTab);
-        }
-    } else if (tab === 'custom') {
-        document.getElementById('listSection').style.display = 'block';
-        document.getElementById('reviewSection').classList.remove('active');
-        if (customBtn) customBtn.className = 'btn btn-primary';
-        
-        categoryTabs.style.display = 'none';
-        setCategoryTab('custom');
-    } else {
-        document.getElementById('listSection').style.display = 'none';
-        document.getElementById('reviewSection').classList.add('active');
-        reviewBtn.className = 'btn btn-primary';
-        
-        if (reviewCards.length === 0) {
-            document.getElementById('reviewEmpty').style.display = 'block';
-            document.getElementById('reviewActive').style.display = 'none';
-            document.getElementById('reviewDone').style.display = 'none';
-        } else {
-            document.getElementById('reviewEmpty').style.display = 'none';
-            document.getElementById('reviewActive').style.display = 'block';
-            document.getElementById('reviewDone').style.display = 'none';
+    if (currentVocabularyPage === 'notebook') {
+        const reviewSection = document.getElementById('reviewSection');
+        if (reviewSection) {
+            reviewSection.classList.add('active');
+            if (tab === 'review') {
+                reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     }
 }
@@ -1238,6 +1799,9 @@ function processCard(newStatus) {
 }
 
 function startReview() {
+    const reviewSection = document.getElementById('reviewSection');
+    if (reviewSection) reviewSection.classList.add('active');
+
     if (currentSessionOriginalCards.length === 0) {
         document.getElementById('reviewEmpty').style.display = 'block';
         document.getElementById('reviewActive').style.display = 'none';
@@ -1315,7 +1879,7 @@ function finishReview() {
     document.getElementById('reviewActive').style.display = 'none';
     document.getElementById('reviewDone').style.display = 'block';
     document.getElementById('reviewEmpty').style.display = 'none';
-    document.getElementById('reviewResult').textContent = totalInitialCards;
+    document.getElementById('reviewResult').textContent = completedCardsCount;
     document.getElementById('reviewResultTotal').textContent = totalInitialCards;
 }
 
@@ -1328,17 +1892,11 @@ function recordReviewActivity() {
 }
 
 function getInitialVocabularyView() {
-    const params = new URLSearchParams(window.location.search);
-    const view = (params.get('view') || '').trim().toLowerCase();
+    return currentVocabularyPage === 'notebook' ? 'custom' : 'list';
+}
 
-    if (view === 'custom' || view === 'notebook' || view === 'so-tu-vung') {
-        return 'custom';
-    }
-    if (view === 'review') {
-        return 'review';
-    }
-
-    return 'list';
+function updateVocabularyQueryParam(view) {
+    return view;
 }
 
 function syncVocabularyMenuActive(view) {
@@ -1352,12 +1910,22 @@ function syncVocabularyMenuActive(view) {
 
 // ===== INITIATE =====
 document.addEventListener('DOMContentLoaded', async () => {
+    if (redirectLegacyVocabularyRoutes()) return;
+
+    currentVocabularyPage = detectVocabularyPageMode();
+    initVocabularyHeaderAuth();
     initData();
     await syncUserVocabularyFromBackend();
     initWordTableControls();
-    const initialView = getInitialVocabularyView();
-    showTab(initialView);
-    syncVocabularyMenuActive(initialView);
+
+    if (currentVocabularyPage === 'notebook') {
+        setCategoryTab('custom');
+        syncVocabularyMenuActive('custom');
+    } else {
+        setCategoryTab('basic');
+        syncVocabularyMenuActive('list');
+    }
+
     renderHeatmap();
     renderOverview();
 });

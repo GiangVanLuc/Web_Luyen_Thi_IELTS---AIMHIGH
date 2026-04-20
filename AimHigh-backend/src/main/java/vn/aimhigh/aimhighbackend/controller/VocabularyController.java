@@ -6,12 +6,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.aimhigh.aimhighbackend.dto.request.SaveVocabularyRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchDeleteRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchSaveRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchStatusRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyGroupCreateRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyGroupUpdateRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyStatusUpdateRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyUpdateRequest;
 import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
+import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyBatchResultResponse;
+import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyGroupResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
 import vn.aimhigh.aimhighbackend.repository.UserRepository;
 import vn.aimhigh.aimhighbackend.service.VocabularyService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,20 +41,41 @@ public class VocabularyController {
     }
 
     @PostMapping("/user-vocabulary")
-    public ResponseEntity<ApiResponse<String>> saveToVocabulary(
+    public ResponseEntity<ApiResponse<VocabularyResponse>> saveToVocabulary(
             @Valid @RequestBody SaveVocabularyRequest request,
             Authentication authentication) {
         Long userId = requireUserId(authentication);
-        vocabularyService.saveToUserVocabulary(request, userId);
-        return ResponseEntity.ok(ApiResponse.success("Lưu từ vựng thành công"));
+        VocabularyResponse response = vocabularyService.saveToUserVocabulary(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Lưu từ vựng thành công"));
     }
 
     @GetMapping("/user-vocabulary")
     public ResponseEntity<ApiResponse<List<VocabularyResponse>>> getMyVocabulary(
             @RequestParam(required = false) Boolean learned,
+            @RequestParam(required = false) Long groupId,
+            @RequestParam(required = false) String partOfSpeech,
+            @RequestParam(required = false) Integer learnLevel,
+            @RequestParam(required = false) LocalDate fromDate,
+            @RequestParam(required = false) LocalDate toDate,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
             Authentication authentication) {
         Long userId = requireUserId(authentication);
-        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getUserVocabulary(userId, learned)));
+        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getUserVocabulary(
+                userId,
+                learned,
+                groupId,
+                partOfSpeech,
+                learnLevel,
+                fromDate,
+                toDate,
+                q,
+                sort,
+                page,
+                size
+        )));
     }
 
     @DeleteMapping("/user-vocabulary/{id}")
@@ -54,6 +85,87 @@ public class VocabularyController {
         Long userId = requireUserId(authentication);
         vocabularyService.deleteUserVocabulary(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Xoá từ vựng đã lưu"));
+    }
+
+    @PatchMapping("/user-vocabulary/{id}/status")
+    public ResponseEntity<ApiResponse<VocabularyResponse>> updateUserVocabularyStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UserVocabularyStatusUpdateRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        VocabularyResponse response = vocabularyService.updateUserVocabularyStatus(id, request.getLearnLevel(), userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật trạng thái thành công"));
+    }
+
+    @PatchMapping("/user-vocabulary/{id}")
+    public ResponseEntity<ApiResponse<VocabularyResponse>> updateUserVocabulary(
+            @PathVariable Long id,
+            @Valid @RequestBody UserVocabularyUpdateRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        VocabularyResponse response = vocabularyService.updateUserVocabulary(id, request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật từ vựng thành công"));
+    }
+
+    @PostMapping("/user-vocabulary/batch-save")
+    public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchSaveUserVocabulary(
+            @Valid @RequestBody UserVocabularyBatchSaveRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        UserVocabularyBatchResultResponse response = vocabularyService.batchSaveToUserVocabulary(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Lưu hàng loạt thành công"));
+    }
+
+    @PatchMapping("/user-vocabulary/batch-status")
+    public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchUpdateUserVocabularyStatus(
+            @Valid @RequestBody UserVocabularyBatchStatusRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        UserVocabularyBatchResultResponse response = vocabularyService.batchUpdateStatus(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật trạng thái hàng loạt thành công"));
+    }
+
+    @PostMapping("/user-vocabulary/batch-delete")
+    public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchDeleteUserVocabulary(
+            @Valid @RequestBody UserVocabularyBatchDeleteRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        UserVocabularyBatchResultResponse response = vocabularyService.batchDelete(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Xoá hàng loạt thành công"));
+    }
+
+    @GetMapping("/user-vocabulary-groups")
+    public ResponseEntity<ApiResponse<List<UserVocabularyGroupResponse>>> getUserVocabularyGroups(Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getUserVocabularyGroups(userId)));
+    }
+
+    @PostMapping("/user-vocabulary-groups")
+    public ResponseEntity<ApiResponse<UserVocabularyGroupResponse>> createUserVocabularyGroup(
+            @Valid @RequestBody UserVocabularyGroupCreateRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        UserVocabularyGroupResponse response = vocabularyService.createUserVocabularyGroup(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Tạo nhóm từ vựng thành công"));
+    }
+
+    @PatchMapping("/user-vocabulary-groups/{groupId}")
+    public ResponseEntity<ApiResponse<UserVocabularyGroupResponse>> renameUserVocabularyGroup(
+            @PathVariable Long groupId,
+            @Valid @RequestBody UserVocabularyGroupUpdateRequest request,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        UserVocabularyGroupResponse response = vocabularyService.renameUserVocabularyGroup(groupId, request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Đổi tên nhóm thành công"));
+    }
+
+    @DeleteMapping("/user-vocabulary-groups/{groupId}")
+    public ResponseEntity<ApiResponse<String>> deleteUserVocabularyGroup(
+            @PathVariable Long groupId,
+            Authentication authentication) {
+        Long userId = requireUserId(authentication);
+        vocabularyService.deleteUserVocabularyGroup(groupId, userId);
+        return ResponseEntity.ok(ApiResponse.success("Xoá nhóm từ vựng thành công"));
     }
 
     private Long requireUserId(Authentication authentication) {

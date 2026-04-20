@@ -410,6 +410,57 @@ async function adminImportExamExcel(file) {
     return response.json();
 }
 
+// ===== ADMIN VOCABULARY API =====
+
+async function adminGetVocabulary(params = {}) {
+    const query = new URLSearchParams({ page: 0, size: 50, ...params });
+    return apiFetch(`/admin/vocabulary?${query}`);
+}
+
+async function adminUpsertVocabulary(payload) {
+    return apiFetch('/admin/vocabulary', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function adminDeleteVocabulary(vocabularyId) {
+    return apiFetch(`/admin/vocabulary/${vocabularyId}`, {
+        method: 'DELETE'
+    });
+}
+
+async function adminImportVocabularyJson(payload) {
+    return apiFetch('/admin/vocabulary/import/json', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function adminImportVocabularyExcel(file) {
+    const token = localStorage.getItem('aimhigh_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE}/admin/vocabulary/import/excel`, {
+        method: 'POST',
+        headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: formData
+    });
+
+    if (response.status === 401) {
+        localStorage.removeItem('aimhigh_loggedIn');
+        localStorage.removeItem('aimhigh_token');
+        window.location.href = 'login.html';
+        return null;
+    }
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+    return response.json();
+}
+
 async function adminDownloadExamTemplate(skill) {
     const token = localStorage.getItem('aimhigh_token');
     const response = await fetch(`${API_BASE}/admin/exams/template/${encodeURIComponent(skill)}`, {
@@ -631,20 +682,116 @@ async function apiLookupVocab(word) {
     return apiFetch(`/vocabulary/lookup?word=${encodeURIComponent(word)}`);
 }
 
-async function apiSaveUserVocab(vocabId, note) {
+async function apiSaveUserVocab(vocabId, options = {}) {
+    const payload = {
+        vocabId
+    };
+
+    if (options && typeof options === 'object') {
+        if (Number.isFinite(Number(options.groupId))) {
+            payload.groupId = Number(options.groupId);
+        }
+        if (typeof options.groupName === 'string') {
+            payload.groupName = options.groupName;
+        }
+        if (typeof options.note === 'string') {
+            payload.note = options.note;
+        }
+    } else if (typeof options === 'string') {
+        payload.groupName = options;
+    }
+
     return apiFetch(`/user-vocabulary`, {
         method: 'POST',
-        body: JSON.stringify({ vocabId, note })
+        body: JSON.stringify(payload)
     });
 }
 
-async function apiGetUserVocab(learned = null) {
-    const suffix = learned == null ? '' : `?learned=${encodeURIComponent(Boolean(learned))}`;
+async function apiGetUserVocab(filters = {}) {
+    let queryData = {};
+
+    if (typeof filters === 'boolean') {
+        queryData.learned = filters;
+    } else if (filters && typeof filters === 'object') {
+        queryData = { ...filters };
+    }
+
+    const query = new URLSearchParams();
+    Object.entries(queryData).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') return;
+        query.set(key, String(value));
+    });
+
+    const suffix = query.toString() ? `?${query.toString()}` : '';
     return apiFetch(`/user-vocabulary${suffix}`);
 }
 
 async function apiDeleteUserVocab(id) {
     return apiFetch(`/user-vocabulary/${id}`, {
+        method: 'DELETE'
+    });
+}
+
+async function apiUpdateUserVocabStatus(id, learnLevel) {
+    return apiFetch(`/user-vocabulary/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ learnLevel })
+    });
+}
+
+async function apiUpdateUserVocab(id, payload = {}) {
+    return apiFetch(`/user-vocabulary/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function apiBatchSaveUserVocab(vocabIds, options = {}) {
+    return apiFetch('/user-vocabulary/batch-save', {
+        method: 'POST',
+        body: JSON.stringify({
+            vocabIds,
+            groupId: options.groupId,
+            groupName: options.groupName,
+            note: options.note
+        })
+    });
+}
+
+async function apiBatchUpdateUserVocabStatus(userVocabularyIds, learnLevel) {
+    return apiFetch('/user-vocabulary/batch-status', {
+        method: 'PATCH',
+        body: JSON.stringify({ userVocabularyIds, learnLevel })
+    });
+}
+
+async function apiBatchDeleteUserVocab(userVocabularyIds) {
+    return apiFetch('/user-vocabulary/batch-delete', {
+        method: 'POST',
+        body: JSON.stringify({ userVocabularyIds })
+    });
+}
+
+async function apiGetUserVocabGroups() {
+    return apiFetch('/user-vocabulary-groups');
+}
+
+async function apiCreateUserVocabGroup(name) {
+    return apiFetch('/user-vocabulary-groups', {
+        method: 'POST',
+        body: JSON.stringify({ name })
+    });
+}
+
+async function apiRenameUserVocabGroup(groupId, name) {
+    return apiFetch(`/user-vocabulary-groups/${groupId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name })
+    });
+}
+
+async function apiDeleteUserVocabGroup(groupId) {
+    return apiFetch(`/user-vocabulary-groups/${groupId}`, {
         method: 'DELETE'
     });
 }

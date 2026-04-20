@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Từ vựng - AimHigh IELTS</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/Vocabulary.css">
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg fixed-top">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">
+				<img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
+				<span class="brand-name">AimHigh</span>
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav mx-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="index.html">Trang chủ</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="practice.html?skill=listening"><i
+										class="bi bi-headphones"></i> Listening</a></li>
+							<li><a class="dropdown-item" href="practice.html?skill=reading"><i class="bi bi-book"></i>
+									Reading</a></li>
+							<li><a class="dropdown-item" href="practice.html?skill=writing"><i class="bi bi-pencil"></i>
+									Writing</a></li>
+							<li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i>
+									Speaking</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Từ vựng</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" id="menuVocabularyNotebook" href="Vocabulary-notebook.html"><i
+										class="bi bi-card-text"></i> Sổ từ vựng</a></li>
+							<li><a class="dropdown-item active" id="menuVocabularyVault" href="Vocabulary.html"><i
+										class="bi bi-collection"></i> Kho từ vựng AimHigh Pick</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">My Journal</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i>
+									Dashboard</a></li>
+							<li><a class="dropdown-item" href="result.html"><i class="bi bi-clock-history"></i> Lịch sử
+									làm bài</a></li>
+						</ul>
+					</li>
+				</ul>
+				<div class="nav-buttons" id="guestActions">
+					<a href="login.html" class="btn btn-outline-primary me-2">Đăng nhập</a>
+					<a href="register.html" class="btn btn-primary">Đăng ký</a>
+				</div>
+				<div class="nav-user d-none" id="userActions">
+					<div class="user-dropdown dropdown">
+						<button class="btn user-btn dropdown-toggle" data-bs-toggle="dropdown">
+							<div class="user-avatar" id="homeHeaderAvatar">U</div>
+							<span id="homeHeaderName">Người dùng</span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li><a class="dropdown-item" href="dashboard.html#my-study-overview"><i class="bi bi-grid-1x2"></i> My Journal</a></li>
+							<li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="#" id="homeLogoutLink"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<div class="vocab-page">
+		<div class="container">
+			<section class="vocab-hero">
+				<div class="hero-copy">
+					<span class="hero-badge"><i class="bi bi-stars"></i> Kho curated bởi AimHigh</span>
+					<h1 class="hero-title">Kho từ vựng AimHigh Pick</h1>
+					<p class="hero-subtitle">Khám phá các nhóm từ Basic và Advanced, lọc từ theo nhiều tiêu chí và lưu nhanh
+						vào Sổ từ vựng cá nhân để ôn tập.</p>
+				</div>
+				<div class="hero-actions">
+					<a href="Vocabulary-notebook.html" class="btn btn-outline-primary">
+						<i class="bi bi-journal-text"></i> Chuyển đến Sổ từ vựng
+					</a>
+				</div>
+			</section>
+
+			<!-- Overview Cards -->
+			<div class="overview-cards">
+				<div class="overview-card">
+					<div class="ov-icon blue"><i class="bi bi-collection"></i></div>
+					<div class="ov-val" id="totalWords">0</div>
+					<div class="ov-lbl">Tổng từ vựng</div>
+				</div>
+				<div class="overview-card">
+					<div class="ov-icon green"><i class="bi bi-folder2-open"></i></div>
+					<div class="ov-val" id="totalGroups">0</div>
+					<div class="ov-lbl">Nhóm từ</div>
+				</div>
+				<div class="overview-card">
+					<div class="ov-icon orange"><i class="bi bi-fire"></i></div>
+					<div class="ov-val" id="streakDays">0</div>
+					<div class="ov-lbl">Ngày streak</div>
+				</div>
+				<div class="overview-card">
+					<div class="ov-icon purple"><i class="bi bi-calendar-check"></i></div>
+					<div class="ov-val" id="todayCount">0</div>
+					<div class="ov-lbl">Hoạt động hôm nay</div>
+				</div>
+			</div>
+
+			<!-- Heatmap -->
+			<div class="heatmap-card">
+				<div class="heatmap-header">
+					<h3><i class="bi bi-grid-3x3-gap-fill"></i> Hoạt động học từ vựng</h3>
+					<div class="heatmap-stats">
+						<div class="heatmap-stat">
+							<span class="stat-val" id="heatmapTotal">0</span>
+							<span class="stat-lbl">tổng hoạt động</span>
+						</div>
+						<div class="heatmap-stat">
+							<span class="stat-val" id="heatmapMaxStreak">0</span>
+							<span class="stat-lbl">max streak</span>
+						</div>
+					</div>
+				</div>
+				<div class="heatmap-wrapper">
+					<div class="heatmap-months" id="heatmapMonths"></div>
+					<div class="heatmap-body">
+						<div class="heatmap-days">
+							<div class="heatmap-day-label">T2</div>
+							<div class="heatmap-day-label"></div>
+							<div class="heatmap-day-label">T4</div>
+							<div class="heatmap-day-label"></div>
+							<div class="heatmap-day-label">T6</div>
+							<div class="heatmap-day-label"></div>
+							<div class="heatmap-day-label">CN</div>
+						</div>
+						<div class="heatmap-grid" id="heatmapGrid"></div>
+					</div>
+				</div>
+				<div class="heatmap-legend">
+					<span>Ít</span>
+					<div class="legend-cell" style="background: #ebedf0;"></div>
+					<div class="legend-cell" style="background: #9be9a8;"></div>
+					<div class="legend-cell" style="background: #40c463;"></div>
+					<div class="legend-cell" style="background: #30a14e;"></div>
+					<div class="legend-cell" style="background: #216e39;"></div>
+					<span>Nhiều</span>
+				</div>
+			</div>
+
+			<section id="vaultSection">
+				<div class="list-shell">
+					<div class="vocab-section-card group-panel">
+						<div class="vocab-section-header">
+							<h3><i class="bi bi-folder2-open"></i> Nhóm từ vựng</h3>
+						</div>
+
+						<div class="category-switch" id="categoryTabs">
+							<button class="btn btn-primary btn-sm" type="button" onclick="setCategoryTab('basic')">Basic</button>
+							<button class="btn btn-outline-primary btn-sm" type="button"
+								onclick="setCategoryTab('advanced')">Advanced</button>
+						</div>
+
+						<div id="groupsContainer"></div>
+
+						<div class="add-group-inline mt-4" id="addGroupContainer" style="display: none;">
+							<input type="text" id="newGroupInput" placeholder="Tên nhóm mới...">
+							<button class="btn btn-primary" type="button" onclick="addGroupFromPage()">
+								<i class="bi bi-plus-lg"></i> Thêm nhóm
+							</button>
+						</div>
+					</div>
+
+					<div class="vocab-section-card table-panel">
+						<div class="vocab-section-header table-panel-head">
+							<div>
+								<h3 id="wordTableTitle"><i class="bi bi-card-text"></i> Tất cả từ vựng</h3>
+								<p class="table-counter" id="wordTableCount">0 từ</p>
+							</div>
+
+							<div class="table-head-actions">
+								<!-- Save Actions (Basic/Advanced only) -->
+								<div id="saveWordsAction" class="table-inline-action d-none">
+									<div class="form-check form-check-inline m-0">
+										<input type="checkbox" class="form-check-input mt-1" id="checkAllWords"
+											onchange="toggleAllWords()">
+										<label class="form-check-label mb-0"
+											style="font-size: 0.85rem; font-weight: 500; cursor: pointer;"
+											for="checkAllWords">Chọn tất cả</label>
+									</div>
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+											data-bs-toggle="dropdown" onclick="populateSaveDropdown()">
+											<i class="bi bi-download"></i> Lưu từ
+										</button>
+										<ul class="dropdown-menu shadow-sm border-0"
+											style="max-height: 250px; overflow-y: auto;" id="saveWordDropdown">
+										</ul>
+									</div>
+								</div>
+
+								<!-- Custom Mass Actions placeholder (hidden in vault page) -->
+								<div id="customMassActions" class="table-inline-action d-none">
+									<div class="form-check form-check-inline m-0">
+										<input type="checkbox" class="form-check-input mt-1" id="checkAllCustomWords"
+											onchange="toggleAllCustomWords()">
+										<label class="form-check-label mb-0"
+											style="font-size: 0.85rem; font-weight: 500; cursor: pointer;"
+											for="checkAllCustomWords">Chọn tất cả</label>
+									</div>
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+											data-bs-toggle="dropdown">
+											Đổi trạng thái
+										</button>
+										<ul class="dropdown-menu shadow-sm border-0"
+											style="min-width: 140px; border-radius: 12px;">
+											<li><a class="dropdown-item py-2" href="#"
+													onclick="event.preventDefault(); massUpdateStatus('Chưa thuộc')"><span
+														class="status-btn status-chua px-2 py-1"
+														style="border-radius: 20px; font-size: 0.8rem; display: inline-block; width: 100px; text-align: center;">Chưa
+														thuộc</span></a></li>
+											<li><a class="dropdown-item py-2" href="#"
+													onclick="event.preventDefault(); massUpdateStatus('Nhớ sơ sơ')"><span
+														class="status-btn status-soso px-2 py-1"
+														style="border-radius: 20px; font-size: 0.8rem; display: inline-block; width: 100px; text-align: center;">Nhớ
+														sơ sơ</span></a></li>
+											<li><a class="dropdown-item py-2" href="#"
+													onclick="event.preventDefault(); massUpdateStatus('Đã thuộc')"><span
+														class="status-btn status-da px-2 py-1"
+														style="border-radius: 20px; font-size: 0.8rem; display: inline-block; width: 100px; text-align: center;">Đã
+														thuộc</span></a></li>
+										</ul>
+									</div>
+								</div>
+
+								<!-- Flashcard actions placeholder (hidden in vault page) -->
+								<div class="dropdown" id="flashcardDropdownContainer" style="display: none;">
+									<button class="btn btn-sm text-white dropdown-toggle" type="button"
+										data-bs-toggle="dropdown" id="btnHocFlashcards"
+										style="background-color: #d85c27; border-color: #d85c27;">
+										<i class="bi bi-play-fill"></i> Học với Flashcards
+									</button>
+									<ul class="dropdown-menu p-3 shadow-sm"
+										style="min-width: 260px; border-radius: 12px; border: none;"
+										onclick="event.stopPropagation()">
+										<li class="mb-2"><span class="text-muted" style="font-size: 0.9rem;">Chọn loại từ
+												bạn muốn học</span></li>
+										<li class="mb-2 d-flex align-items-center gap-2">
+											<input class="form-check-input mt-0" type="checkbox" value="Chưa thuộc"
+												id="fcOptChua" checked onchange="updateFlashcardCount()">
+											<label class="status-btn status-chua px-3 py-1 m-0 border"
+												style="border-radius: 20px; cursor: pointer; font-size: 0.85rem;"
+												for="fcOptChua">Chưa thuộc</label>
+											<span class="text-secondary ms-auto" style="font-size: 0.85rem;">(<span
+													id="fcCountChua">0</span>)</span>
+										</li>
+										<li class="mb-2 d-flex align-items-center gap-2">
+											<input class="form-check-input mt-0" type="checkbox" value="Nhớ sơ sơ"
+												id="fcOptSoSo" checked onchange="updateFlashcardCount()">
+											<label class="status-btn status-soso px-3 py-1 m-0 border"
+												style="border-radius: 20px; cursor: pointer; font-size: 0.85rem;"
+												for="fcOptSoSo">Nhớ sơ sơ</label>
+											<span class="text-secondary ms-auto" style="font-size: 0.85rem;">(<span
+													id="fcCountSoSo">0</span>)</span>
+										</li>
+										<li class="mb-3 d-flex align-items-center gap-2">
+											<input class="form-check-input mt-0" type="checkbox" value="Đã thuộc"
+												id="fcOptDa" onchange="updateFlashcardCount()">
+											<label class="status-btn status-da px-3 py-1 m-0 border"
+												style="border-radius: 20px; cursor: pointer; font-size: 0.85rem;"
+												for="fcOptDa">Đã thuộc</label>
+											<span class="text-secondary ms-auto" style="font-size: 0.85rem;">(<span
+													id="fcCountDa">0</span>)</span>
+										</li>
+										<li>
+											<button class="btn w-100 text-white"
+												style="background-color: #d85c27; border-radius: 8px;"
+												onclick="startCustomFlashcard()">
+												<i class="bi bi-play-fill"></i> Bắt đầu học (<span
+													id="fcCountTotalBtn">0</span>)
+											</button>
+										</li>
+									</ul>
+								</div>
+
+								<button class="btn btn-sm btn-primary" id="addWordBtn" style="display: none;"
+									type="button" onclick="openWordModal()">
+									<i class="bi bi-plus"></i> Thêm từ
+								</button>
+							</div>
+						</div>
+
+						<div class="word-toolbar">
+							<div class="word-search">
+								<i class="bi bi-search"></i>
+								<input type="text" id="wordSearchInput" placeholder="Tìm theo từ, nghĩa, loại từ...">
+							</div>
+							<select class="form-select" id="wordPosFilter">
+								<option value="all">Mọi từ loại</option>
+							</select>
+							<select class="form-select" id="wordStatusFilter">
+								<option value="all">Mọi trạng thái</option>
+								<option value="Chưa thuộc">Chưa thuộc</option>
+								<option value="Nhớ sơ sơ">Nhớ sơ sơ</option>
+								<option value="Đã thuộc">Đã thuộc</option>
+							</select>
+							<select class="form-select" id="wordSortFilter">
+								<option value="newest">Mới nhất</option>
+								<option value="oldest">Cũ nhất</option>
+								<option value="az">A → Z</option>
+								<option value="za">Z → A</option>
+								<option value="status">Theo trạng thái</option>
+							</select>
+							<input class="form-control" id="wordDateFrom" type="date" title="Từ ngày thêm">
+							<input class="form-control" id="wordDateTo" type="date" title="Đến ngày thêm">
+						</div>
+
+						<div class="word-table-container">
+							<table class="word-table" id="wordTable">
+								<thead>
+									<tr>
+										<th style="width: 40px;"><i class="bi bi-check-square"></i></th>
+										<th id="statusColHeader" style="display: none; width: 140px;">Trạng thái</th>
+										<th>Từ vựng</th>
+										<th>Loại từ</th>
+										<th>Nghĩa của từ</th>
+										<th>Collocation/Công thức</th>
+										<th>Ví dụ</th>
+										<th style="width: 80px;"></th>
+									</tr>
+								</thead>
+								<tbody id="wordTableBody"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<!-- Word Form Modal -->
+	<div class="modal fade" id="wordModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="wordModalTitle">Thêm từ mới</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="wordForm">
+						<input type="hidden" id="wordEditIndex" value="-1">
+						<div class="mb-3">
+							<label class="form-label">Từ vựng *</label>
+							<input type="text" class="form-control" id="wordInput" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Phát âm</label>
+							<input type="text" class="form-control" id="pronunciationInput" placeholder="/ˈwɜːrd/">
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Loại từ</label>
+							<input type="text" class="form-control" id="typeInput" placeholder="noun, verb...">
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Nghĩa của từ *</label>
+							<input type="text" class="form-control" id="meaningInput" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Collocation/Công thức</label>
+							<div id="formulaContainer"></div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Ví dụ</label>
+							<div id="exampleContainer"></div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="button" class="btn btn-primary" onclick="saveWord()">Lưu</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container">
+			<div class="footer-bottom">
+				<p>&copy; 2025 AimHigh. All rights reserved.</p>
+			</div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="js/api.js"></script>
+	<script>
+		(function () {
+			const guestActions = document.getElementById('guestActions');
+			const userActions = document.getElementById('userActions');
+			const nameEl = document.getElementById('homeHeaderName');
+			const avatarEl = document.getElementById('homeHeaderAvatar');
+			const logoutLink = document.getElementById('homeLogoutLink');
+
+			let currentUser = {};
+			try {
+				currentUser = JSON.parse(localStorage.getItem('aimhigh_currentUser') || localStorage.getItem('aimhigh_user') || '{}') || {};
+			} catch (_) {
+				currentUser = {};
+			}
+
+			const loggedIn = localStorage.getItem('aimhigh_loggedIn') === 'true'
+				|| !!localStorage.getItem('aimhigh_token')
+				|| !!(currentUser && (currentUser.email || currentUser.name));
+
+			if (guestActions && userActions) {
+				guestActions.classList.toggle('d-none', loggedIn);
+				userActions.classList.toggle('d-none', !loggedIn);
+			}
+
+			if (loggedIn) {
+				const fullName = currentUser.name || currentUser.fullName || currentUser.username || currentUser.email || 'Người dùng';
+				if (nameEl) nameEl.textContent = fullName;
+				if (avatarEl) {
+					const parts = String(fullName).trim().split(/\s+/).filter(Boolean);
+					const initials = parts.length > 1
+						? (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+						: (parts[0]?.charAt(0) || 'U').toUpperCase();
+					avatarEl.textContent = initials;
+				}
+			}
+
+			if (logoutLink && !logoutLink.dataset.bound) {
+				logoutLink.dataset.bound = 'true';
+				logoutLink.addEventListener('click', async function (event) {
+					event.preventDefault();
+					if (typeof apiLogout === 'function') {
+						try {
+							await apiLogout();
+							return;
+						} catch (_) {}
+					}
+					localStorage.removeItem('aimhigh_token');
+					localStorage.removeItem('aimhigh_refreshToken');
+					localStorage.removeItem('aimhigh_loggedIn');
+					localStorage.removeItem('aimhigh_currentUser');
+					window.location.href = 'login.html';
+				});
+			}
+		})();
+	</script>
+	<script src="js/Vocabulary.js"></script>
+</body>
+
+</html>

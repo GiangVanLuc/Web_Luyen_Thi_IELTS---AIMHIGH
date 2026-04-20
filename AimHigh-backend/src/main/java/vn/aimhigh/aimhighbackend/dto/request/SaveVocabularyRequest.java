@@ -7,6 +7,10 @@ import jakarta.validation.constraints.NotNull;
 public class SaveVocabularyRequest {
     @NotNull(message = "VocabId không được bỏ trống")
     private Long vocabId;
-    
+
+    private Long groupId;
+
+    private String groupName;
+
     private String note;
 }

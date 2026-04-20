@@ -406,6 +406,7 @@
     margin-top: 14px;
     display: flex;
     gap: 8px;
+    align-items: stretch;
 }
 
 .add-group-inline input {
@@ -419,6 +420,14 @@
 .add-group-inline input:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+.add-group-inline .btn {
+    white-space: nowrap;
+    min-width: 132px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .table-panel-head {
@@ -452,8 +461,21 @@
 .word-toolbar {
     margin-bottom: 12px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 170px 170px;
+    grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(130px, 170px)) repeat(2, minmax(145px, 170px));
     gap: 10px;
+}
+
+.word-toolbar .form-select,
+.word-toolbar .form-control {
+    border-radius: 10px;
+    border: 1px solid #dce4ef;
+    font-size: 0.9rem;
+}
+
+.word-toolbar .form-select:focus,
+.word-toolbar .form-control:focus {
+    box-shadow: none;
+    border-color: var(--primary-color);
 }
 
 .word-search {
@@ -732,7 +754,7 @@
     }
 
     .word-toolbar {
-        grid-template-columns: minmax(0, 1fr) 150px 150px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

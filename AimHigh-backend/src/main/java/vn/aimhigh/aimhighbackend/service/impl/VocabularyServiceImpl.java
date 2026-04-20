@@ -1,88 +1,519 @@
 package vn.aimhigh.aimhighbackend.service.impl;
 
-import vn.aimhigh.aimhighbackend.service.VocabularyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.aimhigh.aimhighbackend.dto.request.SaveVocabularyRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchDeleteRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchSaveRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchStatusRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyGroupCreateRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyGroupUpdateRequest;
+import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyUpdateRequest;
+import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyBatchResultResponse;
+import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyGroupResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.BadRequestException;
+import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
+import vn.aimhigh.aimhighbackend.model.User;
+import vn.aimhigh.aimhighbackend.model.UserVocabulary;
+import vn.aimhigh.aimhighbackend.model.UserVocabularyGroup;
+import vn.aimhigh.aimhighbackend.model.Vocabulary;
+import vn.aimhigh.aimhighbackend.repository.UserRepository;
+import vn.aimhigh.aimhighbackend.repository.UserVocabularyGroupRepository;
+import vn.aimhigh.aimhighbackend.repository.UserVocabularyRepository;
+import vn.aimhigh.aimhighbackend.repository.VocabularyExampleRepository;
+import vn.aimhigh.aimhighbackend.repository.VocabularyRepository;
+import vn.aimhigh.aimhighbackend.service.VocabularyService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class VocabularyServiceImpl implements VocabularyService {
-    private final vn.aimhigh.aimhighbackend.repository.VocabularyRepository vocabularyRepository;
-    private final vn.aimhigh.aimhighbackend.repository.UserVocabularyRepository userVocabularyRepository;
-    private final vn.aimhigh.aimhighbackend.repository.UserRepository userRepository;
+    private static final String DEFAULT_GROUP_NAME = "Sổ từ vựng";
 
+    private final VocabularyRepository vocabularyRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
+    private final UserVocabularyGroupRepository userVocabularyGroupRepository;
+    private final VocabularyExampleRepository vocabularyExampleRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    @Transactional(readOnly = true)
     public VocabularyResponse lookup(String word, Long userId) {
         String normalizedWord = normalizeWord(word);
         if (normalizedWord.isBlank()) {
             throw new BadRequestException("Invalid vocabulary word");
         }
 
-        vn.aimhigh.aimhighbackend.model.Vocabulary vocab = vocabularyRepository.findByNormalizedWord(normalizedWord).orElseGet(() -> {
-            vn.aimhigh.aimhighbackend.model.Vocabulary newVocab = vn.aimhigh.aimhighbackend.model.Vocabulary.builder()
+        Vocabulary vocab = vocabularyRepository.findByNormalizedWord(normalizedWord).orElseGet(() -> {
+            Vocabulary newVocab = Vocabulary.builder()
                     .word(word.trim())
                     .build();
             return vocabularyRepository.save(newVocab);
         });
 
-        boolean isSaved = userVocabularyRepository.findByUserIdAndVocabularyId(userId, vocab.getId()).isPresent();
-
-        return VocabularyResponse.builder()
-                .id(vocab.getId())
-                .word(vocab.getWord())
-                .ipa(vocab.getIpa())
-                .partOfSpeech(vocab.getPartOfSpeech())
-                .meaning(vocab.getMeaning())
-                .viMeaning(vocab.getViMeaning())
-                .audioUrl(vocab.getAudioUrl())
-                .imageUrl(vocab.getImageUrl())
-                .related(vocab.getRelated())
-                .isSaved(isSaved)
-                .build();
+        Optional<UserVocabulary> saved = userVocabularyRepository.findByUserIdAndVocabularyId(userId, vocab.getId());
+        return toResponse(vocab, saved.orElse(null));
     }
 
-    public void saveToUserVocabulary(SaveVocabularyRequest request, Long userId) {
-        if (userVocabularyRepository.findByUserIdAndVocabularyId(userId, request.getVocabId()).isPresent()) {
-            return;
+    @Override
+    public VocabularyResponse saveToUserVocabulary(SaveVocabularyRequest request, Long userId) {
+        Vocabulary vocab = vocabularyRepository.findById(request.getVocabId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy từ vựng"));
+
+        String groupName = trimToNull(request.getGroupName());
+        String note = trimToNull(request.getNote());
+
+        // Backward compatibility: FE cũ gửi tên nhóm vào trường note.
+        if (request.getGroupId() == null && groupName == null && note != null) {
+            groupName = note;
+            note = null;
         }
-        vn.aimhigh.aimhighbackend.model.User user = userRepository.findById(userId).orElseThrow();
-        vn.aimhigh.aimhighbackend.model.Vocabulary vocab = vocabularyRepository.findById(request.getVocabId()).orElseThrow();
-        
-        vn.aimhigh.aimhighbackend.model.UserVocabulary userVocab = vn.aimhigh.aimhighbackend.model.UserVocabulary.builder()
+
+        UserVocabularyGroup targetGroup = resolveTargetGroup(userId, request.getGroupId(), groupName);
+
+        Optional<UserVocabulary> existing = userVocabularyRepository.findByUserIdAndVocabularyId(userId, request.getVocabId());
+        if (existing.isPresent()) {
+            UserVocabulary userVocabulary = existing.get();
+            boolean changed = false;
+
+            if (targetGroup != null && (userVocabulary.getGroup() == null || !Objects.equals(userVocabulary.getGroup().getId(), targetGroup.getId()))) {
+                userVocabulary.setGroup(targetGroup);
+                changed = true;
+            }
+
+            if (note != null && !Objects.equals(note, userVocabulary.getNote())) {
+                userVocabulary.setNote(note);
+                changed = true;
+            }
+
+            if (changed) {
+                userVocabulary = userVocabularyRepository.save(userVocabulary);
+            }
+            return toResponse(vocab, userVocabulary);
+        }
+
+        User user = getUser(userId);
+        UserVocabulary userVocab = UserVocabulary.builder()
                 .user(user)
                 .vocabulary(vocab)
+                .group(targetGroup)
                 .learned(false)
-                .note(request.getNote())
+                .learnLevel(0)
+                .note(note)
                 .build();
-        userVocabularyRepository.save(userVocab);
+        UserVocabulary saved = userVocabularyRepository.save(userVocab);
+        return toResponse(vocab, saved);
     }
 
-    public List<VocabularyResponse> getUserVocabulary(Long userId, Boolean learned) {
-        return userVocabularyRepository.findByUserId(userId).stream()
-                .filter(uv -> learned == null || learned.equals(Boolean.TRUE.equals(uv.getLearned())))
-                .map(uv -> {
-                    vn.aimhigh.aimhighbackend.model.Vocabulary v = uv.getVocabulary();
-                    return VocabularyResponse.builder()
-                            .id(v.getId())
-                            .word(v.getWord())
-                            .ipa(v.getIpa())
-                            .partOfSpeech(v.getPartOfSpeech())
-                            .meaning(v.getMeaning())
-                            .viMeaning(v.getViMeaning())
-                            .isSaved(true)
-                            .userVocabularyId(uv.getId())
-                            .learned(Boolean.TRUE.equals(uv.getLearned()))
-                            .note(uv.getNote())
-                            .savedAt(uv.getSavedAt())
-                            .build();
-                }).toList();
+    @Override
+    @Transactional(readOnly = true)
+    public List<VocabularyResponse> getUserVocabulary(
+            Long userId,
+            Boolean learned,
+            Long groupId,
+            String partOfSpeech,
+            Integer learnLevel,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String keyword,
+            String sort,
+            Integer page,
+            Integer size
+    ) {
+        ensureDefaultGroup(userId);
+
+        LocalDateTime fromDateTime = fromDate == null ? null : fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate == null ? null : toDate.plusDays(1).atStartOfDay().minusNanos(1);
+
+        if (fromDateTime != null && toDateTime != null && fromDateTime.isAfter(toDateTime)) {
+            LocalDateTime temp = fromDateTime;
+            fromDateTime = toDateTime;
+            toDateTime = temp;
+        }
+
+        Integer normalizedLearnLevel = learnLevel == null ? null : normalizeLearnLevel(learnLevel);
+        String normalizedPos = trimToNull(partOfSpeech);
+        if (normalizedPos != null) {
+            normalizedPos = normalizedPos.toLowerCase(Locale.ROOT);
+        }
+
+        List<UserVocabulary> items = userVocabularyRepository.searchUserVocabulary(
+                userId,
+                learned,
+                normalizedLearnLevel,
+                groupId,
+                normalizedPos,
+                fromDateTime,
+                toDateTime,
+                trimToNull(keyword)
+        );
+
+        sortUserVocabulary(items, sort);
+        List<UserVocabulary> paged = applyPagination(items, page, size);
+
+        return paged.stream()
+                .map(uv -> toResponse(uv.getVocabulary(), uv))
+                .toList();
+    }
+
+    @Override
+    public void deleteUserVocabulary(Long id, Long userId) {
+        UserVocabulary target = findUserVocabularyByAnyId(userId, id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy từ vựng đã lưu để xoá"));
+        userVocabularyRepository.delete(target);
+    }
+
+    @Override
+    public VocabularyResponse updateUserVocabularyStatus(Long userVocabularyId, Integer learnLevel, Long userId) {
+        UserVocabulary userVocabulary = findUserVocabularyByAnyId(userId, userVocabularyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy từ vựng đã lưu"));
+
+        int normalizedLearnLevel = normalizeLearnLevel(learnLevel);
+        applyLearnLevel(userVocabulary, normalizedLearnLevel, true);
+
+        UserVocabulary saved = userVocabularyRepository.save(userVocabulary);
+        return toResponse(saved.getVocabulary(), saved);
+    }
+
+    @Override
+    public VocabularyResponse updateUserVocabulary(Long userVocabularyId, UserVocabularyUpdateRequest request, Long userId) {
+        UserVocabulary userVocabulary = findUserVocabularyByAnyId(userId, userVocabularyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy từ vựng đã lưu"));
+
+        if (request.getGroupId() != null) {
+            UserVocabularyGroup targetGroup = resolveTargetGroup(userId, request.getGroupId(), null);
+            userVocabulary.setGroup(targetGroup);
+        }
+
+        if (request.getNote() != null) {
+            userVocabulary.setNote(trimToNull(request.getNote()));
+        }
+
+        if (request.getLearnLevel() != null) {
+            int current = userVocabulary.getLearnLevel() == null ? 0 : userVocabulary.getLearnLevel();
+            int target = normalizeLearnLevel(request.getLearnLevel());
+            applyLearnLevel(userVocabulary, target, current != target);
+        }
+
+        UserVocabulary saved = userVocabularyRepository.save(userVocabulary);
+        return toResponse(saved.getVocabulary(), saved);
+    }
+
+    @Override
+    public UserVocabularyBatchResultResponse batchSaveToUserVocabulary(UserVocabularyBatchSaveRequest request, Long userId) {
+        LinkedHashSet<Long> uniqueIds = new LinkedHashSet<>(request.getVocabIds());
+
+        int success = 0;
+        int skipped = 0;
+        int failed = 0;
+
+        for (Long vocabId : uniqueIds) {
+            try {
+                if (vocabId == null) {
+                    skipped++;
+                    continue;
+                }
+
+                if (userVocabularyRepository.findByUserIdAndVocabularyId(userId, vocabId).isPresent()) {
+                    skipped++;
+                    continue;
+                }
+
+                SaveVocabularyRequest saveRequest = new SaveVocabularyRequest();
+                saveRequest.setVocabId(vocabId);
+                saveRequest.setGroupId(request.getGroupId());
+                saveRequest.setGroupName(request.getGroupName());
+                saveRequest.setNote(request.getNote());
+                saveToUserVocabulary(saveRequest, userId);
+                success++;
+            } catch (RuntimeException ex) {
+                failed++;
+                log.warn("Batch save vocabulary failed for vocabId={}: {}", vocabId, ex.getMessage());
+            }
+        }
+
+        return UserVocabularyBatchResultResponse.builder()
+                .requested(uniqueIds.size())
+                .success(success)
+                .skipped(skipped)
+                .failed(failed)
+                .build();
+    }
+
+    @Override
+    public UserVocabularyBatchResultResponse batchUpdateStatus(UserVocabularyBatchStatusRequest request, Long userId) {
+        LinkedHashSet<Long> uniqueIds = new LinkedHashSet<>(request.getUserVocabularyIds());
+        int normalizedLevel = normalizeLearnLevel(request.getLearnLevel());
+
+        int success = 0;
+        int skipped = 0;
+
+        for (Long userVocabularyId : uniqueIds) {
+            Optional<UserVocabulary> candidate = userVocabularyRepository.findByUserIdAndId(userId, userVocabularyId);
+            if (candidate.isEmpty()) {
+                skipped++;
+                continue;
+            }
+
+            UserVocabulary userVocabulary = candidate.get();
+            int current = userVocabulary.getLearnLevel() == null ? 0 : userVocabulary.getLearnLevel();
+            applyLearnLevel(userVocabulary, normalizedLevel, current != normalizedLevel);
+            success++;
+        }
+
+        return UserVocabularyBatchResultResponse.builder()
+                .requested(uniqueIds.size())
+                .success(success)
+                .skipped(skipped)
+                .failed(0)
+                .build();
+    }
+
+    @Override
+    public UserVocabularyBatchResultResponse batchDelete(UserVocabularyBatchDeleteRequest request, Long userId) {
+        LinkedHashSet<Long> uniqueIds = new LinkedHashSet<>(request.getUserVocabularyIds());
+        int success = 0;
+        int skipped = 0;
+
+        for (Long id : uniqueIds) {
+            Optional<UserVocabulary> candidate = findUserVocabularyByAnyId(userId, id);
+            if (candidate.isEmpty()) {
+                skipped++;
+                continue;
+            }
+            userVocabularyRepository.delete(candidate.get());
+            success++;
+        }
+
+        return UserVocabularyBatchResultResponse.builder()
+                .requested(uniqueIds.size())
+                .success(success)
+                .skipped(skipped)
+                .failed(0)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserVocabularyGroupResponse> getUserVocabularyGroups(Long userId) {
+        ensureDefaultGroup(userId);
+        return userVocabularyGroupRepository.findByUserIdOrderByCreatedAtAsc(userId).stream()
+                .map(group -> UserVocabularyGroupResponse.builder()
+                        .id(group.getId())
+                        .name(group.getName())
+                        .totalWords(userVocabularyRepository.countByUserIdAndGroupId(userId, group.getId()))
+                        .createdAt(group.getCreatedAt())
+                        .updatedAt(group.getUpdatedAt())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public UserVocabularyGroupResponse createUserVocabularyGroup(UserVocabularyGroupCreateRequest request, Long userId) {
+        String groupName = sanitizeGroupName(request.getName());
+        String normalizedName = normalizeWord(groupName);
+
+        if (userVocabularyGroupRepository.existsByUserIdAndNormalizedName(userId, normalizedName)) {
+            throw new BadRequestException("Tên nhóm đã tồn tại");
+        }
+
+        User user = getUser(userId);
+        UserVocabularyGroup group = UserVocabularyGroup.builder()
+                .user(user)
+                .name(groupName)
+                .normalizedName(normalizedName)
+                .build();
+
+        UserVocabularyGroup saved = userVocabularyGroupRepository.save(group);
+        return UserVocabularyGroupResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .totalWords(0L)
+                .createdAt(saved.getCreatedAt())
+                .updatedAt(saved.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    public UserVocabularyGroupResponse renameUserVocabularyGroup(Long groupId, UserVocabularyGroupUpdateRequest request, Long userId) {
+        UserVocabularyGroup group = userVocabularyGroupRepository.findByUserIdAndId(userId, groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhóm từ vựng"));
+
+        String newName = sanitizeGroupName(request.getName());
+        String normalized = normalizeWord(newName);
+
+        if (!Objects.equals(group.getNormalizedName(), normalized)
+                && userVocabularyGroupRepository.existsByUserIdAndNormalizedName(userId, normalized)) {
+            throw new BadRequestException("Tên nhóm đã tồn tại");
+        }
+
+        group.setName(newName);
+        group.setNormalizedName(normalized);
+        UserVocabularyGroup saved = userVocabularyGroupRepository.save(group);
+
+        return UserVocabularyGroupResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .totalWords(userVocabularyRepository.countByUserIdAndGroupId(userId, saved.getId()))
+                .createdAt(saved.getCreatedAt())
+                .updatedAt(saved.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    public void deleteUserVocabularyGroup(Long groupId, Long userId) {
+        UserVocabularyGroup group = userVocabularyGroupRepository.findByUserIdAndId(userId, groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhóm từ vựng"));
+
+        if (DEFAULT_GROUP_NAME.equalsIgnoreCase(group.getName())) {
+            throw new BadRequestException("Không thể xoá nhóm mặc định");
+        }
+
+        List<UserVocabulary> items = userVocabularyRepository.findByUserIdAndGroupId(userId, groupId);
+        if (!items.isEmpty()) {
+            userVocabularyRepository.deleteAll(items);
+        }
+        userVocabularyGroupRepository.delete(group);
+    }
+
+    private void sortUserVocabulary(List<UserVocabulary> items, String sort) {
+        String sortKey = trimToNull(sort);
+        if (sortKey == null) {
+            sortKey = "newest";
+        }
+
+        Comparator<UserVocabulary> bySavedAtAsc = Comparator.comparing(UserVocabulary::getSavedAt,
+                Comparator.nullsLast(LocalDateTime::compareTo));
+        Comparator<UserVocabulary> byWordAsc = Comparator.comparing(
+                uv -> uv.getVocabulary() == null ? "" : String.valueOf(uv.getVocabulary().getWord()).toLowerCase(Locale.ROOT),
+                Comparator.nullsLast(String::compareTo)
+        );
+
+        Comparator<UserVocabulary> comparator;
+        switch (sortKey.toLowerCase(Locale.ROOT)) {
+            case "oldest" -> comparator = bySavedAtAsc;
+            case "az" -> comparator = byWordAsc;
+            case "za" -> comparator = byWordAsc.reversed();
+            case "status" -> comparator = Comparator
+                    .comparing((UserVocabulary uv) -> uv.getLearnLevel() == null ? 0 : uv.getLearnLevel())
+                    .thenComparing(byWordAsc);
+            case "newest" -> comparator = bySavedAtAsc.reversed();
+            default -> comparator = bySavedAtAsc.reversed();
+        }
+        items.sort(comparator);
+    }
+
+    private List<UserVocabulary> applyPagination(List<UserVocabulary> items, Integer page, Integer size) {
+        if (size == null || size <= 0) {
+            return items;
+        }
+
+        int safePage = page == null || page < 0 ? 0 : page;
+        int safeSize = Math.min(Math.max(size, 1), 200);
+        int fromIndex = safePage * safeSize;
+        if (fromIndex >= items.size()) {
+            return List.of();
+        }
+        int toIndex = Math.min(items.size(), fromIndex + safeSize);
+        return items.subList(fromIndex, toIndex);
+    }
+
+    private Optional<UserVocabulary> findUserVocabularyByAnyId(Long userId, Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        Optional<UserVocabulary> byUserVocabularyId = userVocabularyRepository.findByUserIdAndId(userId, id);
+        if (byUserVocabularyId.isPresent()) {
+            return byUserVocabularyId;
+        }
+        return userVocabularyRepository.findByUserIdAndVocabularyId(userId, id);
+    }
+
+    private UserVocabularyGroup resolveTargetGroup(Long userId, Long groupId, String groupName) {
+        if (groupId != null) {
+            return userVocabularyGroupRepository.findByUserIdAndId(userId, groupId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhóm từ vựng"));
+        }
+
+        String cleanedName = trimToNull(groupName);
+        if (cleanedName == null) {
+            return ensureDefaultGroup(userId);
+        }
+
+        String normalized = normalizeWord(cleanedName);
+        return userVocabularyGroupRepository.findByUserIdAndNormalizedName(userId, normalized)
+                .orElseGet(() -> userVocabularyGroupRepository.save(UserVocabularyGroup.builder()
+                        .user(getUser(userId))
+                        .name(cleanedName)
+                        .normalizedName(normalized)
+                        .build()));
+    }
+
+    private UserVocabularyGroup ensureDefaultGroup(Long userId) {
+        String normalized = normalizeWord(DEFAULT_GROUP_NAME);
+        return userVocabularyGroupRepository.findByUserIdAndNormalizedName(userId, normalized)
+                .orElseGet(() -> userVocabularyGroupRepository.save(UserVocabularyGroup.builder()
+                        .user(getUser(userId))
+                        .name(DEFAULT_GROUP_NAME)
+                        .normalizedName(normalized)
+                        .build()));
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));
+    }
+
+    private void applyLearnLevel(UserVocabulary userVocabulary, int learnLevel, boolean reviewedNow) {
+        userVocabulary.setLearnLevel(learnLevel);
+        userVocabulary.setLearned(learnLevel >= 2);
+        if (reviewedNow) {
+            userVocabulary.setLastReviewedAt(LocalDateTime.now());
+            Integer current = userVocabulary.getReviewCount() == null ? 0 : userVocabulary.getReviewCount();
+            userVocabulary.setReviewCount(current + 1);
+        }
+    }
+
+    private int normalizeLearnLevel(Integer learnLevel) {
+        if (learnLevel == null) {
+            return 0;
+        }
+        if (learnLevel < 0 || learnLevel > 2) {
+            throw new BadRequestException("learnLevel phải từ 0 đến 2");
+        }
+        return learnLevel;
+    }
+
+    private String sanitizeGroupName(String name) {
+        String cleaned = trimToNull(name);
+        if (cleaned == null) {
+            throw new BadRequestException("Tên nhóm không hợp lệ");
+        }
+        if (cleaned.length() > 120) {
+            throw new BadRequestException("Tên nhóm quá dài (tối đa 120 ký tự)");
+        }
+        return cleaned;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String cleaned = value.trim();
+        return cleaned.isEmpty() ? null : cleaned;
     }
 
     private String normalizeWord(String word) {
@@ -92,16 +523,42 @@ public class VocabularyServiceImpl implements VocabularyService {
         return word.trim().toLowerCase(Locale.ROOT);
     }
 
-    public void deleteUserVocabulary(Long id, Long userId) {
-        userVocabularyRepository.findByUserIdAndVocabularyId(userId, id)
-                .ifPresentOrElse(
-                        userVocabularyRepository::delete,
-                        () -> userVocabularyRepository.findById(id).ifPresent(uv -> {
-                            if (uv.getUser().getId().equals(userId)) {
-                                userVocabularyRepository.delete(uv);
-                            }
-                        })
-                );
+    private VocabularyResponse toResponse(Vocabulary vocab, UserVocabulary userVocabulary) {
+        Long vocabId = vocab == null ? null : vocab.getId();
+        List<VocabularyResponse.ExampleDto> examples = vocabId == null
+                ? List.of()
+                : vocabularyExampleRepository.findByVocabularyId(vocabId).stream()
+                .map(example -> VocabularyResponse.ExampleDto.builder()
+                        .enSentence(example.getEnSentence())
+                        .viSentence(example.getViSentence())
+                        .source(example.getSource())
+                        .build())
+                .toList();
+
+        UserVocabularyGroup group = userVocabulary == null ? null : userVocabulary.getGroup();
+
+        return VocabularyResponse.builder()
+                .id(vocab == null ? null : vocab.getId())
+                .word(vocab == null ? null : vocab.getWord())
+                .ipa(vocab == null ? null : vocab.getIpa())
+                .partOfSpeech(vocab == null ? null : vocab.getPartOfSpeech())
+                .meaning(vocab == null ? null : vocab.getMeaning())
+                .viMeaning(vocab == null ? null : vocab.getViMeaning())
+                .audioUrl(vocab == null ? null : vocab.getAudioUrl())
+                .imageUrl(vocab == null ? null : vocab.getImageUrl())
+                .related(vocab == null ? null : vocab.getRelated())
+                .examples(examples)
+                .isSaved(userVocabulary != null)
+                .userVocabularyId(userVocabulary == null ? null : userVocabulary.getId())
+                .learned(userVocabulary == null ? null : Boolean.TRUE.equals(userVocabulary.getLearned()))
+                .learnLevel(userVocabulary == null ? null : userVocabulary.getLearnLevel())
+                .note(userVocabulary == null ? null : userVocabulary.getNote())
+                .groupId(group == null ? null : group.getId())
+                .groupName(group == null ? null : group.getName())
+                .lastReviewedAt(userVocabulary == null ? null : userVocabulary.getLastReviewedAt())
+                .reviewCount(userVocabulary == null ? null : userVocabulary.getReviewCount())
+                .savedAt(userVocabulary == null ? null : userVocabulary.getSavedAt())
+                .build();
     }
 }
 
