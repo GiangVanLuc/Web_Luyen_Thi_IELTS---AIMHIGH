@@ -2,9 +2,12 @@
 // Fetch /api/exams/{id} rồi build questions vào DOM.
 // Tích hợp API Backend: startAttempt, autoSave, submit.
 
-// ─── CONFIG từ localStorage ───────────────────────────────────────────────────
-const examSection = localStorage.getItem('currentExamSection') || 'full';
-const examId      = parseInt(localStorage.getItem('currentExamId') || '1', 10);
+// ─── CONFIG từ URL/localStorage ───────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const examSection = urlParams.get('section') || localStorage.getItem('currentExamSection') || 'full';
+const examId = parseInt(urlParams.get('examId') || localStorage.getItem('currentExamId') || '1', 10);
+const examModeFromContext = urlParams.get('mode') || localStorage.getItem('currentExamMode') || 'practice';
+const examTitleFromContext = urlParams.get('title') || localStorage.getItem('currentExamTitle') || '';
 
 const SEC_CFG = {
     1:{from:1, to:10, label:'Section 1', time:8*60},
@@ -22,16 +25,147 @@ let timeLeft = isSingle ? SEC_CFG[singleSec].time : 30*60;
 let ans = {}, timerInt, activeTool = null, noteVisible = false, notes = [];
 let attemptId = null;  // ID phiên thi từ Backend
 let autoSaveInt = null; // Interval auto-save
+const ATTEMPT_META_KEY = 'currentAttemptMeta';
+let questionIdMap = new Map();
+let questionNumberMap = new Map();
+
+function rememberQuestionId(question) {
+    const qNum = Number(question?.questionNumber);
+    const qId = Number(question?.id);
+    if (!Number.isFinite(qNum) || qNum <= 0 || !Number.isFinite(qId) || qId <= 0) return;
+    questionIdMap.set(qNum, qId);
+    questionNumberMap.set(qId, qNum);
+}
+
+function getQuestionIdByNumber(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return null;
+    return questionIdMap.get(qNum) || null;
+}
+
+function getQuestionNumberById(questionId) {
+    const qId = Number(questionId);
+    if (!Number.isFinite(qId) || qId <= 0) return null;
+    return questionNumberMap.get(qId) || null;
+}
+
+function getCurrentQuestionNumber() {
+    if (document.body.classList.contains('real-mode') && Number.isFinite(currentRealQ)) {
+        return Number(currentRealQ);
+    }
+
+    const currentBtn = document.querySelector('.qnb.cur');
+    if (currentBtn) {
+        const value = Number(currentBtn.textContent);
+        if (Number.isFinite(value) && value > 0) return value;
+    }
+
+    const visibleQuestion = document.querySelector('#qScroll .qi[data-q]');
+    if (visibleQuestion) {
+        const value = Number(visibleQuestion.dataset.q);
+        if (Number.isFinite(value) && value > 0) return value;
+    }
+
+    return Number(isSingle ? SEC_CFG[singleSec].from : 1);
+}
+
+function getQuestionNumberFromSelection(selection) {
+    if (!selection) return null;
+    const anchorNode = selection.anchorNode;
+    const anchorEl = anchorNode && anchorNode.nodeType === Node.ELEMENT_NODE
+        ? anchorNode
+        : anchorNode?.parentElement;
+    const questionEl = anchorEl?.closest?.('.qi[data-q]');
+    if (!questionEl) return null;
+    const value = Number(questionEl.dataset.q);
+    return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function encodeNoteContent(selectedText, noteText) {
+    return JSON.stringify({
+        selectedText: String(selectedText || ''),
+        note: String(noteText || '')
+    });
+}
+
+function decodeNoteContent(rawContent) {
+    const raw = String(rawContent || '');
+    if (!raw) return { selectedText: '', note: '' };
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+            return {
+                selectedText: String(parsed.selectedText || ''),
+                note: String(parsed.note || '')
+            };
+        }
+    } catch (_) {
+        // Fallback for legacy plain-text notes.
+    }
+
+    return { selectedText: raw, note: '' };
+}
+
+function buildAttemptMeta() {
+    return {
+        skill: 'LISTENING',
+        examId: Number(examId),
+        mode: String(examModeFromContext || 'practice').toLowerCase(),
+        section: String(examSection || 'full')
+    };
+}
+
+function saveAttemptContext(id) {
+    if (!id) return;
+    localStorage.setItem('currentAttemptId', String(id));
+    localStorage.setItem(ATTEMPT_META_KEY, JSON.stringify(buildAttemptMeta()));
+}
+
+function clearAttemptContext() {
+    localStorage.removeItem('currentAttemptId');
+    localStorage.removeItem(ATTEMPT_META_KEY);
+}
+
+function getReusableAttemptId() {
+    const rawId = Number(localStorage.getItem('currentAttemptId'));
+    const rawMeta = localStorage.getItem(ATTEMPT_META_KEY);
+    if (!Number.isFinite(rawId) || rawId <= 0 || !rawMeta) return null;
+
+    try {
+        const meta = JSON.parse(rawMeta);
+        const current = buildAttemptMeta();
+        const isMatch =
+            String(meta?.skill || '') === current.skill
+            && Number(meta?.examId) === current.examId
+            && String(meta?.mode || '') === current.mode
+            && String(meta?.section || '') === current.section;
+        if (isMatch) return rawId;
+    } catch (_) {
+        // Ignore parse errors and clear stale context below.
+    }
+
+    clearAttemptContext();
+    return null;
+}
+
+function isRealMode() {
+    return String(examModeFromContext || '').toLowerCase() === 'real';
+}
 
 // Audio
-const SEC_AUDIO = {1:{start:0,end:480},2:{start:480,end:960},3:{start:960,end:1440},4:{start:1440,end:1800}};
-const AUDIO_START = isSingle ? SEC_AUDIO[singleSec].start : 0;
-const AUDIO_END   = isSingle ? SEC_AUDIO[singleSec].end   : 1800;
-let audioTime=AUDIO_START, audioPlaying=false, audioInterval=null;
+let audioElement = new Audio();
 const SPEEDS=[0.75,1,1.25,1.5,2]; let speedIdx=1;
+let audioTime = 0, audioPlaying = false;
+let AUDIO_END = 1800;
 
 // ─── BOOTSTRAP ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+    if (examModeFromContext === 'real') {
+        document.body.classList.add('real-mode');
+    } else {
+        document.body.classList.add('practice-mode');
+    }
     updateAudioTotalTime();
     await loadExam();
 });
@@ -50,19 +184,19 @@ async function loadExam() {
 
     // --- Khởi tạo phiên thi (Attempt) ---
     try {
-        const examMode = localStorage.getItem('currentExamMode') || 'practice';
+        const examMode = examModeFromContext;
         const attemptRes = await startAttempt(examId, examMode);
         const attemptData = attemptRes.data || attemptRes;
         attemptId = attemptData.id;
-        localStorage.setItem('currentAttemptId', attemptId);
+        saveAttemptContext(attemptId);
         console.log('Phiên thi Listening đã khởi tạo. AttemptId:', attemptId);
     } catch (err) {
         console.warn('Không thể tạo phiên thi:', err.message);
-        attemptId = localStorage.getItem('currentAttemptId');
+        attemptId = getReusableAttemptId();
     }
 
     TOTAL    = isSingle ? (SEC_CFG[singleSec].to - SEC_CFG[singleSec].from + 1) : 40;
-    timeLeft = isSingle ? SEC_CFG[singleSec].time : 30*60;
+    timeLeft = isRealMode() ? (isSingle ? SEC_CFG[singleSec].time : 30*60) : 0;
 
     renderQuestions();
 
@@ -70,7 +204,7 @@ async function loadExam() {
     updateAudioSrc();
 
     // UI
-    const title = localStorage.getItem('currentExamTitle') ||
+    const title = examTitleFromContext ||
         (isSingle ? `${examData.exam?.title} – ${SEC_CFG[singleSec].label}` : (examData.exam?.title || 'Listening Test'));
     document.getElementById('examTitle').textContent = title;
 
@@ -84,7 +218,7 @@ async function loadExam() {
     const mTotalEl=document.getElementById('mTotal'); if(mTotalEl) mTotalEl.textContent=TOTAL;
     const mUEl=document.getElementById('mU');         if(mUEl) mUEl.textContent=TOTAL;
 
-    const examMode = localStorage.getItem('currentExamMode') || 'practice';
+    const examMode = examModeFromContext;
     if (examMode === 'real') {
         initRealMode();
     } else {
@@ -98,6 +232,9 @@ async function loadExam() {
     // Khôi phục tiến độ nếu user F5
     await restoreProgress();
 
+    // Khôi phục ghi chú đã lưu của attempt
+    await loadNotesFromBackend();
+
     document.getElementById('qScroll').addEventListener('mouseup', onSel);
     document.addEventListener('keydown', onKey);
 }
@@ -106,6 +243,8 @@ async function loadExam() {
 function renderQuestions() {
     const qScroll = document.getElementById('qScroll');
     qScroll.innerHTML = '';
+    questionIdMap = new Map();
+    questionNumberMap = new Map();
 
     (examData.sections || []).forEach(sec => {
         const sn = sec.sectionNumber;
@@ -124,31 +263,79 @@ function renderQuestions() {
 }
 
 function renderGroup(g, sec) {
-    const display = g.displayType || '';
+        const display = normalizeDisplayType(g.displayType || g.type || '');
     let html = `<div class="qsh">
-      <div class="qsh-title">${eh(g.groupTitle||'')}</div>
+            <div class="qsh-title">${eh(g.groupTitle || g.title || '')}</div>
       <div class="qsh-inst">${eh(g.instruction||'')}</div>
     </div>`;
 
+    const sourceQuestions = (g.questions || []).length
+        ? (g.questions || [])
+        : buildFallbackQuestions(g, sec, display);
+
     switch(display) {
+        case 'TRUE_FALSE_NG':
         case 'MULTIPLE_CHOICE':
-            (g.questions||[]).forEach(q=>{ html+=renderQItem(q); });
+            sourceQuestions.forEach(q=>{ html+=renderQItem(q); });
             break;
 
         case 'FILL_BLOCK':
             html += `<div class="fill-block">`;
             if(g.blockTitle) html += `<div class="fill-title">${eh(g.blockTitle)}</div>`;
-            (g.questions||[]).forEach(q=>{ html+=renderFillLine(q); });
+            sourceQuestions.forEach(q=>{ html+=renderFillLine(q); });
             html += `</div>`;
             break;
 
         default:
-            (g.questions||[]).forEach(q=>{ html+=renderFillLine(q); });
+            sourceQuestions.forEach(q=>{ html+=renderFillLine(q); });
     }
     return html;
 }
 
+function normalizeDisplayType(type) {
+    const t = String(type || '').toUpperCase();
+    if (t === 'TRUE_FALSE_NOT_GIVEN') return 'TRUE_FALSE_NG';
+    if (t === 'FILL_IN_BLANK' || t === 'FILL_BLANK' || t === 'SENTENCE_COMPLETION') return 'FILL_BLOCK';
+    return t;
+}
+
+function inferGroupRange(g, sec) {
+    let from = parseInt(g?.questionFrom || 0, 10);
+    let to = parseInt(g?.questionTo || 0, 10);
+    if (from > 0 && to >= from) return { from, to };
+
+    const title = String(g?.groupTitle || g?.title || '');
+    const m = title.match(/(\d+)\s*[-–]\s*(\d+)/);
+    if (m) return { from: parseInt(m[1], 10), to: parseInt(m[2], 10) };
+
+    from = parseInt(sec?.questionFrom || 1, 10);
+    to = parseInt(sec?.questionTo || from, 10);
+    return { from, to: Math.max(from, to) };
+}
+
+function buildFallbackQuestions(g, sec, normalizedDisplay) {
+    const { from, to } = inferGroupRange(g, sec);
+    const list = [];
+    for (let qn = from; qn <= to; qn++) {
+        if (normalizedDisplay === 'TRUE_FALSE_NG') {
+            list.push({
+                questionNumber: qn,
+                questionText: `Question ${qn}`,
+                choices: [
+                    { label: 'TRUE', text: 'TRUE' },
+                    { label: 'FALSE', text: 'FALSE' },
+                    { label: 'NOT GIVEN', text: 'NOT GIVEN' }
+                ]
+            });
+        } else {
+            list.push({ questionNumber: qn, questionText: `Question ${qn}`, lineTemplate: `[${qn}] ___` });
+        }
+    }
+    return list;
+}
+
 function renderQItem(q) {
+    rememberQuestionId(q);
     const qn=q.questionNumber;
     let html=`<div id="qi${qn}" class="qi" data-q="${qn}">
       <div class="qi-head"><span class="qbadge">${qn}</span><span class="qtext">${eh(q.questionText||'')}</span></div>
@@ -165,65 +352,81 @@ function renderQItem(q) {
 }
 
 function renderFillLine(q) {
+    rememberQuestionId(q);
     const qn=q.questionNumber, w=q.inputWidth||100;
-    const tpl=q.lineTemplate||'___';
+    const tpl=q.lineTemplate||q.questionText||`Question ${qn}: ___`;
     const inputHtml=`<span id="b${qn}" class="fb">${qn}</span> <input class="finp" id="q${qn}" placeholder="……" style="width:${w}px;" oninput="pa(${qn},this.value)">`;
     return `<div class="fill-line">${tpl.replace('___',inputHtml)}</div>`;
 }
 
 // ─── AUDIO PLAYER ────────────────────────────────────────────────────────────
 function updateAudioTotalTime() {
-    const dur=AUDIO_END-AUDIO_START;
-    const totEl=document.getElementById('totTime');
-    if(totEl) totEl.textContent=Math.floor(dur/60)+':'+pad(dur%60);
+    if(audioElement.duration && !isNaN(audioElement.duration)) {
+        AUDIO_END = Math.floor(audioElement.duration);
+        const totEl=document.getElementById('totTime');
+        if(totEl) totEl.textContent=Math.floor(AUDIO_END/60)+':'+pad(AUDIO_END%60);
+    }
 }
 function updateAudioSrc() {
-    // Nếu exam JSON có audioUrl cho từng section, cập nhật <audio> nếu có
-    // Hiện tại UI dùng simulated audio nên không cần làm gì thêm
+    const url = (examData.exam && examData.exam.audioUrl) ? examData.exam.audioUrl : 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+    audioElement.src = url;
+    audioElement.addEventListener('timeupdate', () => {
+        audioTime = Math.floor(audioElement.currentTime);
+        updateAudioUI();
+        if(!isSingle) syncSectionLabel();
+    });
+    audioElement.addEventListener('loadedmetadata', updateAudioTotalTime);
+    audioElement.addEventListener('ended', () => {
+        audioPlaying = false;
+        document.getElementById('playIcon').className = 'bi bi-play-fill';
+    });
 }
 function togglePlay(){
     audioPlaying=!audioPlaying;
     const icon=document.getElementById('playIcon');
     icon.className=audioPlaying?'bi bi-pause-fill':'bi bi-play-fill';
-    if(audioPlaying){
-        audioInterval=setInterval(()=>{
-            audioTime+=SPEEDS[speedIdx];
-            if(audioTime>=AUDIO_END){audioTime=AUDIO_END;clearInterval(audioInterval);audioPlaying=false;document.getElementById('playIcon').className='bi bi-play-fill';}
-            updateAudioUI();
-            if(!isSingle) syncSectionLabel();
-        },1000);
-    } else { clearInterval(audioInterval); }
+    if(audioPlaying) audioElement.play();
+    else audioElement.pause();
 }
-function skipAudio(delta){audioTime=Math.max(AUDIO_START,Math.min(AUDIO_END,audioTime+delta));updateAudioUI();}
+function skipAudio(delta){
+    audioElement.currentTime = Math.max(0, Math.min(audioElement.duration || AUDIO_END, audioElement.currentTime + delta));
+}
 function seekAudio(e){
     const bar=document.getElementById('progBar');
     const rect=bar.getBoundingClientRect();
     const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
-    audioTime=Math.round(AUDIO_START+pct*(AUDIO_END-AUDIO_START));
-    updateAudioUI(); if(!isSingle) syncSectionLabel();
+    if(audioElement.duration) audioElement.currentTime = pct * audioElement.duration;
 }
 function updateAudioUI(){
-    const elapsed=audioTime-AUDIO_START, duration=AUDIO_END-AUDIO_START;
-    const pct=(elapsed/duration)*100;
+    const duration = audioElement.duration || AUDIO_END;
+    const pct = duration ? (audioTime / duration) * 100 : 0;
     document.getElementById('progFill').style.width=pct+'%';
     document.getElementById('progDot').style.left=pct+'%';
-    const m=Math.floor(elapsed/60),s=Math.floor(elapsed)%60;
+    const m=Math.floor(audioTime/60),s=Math.floor(audioTime)%60;
     document.getElementById('curTime').textContent=m+':'+pad(s);
 }
 function syncSectionLabel(){
     const sec=Math.min(4,Math.floor(audioTime/450)+1);
     [1,2,3,4].forEach(s=>{const box=document.getElementById('secbox'+s);if(box)box.classList.toggle('secbox-playing',s===sec);});
 }
-function cycleSpeed(){speedIdx=(speedIdx+1)%SPEEDS.length;document.getElementById('speedBtn').textContent=SPEEDS[speedIdx]+'×';}
+function cycleSpeed(){
+    speedIdx=(speedIdx+1)%SPEEDS.length;
+    document.getElementById('speedBtn').textContent=SPEEDS[speedIdx]+'×';
+    audioElement.playbackRate = SPEEDS[speedIdx];
+}
 
 // ─── TIMER ────────────────────────────────────────────────────────────────────
 function startTimer(){
     timerInt=setInterval(()=>{
-        timeLeft--;
+        if (isRealMode()) {
+            timeLeft--;
+        } else {
+            timeLeft++;
+        }
         const h=Math.floor(timeLeft/3600),m=Math.floor((timeLeft%3600)/60),s=timeLeft%60;
         document.getElementById('timer').textContent=pad(h)+':'+pad(m)+':'+pad(s);
-        if(timeLeft<=300) document.getElementById('timerPill').classList.add('timer-warn');
-        if(timeLeft<=0){clearInterval(timerInt);submitTest();}
+        if(isRealMode() && timeLeft<=300) document.getElementById('timerPill').classList.add('timer-warn');
+        if(isRealMode() && timeLeft<=0){clearInterval(timerInt);submitTest();}
     },1000);
 }
 const pad=n=>String(n).padStart(2,'0');
@@ -234,7 +437,7 @@ function pa(q,v){
     const el=document.getElementById('qi'+q);
     if(el){el.classList.toggle('done',!!v);const b=el.querySelector('.qbadge');if(b)b.style.background=v?'var(--success)':'var(--primary)';}
     const fb=document.getElementById('b'+q); if(fb)fb.classList.toggle('done',!!v);
-    const nb=document.getElementById('nb'+q); if(nb){nb.classList.toggle('done',!!v);if(v)nb.classList.remove('cur');}
+    const nb=document.getElementById('nb'+q); if(nb){nb.classList.toggle('done',!!v);}
     if(document.body.classList.contains('real-mode')) updateRealBot();
 }
 
@@ -299,7 +502,7 @@ function goQ(q){
         if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
     },50);
     document.querySelectorAll('.qnb').forEach(b=>b.classList.remove('cur'));
-    const nb=document.getElementById('nb'+q);if(nb&&!nb.classList.contains('done'))nb.classList.add('cur');
+    const nb=document.getElementById('nb'+q);if(nb)nb.classList.add('cur');
 }
 function secOfQ(q){if(q<=10)return 1;if(q<=20)return 2;if(q<=30)return 3;return 4;}
 
@@ -420,7 +623,12 @@ function onSel(){
     const sel=window.getSelection();if(!sel||sel.isCollapsed)return;
     const txt=sel.toString().trim();if(!txt)return;
     if(activeTool==='hl'){doHL(sel,'hl-y');sel.removeAllRanges();}
-    else if(activeTool==='nt'){doHL(sel,'hl-n');addNote(txt);sel.removeAllRanges();}
+    else if(activeTool==='nt'){
+        const qFromSelection = getQuestionNumberFromSelection(sel) || getCurrentQuestionNumber();
+        doHL(sel,'hl-n');
+        void addNote(txt, qFromSelection);
+        sel.removeAllRanges();
+    }
 }
 function doHL(sel,cls){
     try{const r=sel.getRangeAt(0),sp=document.createElement('span');sp.className=cls;r.surroundContents(sp);}
@@ -428,7 +636,68 @@ function doHL(sel,cls){
 }
 
 // ─── NOTES ────────────────────────────────────────────────────────────────────
-function addNote(txt){notes.push({id:Date.now(),txt,note:''});renderNotes();if(!noteVisible)toggleNote();}
+async function addNote(txt, questionNumber = null) {
+    const selectedText = String(txt || '').trim();
+    if (!selectedText) return;
+
+    const resolvedQuestionNumber = Number(questionNumber) || getCurrentQuestionNumber();
+    const questionId = getQuestionIdByNumber(resolvedQuestionNumber);
+    const localNote = {
+        id: Date.now(),
+        txt: selectedText,
+        note: '',
+        questionNumber: resolvedQuestionNumber,
+        questionId: questionId || null,
+        isRemote: false
+    };
+
+    notes.push(localNote);
+    renderNotes();
+    if(!noteVisible)toggleNote();
+
+    if (!attemptId || !questionId) return;
+
+    try {
+        const response = await createNote(attemptId, questionId, encodeNoteContent(selectedText, ''));
+        const saved = response?.data || response;
+        if (saved?.id) {
+            localNote.id = saved.id;
+            localNote.questionId = saved.questionId || questionId;
+            localNote.questionNumber = getQuestionNumberById(localNote.questionId) || resolvedQuestionNumber;
+            localNote.isRemote = true;
+            renderNotes();
+        }
+    } catch (error) {
+        console.warn('Không thể lưu note lên backend:', error?.message || error);
+    }
+}
+
+async function loadNotesFromBackend() {
+    if (!attemptId) return;
+    try {
+        const response = await getAttemptNotes(attemptId);
+        const items = response?.data || response || [];
+        if (!Array.isArray(items)) return;
+
+        notes = items.map((item) => {
+            const parsed = decodeNoteContent(item?.content);
+            const qId = Number(item?.questionId);
+            return {
+                id: item?.id,
+                txt: parsed.selectedText || '(Không có đoạn trích)',
+                note: parsed.note || '',
+                questionId: Number.isFinite(qId) && qId > 0 ? qId : null,
+                questionNumber: Number.isFinite(qId) && qId > 0 ? getQuestionNumberById(qId) : null,
+                isRemote: true
+            };
+        });
+
+        renderNotes();
+    } catch (error) {
+        console.warn('Không thể tải danh sách note từ backend:', error?.message || error);
+    }
+}
+
 function renderNotes(){
     const list=document.getElementById('nbList'),empty=document.getElementById('nbEmpty');
     if(!notes.length){if(empty)empty.style.display='block';list.innerHTML='';list.appendChild(empty);return;}
@@ -443,14 +712,38 @@ function renderNotes(){
           onblur="saveNote(${n.id},this.value)">${eh(n.note)}</textarea>
       </div>`).join('');
 }
-function saveNote(id,v){const n=notes.find(x=>x.id===id);if(n)n.note=v;}
-function delNote(id){notes=notes.filter(x=>x.id!==id);renderNotes();}
-function clearAllNotes(){
+async function saveNote(id,v){
+    const n=notes.find(x=>String(x.id)===String(id));
+    if(!n)return;
+    n.note=String(v||'');
+    if(!n.isRemote || !attemptId || !n.questionId)return;
+    try {
+        await updateNote(n.id, encodeNoteContent(n.txt, n.note));
+    } catch (error) {
+        console.warn('Không thể cập nhật note:', error?.message || error);
+    }
+}
+async function delNote(id){
+    const index=notes.findIndex(x=>String(x.id)===String(id));
+    if(index===-1)return;
+    const noteItem=notes[index];
+    notes.splice(index,1);
+    renderNotes();
+    if(!noteItem.isRemote)return;
+    try {
+        await deleteNote(noteItem.id);
+    } catch (error) {
+        console.warn('Không thể xóa note trên backend:', error?.message || error);
+    }
+}
+async function clearAllNotes(){
     if(!notes.length)return;
     if(confirm('Xoá tất cả ghi chú?')){
+        const remoteIds = notes.filter(n => n.isRemote).map(n => n.id);
         notes=[];
         document.querySelectorAll('.hl-n').forEach(el=>{const p=el.parentNode;while(el.firstChild)p.insertBefore(el.firstChild,el);p.removeChild(el);});
         renderNotes();
+        await Promise.allSettled(remoteIds.map((id)=>deleteNote(id)));
     }
 }
 function toggleNote(){
@@ -467,17 +760,103 @@ function submitTest(){
     document.getElementById('mT').textContent=document.getElementById('timer').textContent;
     new bootstrap.Modal(document.getElementById('subModal')).show();
 }
-function confirmSub(){
-    clearInterval(timerInt);clearInterval(audioInterval);
-    let ok=0;
-    for(const[q,a] of Object.entries(KEY)){
-        const userAns=(ans[q]||'').trim().toLowerCase();
-        const correct=String(a).toLowerCase();
-        if(correct.includes('/')){if(correct.split('/').some(x=>x.trim()===userAns))ok++;}
-        else{if(userAns===correct)ok++;}
-    }
+async function confirmSub(){
+    clearInterval(timerInt);
+    clearInterval(audioInterval);
+    if (autoSaveInt) clearInterval(autoSaveInt);
+
     bootstrap.Modal.getInstance(document.getElementById('subModal')).hide();
-    setTimeout(()=>alert(`Nộp bài thành công!\nĐúng: ${ok}/${TOTAL} câu`),300);
+
+    if (!attemptId) {
+        try {
+            const retryAttempt = await startAttempt(examId, examModeFromContext);
+            const retryData = retryAttempt.data || retryAttempt;
+            attemptId = retryData.id;
+            if (attemptId) {
+                saveAttemptContext(attemptId);
+            }
+        } catch (retryErr) {
+            alert('Lỗi: Không tìm thấy phiên thi. Vui lòng tải lại trang.\nChi tiết: ' + (retryErr?.message || 'Unknown'));
+            return;
+        }
+    }
+
+    const fromQ = isSingle ? SEC_CFG[singleSec].from : 1;
+    const toQ = isSingle ? SEC_CFG[singleSec].to : 40;
+    const answersPayload = [];
+
+    for (let q = fromQ; q <= toQ; q++) {
+        const userAns = (ans[q] || '').trim();
+        answersPayload.push({
+            questionNumber: q,
+            answerText: userAns || null,
+            isSkipped: !userAns
+        });
+    }
+
+    try {
+        const res = await submitAttemptAnswers(attemptId, answersPayload);
+        const result = res.data || res;
+
+        localStorage.setItem('lastResultAttemptId', String(attemptId));
+        localStorage.setItem('aimhigh_lastResult', JSON.stringify(result || {}));
+        clearAttemptContext();
+
+        window.location.href = `result.html?attemptId=${attemptId}`;
+    } catch (err) {
+        console.error('Lỗi nộp bài:', err);
+        alert('Lỗi khi nộp bài! ' + err.message);
+    }
+}
+
+// ─── AUTO SAVE PROGRESS ──────────────────────────────────────────────────────
+function startAutoSave() {
+    if (!attemptId) return;
+
+    autoSaveInt = setInterval(async () => {
+        const keys = Object.keys(ans);
+        if (keys.length === 0) return;
+
+        for (const qNum of keys) {
+            const val = (ans[qNum] || '').trim();
+            if (!val) continue;
+            try {
+                await saveAttemptProgress(attemptId, parseInt(qNum, 10), val);
+            } catch (e) {
+                console.warn('Auto-save lỗi câu', qNum, e.message);
+            }
+        }
+    }, 60000);
+}
+
+// ─── RESTORE PROGRESS (khi F5) ──────────────────────────────────────────────
+async function restoreProgress() {
+    if (!attemptId) return;
+    try {
+        const res = await getAttemptProgress(attemptId);
+        const progressList = res.data || res || [];
+
+        if (!Array.isArray(progressList) || progressList.length === 0) return;
+
+        progressList.forEach(item => {
+            const qNum = item.questionId || item.questionNumber;
+            const aText = item.answerText;
+            if (!qNum || !aText) return;
+
+            ans[qNum] = aText;
+            const input = document.getElementById('q' + qNum);
+            if (input) input.value = aText;
+            pa(qNum, aText);
+
+            const escaped = (window.CSS && typeof window.CSS.escape === 'function')
+                ? window.CSS.escape(aText)
+                : String(aText).replace(/(["\\])/g, '\\$1');
+            const radio = document.querySelector(`input[name="q${qNum}"][value="${escaped}"]`);
+            if (radio) radio.checked = true;
+        });
+    } catch (e) {
+        console.warn('Không thể khôi phục tiến độ:', e.message);
+    }
 }
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────

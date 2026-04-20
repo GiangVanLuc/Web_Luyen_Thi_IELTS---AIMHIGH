@@ -8,8 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "exams")
-@Data
+@Table(
+    name = "exams",
+    indexes = {
+        @Index(name = "idx_exams_skill_level_active", columnList = "skill, level, is_active")
+    }
+)
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,12 +27,15 @@ public class Exam {
     private String title;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Skill skill;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ExamType type;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ExamLevel level;
     
     private Integer duration;
@@ -39,8 +48,9 @@ public class Exam {
     @Column(name = "exam_data", columnDefinition = "LONGTEXT")
     private String examData;
     
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = Boolean.TRUE;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id")

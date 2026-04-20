@@ -6,7 +6,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "listening_parts")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

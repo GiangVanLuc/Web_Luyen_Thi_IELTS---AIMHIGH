@@ -1,0 +1,30 @@
+# AimHigh AI Context Rules
+
+## Stack Summary
+- Frontend: multi-page static HTML + CSS + Vanilla JavaScript modules.
+- Backend: Java 21 + Spring Boot, layered architecture Controller -> Service -> Repository.
+- Data flow is API-first: UI never talks to database directly, only through REST endpoints.
+
+## Architecture Boundaries
+- Keep page UI logic in page-specific JS files under `AimHigh-IELTS-Website/js`.
+- Keep transport logic in a centralized API client module (`api.js`).
+- Keep business rules in Spring Service classes, not in Controller classes.
+- Keep persistence logic in Repository/JPA layer only.
+
+## Frontend <-> Backend Contract
+- All frontend API calls must go through a shared request helper with base URL and timeout.
+- Attach JWT from localStorage key `aimhigh_token` in `Authorization: Bearer <token>`.
+- Use JSON request/response; set `Content-Type: application/json` for non-file payloads.
+- Standard response envelope should be consistent: `{ success, message, data, errors, timestamp }`.
+- Handle 401/403 globally and redirect to login page when session is invalid.
+
+## API Change Workflow
+- When adding an API: create DTOs -> implement Service -> expose Controller endpoint -> update JS API client -> update page module.
+- Keep endpoint naming resource-based (`/api/exams`, `/api/attempts/{id}`), avoid action verbs in URI.
+- Update SOURCE_CODE_MAP.md and relevant ai-docs rule files whenever contracts change.
+
+## Quality and Safety Rules
+- Validate input using Bean Validation annotations on request DTOs.
+- Never return entities directly; return response DTOs only.
+- Add unit/integration tests for new backend behavior and smoke test frontend flow.
+- Do not break existing response fields without a migration note and frontend update.

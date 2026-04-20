@@ -1,0 +1,573 @@
+{
+  "exam": {
+    "duration": 60,
+    "title": "Cambridge 20 - Reading Test 1",
+    "description": "Cambridge IELTS 20 - Reading Test 1 Full",
+    "mode": "FULL",
+    "skill": "READING"
+  },
+  "sections": [
+    {
+      "questionFrom": 1,
+      "questionTo": 13,
+      "label": "Section 1",
+      "sectionNumber": 1,
+      "passages": [
+        {
+          "title": "The kākāpō",
+          "content": "<p>The kākāpō is a nocturnal, flightless parrot that is critically endangered and one of New Zealand's unique treasures. The kākāpō, also known as the owl parrot, is a large, forest-dwelling bird, with a pale owl-like face. Up to 64 cm in length, it has predominantly yellow-green feathers, forward-facing eyes, a large grey beak, large blue feet, and relatively short wings and tail. It is the world's only flightless parrot, and is also possibly one of the world's longest-living birds, with a reported lifespan of up to 100 years.</p><p>Kākāpō are solitary birds and tend to occupy the same home range for many years. They forage on the ground and climb high into trees. They often leap from trees and flap their wings, but at best manage a controlled descent to the ground. They are entirely vegetarian, with their diet including the leaves, roots and bark of trees as well as bulbs, and fern fronds.</p><p>Kākāpō breed in summer and autumn, but only in years when food is plentiful. Males play no part in incubation or chick-rearing - females alone incubate eggs and feed the chicks. The 1-4 eggs are laid in soil, which is repeatedly turned over before and during incubation. The female kākāpō has to spend long periods away from the nest searching for food, which leaves the unattended eggs and chicks particularly vulnerable to predators.</p><p>Before humans arrived, kākāpō were common throughout New Zealand's forests. However, this all changed with the arrival of the first Polynesian settlers about 700 years ago. For the early settlers, the flightless kākāpō was easy prey. They ate its meat and used its feathers to make soft cloaks. With them came the Polynesian dog and rat, which also preyed on kākāpō. By the time European colonisers arrived in the early 1800s, kākāpō had become confined to the central North Island and forested parts of the South Island.</p><p>The fall in kākāpō numbers was accelerated by European colonisation. A great deal of habitat was lost through forest clearance, and introduced species such as deer depleted the remaining forests of food. Other predators such as cats, stoats and two more species of rat were also introduced. The kākāpō were in serious trouble.</p><p>In 1894, the New Zealand government launched its first attempt to save the kākāpō. Conservationist Richard Henry led an effort to relocate several hundred of the birds to predator-free Resolution Island in Fiordland. Unfortunately, the island didn't remain predator free - stoats arrived within six years, eventually destroying the kākāpō population.</p><p>By the mid-1900s, the kākāpō was practically a lost species. Only a few clung to life in the most isolated parts of New Zealand. From 1949 to 1973, the newly formed New Zealand Wildlife Service made over 60 expeditions to find kākāpō, focusing mainly on Fiordland. Six were caught, but there were no females amongst them and all but one died within a few months of captivity.</p><p>In 1974, a new initiative was launched, and by 1977, 18 more kākāpō were found in Fiordland. However, there were still no females. In 1977, a large population of males was spotted in Rakiura - a large island free from stoats, ferrets and weasels. There were about 200 individuals, and in 1980 it was confirmed females were also present. These birds have been the foundation of all subsequent work in managing the species.</p><p>In 1996, a new Recovery Plan was launched, together with a specialist advisory group and a higher amount of funding. Renewed steps were taken to control predators. By 2000, five new females had been produced. Today, kākāpō management continues to be guided by the Recovery Plan to ensure stakeholders continue to be fully engaged.</p>",
+          "imageUrl": ""
+        }
+      ],
+      "groups": [
+        {
+          "title": "Questions 1-6",
+          "questionFrom": 1,
+          "questionTo": 6,
+          "type": "TRUE_FALSE_NG",
+          "instruction": "Do the following statements agree with the information given in Reading Passage 1? In boxes 1-6 on your answer sheet, write TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, NOT GIVEN if there is no information on this.",
+          "questions": [
+            {
+              "questionNumber": 1,
+              "questionText": "There are other parrots that share the kakapo's inability to fly.",
+              "points": 1,
+              "correctAnswer": "FALSE",
+              "explanation": "The passage says 'It is the world's only flightless parrot.'",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 2,
+              "questionText": "Adult kakapo produce chicks every year.",
+              "points": 1,
+              "correctAnswer": "FALSE",
+              "explanation": "The passage says 'Kākāpō breed... but only in years when food is plentiful.'",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 3,
+              "questionText": "Adult male kakapo bring food back to nesting females.",
+              "points": 1,
+              "correctAnswer": "FALSE",
+              "explanation": "The passage states 'Males play no part in incubation or chick-rearing'.",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 4,
+              "questionText": "The Polynesian rat was a greater threat to the kakapo than Polynesian settlers.",
+              "points": 1,
+              "correctAnswer": "NOT GIVEN",
+              "explanation": "The text mentions both were threats but does not compare which was greater.",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": true}
+              ]
+            },
+            {
+              "questionNumber": 5,
+              "questionText": "Kakapo were transferred from Rakiura Island to other locations because they were at risk from feral cats.",
+              "points": 1,
+              "correctAnswer": "TRUE",
+              "explanation": "The passage says 'predation by feral cats on Rakiura Island led to a rapid decline... As a result... population was evacuated to three island sanctuaries'.",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": true},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 6,
+              "questionText": "One Recovery Plan initiative that helped increase the kakapo population size was caring for struggling young birds.",
+              "points": 1,
+              "correctAnswer": "TRUE",
+              "explanation": "The passage mentions 'rescuing and hand-raising any failing chicks'.",
+              "choices": [
+                {"label": "TRUE", "text": "TRUE", "isCorrect": true},
+                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Questions 7-13",
+          "questionFrom": 7,
+          "questionTo": 13,
+          "type": "FILL_BLANK",
+          "instruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+          "questions": [
+            {
+              "questionNumber": 7,
+              "questionText": "diet consists of fern fronds, various parts of a tree and ______",
+              "points": 1,
+              "correctAnswer": "bulbs",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 8,
+              "questionText": "nests are created in ______ where eggs are laid.",
+              "points": 1,
+              "correctAnswer": "soil",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 9,
+              "questionText": "the ______ of the kākāpō were used to make clothes.",
+              "points": 1,
+              "correctAnswer": "feathers",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 10,
+              "questionText": "______ were an animal which they introduced that ate the kākāpō's food sources.",
+              "points": 1,
+              "correctAnswer": "deer",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 11,
+              "questionText": "a definite sighting of female kākāpō on Rakiura Island was reported in the year ______",
+              "points": 1,
+              "correctAnswer": "1980",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 12,
+              "questionText": "the Recovery Plan included an increase in ______",
+              "points": 1,
+              "correctAnswer": "funding",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 13,
+              "questionText": "a current goal of the Recovery Plan is to maintain the involvement of ______ in kākāpō protection.",
+              "points": 1,
+              "correctAnswer": "stakeholders",
+              "explanation": "",
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "questionFrom": 14,
+      "questionTo": 26,
+      "label": "Section 2",
+      "sectionNumber": 2,
+      "passages": [
+        {
+          "title": "Reintroducing elms to Britain",
+          "content": "<p><b>A</b> Around 25 million elms, accounting for 90% of all elm trees in the UK, died during the 1960s and 70s of Dutch elm disease. Matt Elliot of the Woodland Trust says: 'You look at old photographs from the 1960s and it's only then that you realise the impact... They were significant, large trees... then they were gone.'</p><p><b>B</b> The disease is caused by a fungus... A first epidemic occurred in the 1920s, but in the 70s a second epidemic was triggered by shipments of elm from Canada. The wood came in the form of logs destined for boat building and its intact bark was perfect for the elm bark beetles.</p><p><b>C</b> Today, elms still exist in the southern English countryside but mostly only in low hedgerows. Karen Russell says: 'We have millions of small elms... but they get targeted by the beetle as soon as they reach a certain size (10-15 centimetres in diameter).' Yet mature specimens have been identified... 'What are the reasons for their survival?'</p><p><b>D</b> For centuries, elm ran a close second to oak as the hardwood tree of choice in Britain. The use of elm is thought to go back to the Bronze Age. In the 18th century, its wood was used for items such as storage crates and flooring... and was used to build the keel of the 19th-century sailing ship Cutty Sark.</p><p><b>E</b> Given how ingrained elm is in British culture... Peter Bourne of the National Elm Collection says: 'I saw Dutch elm disease unfold as a small boy... I remember watching trees just lose their leaves.' Today, Brighton's elms total about 17,000. Strong winds from the sea make it difficult for the beetle to attack.</p><p><b>F</b> A new generation of seedlings have been bred and tested... 'The effects are very quick,' says Russell.</p><p><b>G</b> All of this raises questions of social acceptance. Others are more wary. 'Sometimes the best thing you can do is just give nature time to recover...' says Elliot.</p>",
+          "imageUrl": ""
+        }
+      ],
+      "groups": [
+        {
+          "title": "Questions 14-18",
+          "questionFrom": 14,
+          "questionTo": 18,
+          "type": "MATCHING",
+          "matchOptions": ["A", "B", "C", "D", "E", "F", "G"],
+          "instruction": "Reading Passage 2 has seven paragraphs, A-G. Which paragraph contains the following information? Write the correct letter, A-G, in boxes 14-18 on your answer sheet.",
+          "questions": [
+            {
+              "questionNumber": 14,
+              "questionText": "reference to the research problems that arise from there being only a few surviving large elms",
+              "points": 1,
+              "correctAnswer": "C",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 15,
+              "questionText": "details of a difference of opinion about the value of reintroducing elms to Britain",
+              "points": 1,
+              "correctAnswer": "G",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 16,
+              "questionText": "reference to how Dutch elm disease was brought into Britain",
+              "points": 1,
+              "correctAnswer": "B",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 17,
+              "questionText": "a description of the conditions that have enabled a location in Britain to escape Dutch elm disease",
+              "points": 1,
+              "correctAnswer": "E",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 18,
+              "questionText": "reference to the stage at which young elms become vulnerable to Dutch elm disease",
+              "points": 1,
+              "correctAnswer": "C",
+              "explanation": "",
+              "choices": []
+            }
+          ]
+        },
+        {
+          "title": "Questions 19-23",
+          "questionFrom": 19,
+          "questionTo": 23,
+          "type": "MULTIPLE_CHOICE",
+          "instruction": "Look at the following statements and the list of people below. Match each statement with the correct person, A, B or C.",
+          "questions": [
+            {
+              "questionNumber": 19,
+              "questionText": "If a tree gets infected with Dutch elm disease, the damage rapidly becomes visible.",
+              "points": 1,
+              "correctAnswer": "B",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
+                {"label": "B", "text": "Karen Russell", "isCorrect": true},
+                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 20,
+              "questionText": "It may be better to wait and see if the mature elms that have survived continue to flourish.",
+              "points": 1,
+              "correctAnswer": "A",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "Matt Elliot", "isCorrect": true},
+                {"label": "B", "text": "Karen Russell", "isCorrect": false},
+                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 21,
+              "questionText": "There must be an explanation for the survival of some mature elms.",
+              "points": 1,
+              "correctAnswer": "B",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
+                {"label": "B", "text": "Karen Russell", "isCorrect": true},
+                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 22,
+              "questionText": "We need to be aware that insects carrying Dutch elm disease are not very far away.",
+              "points": 1,
+              "correctAnswer": "C",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
+                {"label": "B", "text": "Karen Russell", "isCorrect": false},
+                {"label": "C", "text": "Peter Bourne", "isCorrect": true}
+              ]
+            },
+            {
+              "questionNumber": 23,
+              "questionText": "You understand the effect Dutch elm disease has had when you see evidence of how prominent the tree once was.",
+              "points": 1,
+              "correctAnswer": "A",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "Matt Elliot", "isCorrect": true},
+                {"label": "B", "text": "Karen Russell", "isCorrect": false},
+                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Questions 24-26",
+          "questionFrom": 24,
+          "questionTo": 26,
+          "type": "FILL_BLANK",
+          "instruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+          "questions": [
+            {
+              "questionNumber": 24,
+              "questionText": "For hundreds of years, the only tree that was more popular in Britain than elm was ______",
+              "points": 1,
+              "correctAnswer": "oak",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 25,
+              "questionText": "In the 18th century, it was grown to provide wood for boxes and ______",
+              "points": 1,
+              "correctAnswer": "flooring",
+              "explanation": "",
+              "choices": []
+            },
+            {
+              "questionNumber": 26,
+              "questionText": "Due to its strength, elm was often used for mining equipment and the Cutty Sark's ______ was also constructed from elm.",
+              "points": 1,
+              "correctAnswer": "keel",
+              "explanation": "",
+              "choices": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "questionFrom": 27,
+      "questionTo": 40,
+      "label": "Section 3",
+      "sectionNumber": 3,
+      "passages": [
+        {
+          "title": "How stress affects our judgement",
+          "content": "<p>Some of the most important decisions of our lives occur while we're feeling stressed and anxious. My colleague and I, both neuroscientists, wanted to investigate how the mind operates under stress, so we visited some local fire stations. Firefighters' workdays vary quite a bit. These ups and downs presented the perfect setting for an experiment.</p><p>We found that perceived threat acted as a trigger for a stress reaction that made the task of processing information easier for the firefighters - but only as long as it conveyed bad news.</p><p>Back in our lab, we observed the same pattern in students who were told they had to give a surprise public speech... their cortisol levels spiked, their heart rates went up and they suddenly became better at processing unrelated, yet alarming, information.</p><p>When we experience stressful events, a physiological change is triggered... Brain imaging reveals that this 'switch' is related to a sudden boost in a neural signal important for learning, specifically in response to unexpected warning signs.</p><p>It is also important to realise that stress travels rapidly from one person to the next. Studies show that if we observe positive feeds on social media... we are more likely to post uplifting messages ourselves. If we observe negative posts... we will in turn create more negative posts.</p><p>Repeatedly checking your phone... is related to stress. The fact that stress increases the likelihood that we will focus more on alarming messages, together with the fact that it spreads extremely rapidly, can create collective fear that is not always justified.</p><p>The good news, however, is that positive emotions, such as hope, are contagious too... Being aware of the close relationship between people's emotional state and how they process information can help us frame our messages more effectively.</p>",
+          "imageUrl": ""
+        }
+      ],
+      "groups": [
+        {
+          "title": "Questions 27-30",
+          "questionFrom": 27,
+          "questionTo": 30,
+          "type": "MULTIPLE_CHOICE",
+          "instruction": "Choose the correct answer, A, B, C or D.",
+          "questions": [
+            {
+              "questionNumber": 27,
+              "questionText": "In the first paragraph, the writer introduces the topic of the text by:",
+              "points": 1,
+              "correctAnswer": "C",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "defining some commonly used terms.", "isCorrect": false},
+                {"label": "B", "text": "questioning a widely held assumption.", "isCorrect": false},
+                {"label": "C", "text": "mentioning a challenge faced by everyone.", "isCorrect": true},
+                {"label": "D", "text": "specifying a situation which makes us most anxious.", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 28,
+              "questionText": "What point does the writer make about firefighters in the second paragraph?",
+              "points": 1,
+              "correctAnswer": "A",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "The regular changes of stress levels in their working lives make them ideal study subjects.", "isCorrect": true},
+                {"label": "B", "text": "The strategies they use to handle stress are of particular interest to researchers.", "isCorrect": false},
+                {"label": "C", "text": "The stressful nature of their job is typical of many public service professions.", "isCorrect": false},
+                {"label": "D", "text": "Their personalities make them especially well-suited to working under stress.", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 29,
+              "questionText": "What is the writer doing in the fourth paragraph?",
+              "points": 1,
+              "correctAnswer": "D",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "explaining their findings", "isCorrect": false},
+                {"label": "B", "text": "justifying their approach", "isCorrect": false},
+                {"label": "C", "text": "setting out their objectives", "isCorrect": false},
+                {"label": "D", "text": "describing their methodology", "isCorrect": true}
+              ]
+            },
+            {
+              "questionNumber": 30,
+              "questionText": "In the seventh paragraph, the writer describes a mechanism in the brain which:",
+              "points": 1,
+              "correctAnswer": "C",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "enables people to respond more quickly to stressful situations.", "isCorrect": false},
+                {"label": "B", "text": "results in increased ability to control our levels of anxiety.", "isCorrect": false},
+                {"label": "C", "text": "produces heightened sensitivity to indications of external threats.", "isCorrect": true},
+                {"label": "D", "text": "is activated when there is a need to communicate a sense of danger.", "isCorrect": false}
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Questions 31-35",
+          "questionFrom": 31,
+          "questionTo": 35,
+          "type": "MULTIPLE_CHOICE",
+          "instruction": "Complete each sentence with the correct ending, A-G.",
+          "questions": [
+            {
+              "questionNumber": 31,
+              "questionText": "At times when they were relaxed, the firefighters usually...",
+              "points": 1,
+              "correctAnswer": "B",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
+                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": true},
+                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
+                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
+                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
+                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
+                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 32,
+              "questionText": "The researchers noted that when the firefighters were stressed, they...",
+              "points": 1,
+              "correctAnswer": "G",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
+                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
+                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
+                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
+                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
+                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
+                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": true}
+              ]
+            },
+            {
+              "questionNumber": 33,
+              "questionText": "When the firefighters were told good news, they always...",
+              "points": 1,
+              "correctAnswer": "F",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
+                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
+                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
+                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
+                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
+                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": true},
+                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 34,
+              "questionText": "The students' cortisol levels and heart rates were affected when the researchers...",
+              "points": 1,
+              "correctAnswer": "E",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
+                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
+                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
+                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
+                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": true},
+                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
+                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 35,
+              "questionText": "In both experiments, negative information was processed better when the subjects...",
+              "points": 1,
+              "correctAnswer": "D",
+              "explanation": "",
+              "choices": [
+                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
+                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
+                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
+                {"label": "D", "text": "were feeling under stress.", "isCorrect": true},
+                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
+                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
+                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Questions 36-40",
+          "questionFrom": 36,
+          "questionTo": 40,
+          "type": "TRUE_FALSE_NG",
+          "instruction": "Do the following statements agree with the views of the writer in Reading Passage 3? In boxes 36-40 on your answer sheet, write YES if the statement agrees with the views, NO if the statement contradicts the views, NOT GIVEN if there is no information on this.",
+          "questions": [
+            {
+              "questionNumber": 36,
+              "questionText": "The tone of the content we post on social media tends to reflect the nature of the posts in our feeds.",
+              "points": 1,
+              "correctAnswer": "YES",
+              "explanation": "",
+              "choices": [
+                {"label": "YES", "text": "YES", "isCorrect": true},
+                {"label": "NO", "text": "NO", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 37,
+              "questionText": "Phones have a greater impact on our stress levels than other electronic media devices.",
+              "points": 1,
+              "correctAnswer": "NOT GIVEN",
+              "explanation": "",
+              "choices": [
+                {"label": "YES", "text": "YES", "isCorrect": false},
+                {"label": "NO", "text": "NO", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": true}
+              ]
+            },
+            {
+              "questionNumber": 38,
+              "questionText": "The more we read about a stressful public event on social media, the less able we are to take the information in.",
+              "points": 1,
+              "correctAnswer": "NO",
+              "explanation": "",
+              "choices": [
+                {"label": "YES", "text": "YES", "isCorrect": false},
+                {"label": "NO", "text": "NO", "isCorrect": true},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 39,
+              "questionText": "Stress created by social media posts can lead us to take unnecessary precautions.",
+              "points": 1,
+              "correctAnswer": "YES",
+              "explanation": "",
+              "choices": [
+                {"label": "YES", "text": "YES", "isCorrect": true},
+                {"label": "NO", "text": "NO", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            },
+            {
+              "questionNumber": 40,
+              "questionText": "Our tendency to be affected by other people's moods can be used in a positive way.",
+              "points": 1,
+              "correctAnswer": "YES",
+              "explanation": "",
+              "choices": [
+                {"label": "YES", "text": "YES", "isCorrect": true},
+                {"label": "NO", "text": "NO", "isCorrect": false},
+                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

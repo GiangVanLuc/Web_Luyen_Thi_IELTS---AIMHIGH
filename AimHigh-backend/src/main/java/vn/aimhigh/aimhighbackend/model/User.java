@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,12 +34,14 @@ public class User implements UserDetails {
 
     private String name;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(nullable = false)
+    private Role role = Role.STUDENT;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "auth_provider")
+    @Column(name = "auth_provider", nullable = false)
     private AuthProvider authProvider = AuthProvider.LOCAL;
 
 

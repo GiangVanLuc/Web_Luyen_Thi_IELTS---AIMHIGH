@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ResultResponse {
     private Long attemptId;
+    private Long examId;
     private String examTitle;
     private Skill skill;
     private AttemptMode mode;
@@ -28,6 +29,10 @@ public class ResultResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ResultPartResponse {
+        private Integer sectionNumber;
+        private String label;
+        private Integer totalQuestions;
+        private Integer correctCount;
         private List<ResultQuestionResponse> questions;
     }
 
@@ -36,6 +41,10 @@ public class ResultResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ResultPassageResponse {
+        private Integer passageOrder;
+        private String label;
+        private Integer totalQuestions;
+        private Integer correctCount;
         private List<ResultQuestionResponse> questions;
     }
 
@@ -46,6 +55,7 @@ public class ResultResponse {
     public static class ResultQuestionResponse {
         private Integer questionNumber;
         private String questionText;
+        private String questionType;
         private String userAnswer;
         private String correctAnswer;
         private Boolean isCorrect;

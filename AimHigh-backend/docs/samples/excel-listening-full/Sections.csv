@@ -1,0 +1,5 @@
+﻿sectionNumber,label,questionFrom,questionTo,audioUrl,audioDuration,transcript
+1,Section 1,1,10,https://cdn.aimhigh.vn/audio/listening-sec1.mp3,430,Transcript section 1
+2,Section 2,11,20,https://cdn.aimhigh.vn/audio/listening-sec2.mp3,440,Transcript section 2
+3,Section 3,21,30,https://cdn.aimhigh.vn/audio/listening-sec3.mp3,450,Transcript section 3
+4,Section 4,31,40,https://cdn.aimhigh.vn/audio/listening-sec4.mp3,460,Transcript section 4

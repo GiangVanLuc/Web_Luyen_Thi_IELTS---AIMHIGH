@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -153,6 +153,62 @@
                     </div>
                 </div>
 
+                <div class="admin-card">
+                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                        <h3 class="admin-card-title mb-0">Upload đề theo cấu trúc chuẩn (JSON)</h3>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">File JSON đề thi</label>
+                            <input type="file" class="form-control" id="examJsonFileInput" accept="application/json,.json">
+                            <div class="form-text">Hỗ trợ cấu trúc có đủ exam, sections, groups, questions (kèm correctAnswer). Hệ thống sẽ tự loại bỏ đáp án khỏi examData client.</div>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button class="btn-admin-outline w-100" id="btnPreviewJsonStructure" type="button">
+                                <i class="bi bi-eye"></i> Kiểm tra nhanh
+                            </button>
+                            <button class="btn-admin-primary w-100" id="btnUploadExamJson" type="button">
+                                <i class="bi bi-cloud-upload"></i> Upload đề
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <pre id="jsonUploadFeedback" style="display:none;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:12px;font-size:0.8rem;max-height:220px;overflow:auto;"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                        <h3 class="admin-card-title mb-0">Upload đề từ Excel</h3>
+                        <div class="d-flex gap-2">
+                            <button class="btn-admin-outline" id="btnDownloadReadingTemplate" type="button">
+                                <i class="bi bi-download"></i> Template Reading
+                            </button>
+                            <button class="btn-admin-outline" id="btnDownloadListeningTemplate" type="button">
+                                <i class="bi bi-download"></i> Template Listening
+                            </button>
+                            <button class="btn-admin-outline" id="btnDownloadReadingFullSample" type="button">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Full sample Reading
+                            </button>
+                            <button class="btn-admin-outline" id="btnDownloadListeningFullSample" type="button">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Full sample Listening
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">File Excel đề thi</label>
+                            <input type="file" class="form-control" id="examExcelFileInput" accept=".xlsx,.xls">
+                            <div class="form-text">Excel gồm các sheet: Exam, Sections, Passages (Reading), Questions, Choices.</div>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button class="btn-admin-primary w-100" id="btnUploadExamExcel" type="button">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Upload Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Split Screen Builder -->
                 <div class="builder-split">
                     <!-- Left: Content Panel -->
@@ -248,6 +304,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
     <script>
         // ===== Content Type Switch =====
@@ -483,6 +540,180 @@
                 questions
             };
         }
+
+        const jsonFileInput = document.getElementById('examJsonFileInput');
+        const excelFileInput = document.getElementById('examExcelFileInput');
+        const jsonFeedback = document.getElementById('jsonUploadFeedback');
+
+        function showJsonFeedback(message, isError = false) {
+            jsonFeedback.style.display = '';
+            jsonFeedback.style.color = isError ? '#fecaca' : '#e2e8f0';
+            jsonFeedback.textContent = message;
+        }
+
+        async function readSelectedJsonFile() {
+            const file = jsonFileInput.files[0];
+            if (!file) {
+                throw new Error('Vui lòng chọn file JSON trước.');
+            }
+
+            const raw = await file.text();
+            let payload;
+            try {
+                payload = JSON.parse(raw);
+            } catch (_error) {
+                throw new Error('File JSON không hợp lệ.');
+            }
+
+            if (!payload?.exam || !Array.isArray(payload?.sections)) {
+                throw new Error('Cấu trúc thiếu exam hoặc sections.');
+            }
+
+            return payload;
+        }
+
+        function summarizeStructure(payload) {
+            const skill = String(payload.exam?.skill || '').toUpperCase();
+            const sections = payload.sections || [];
+            const totalGroups = sections.reduce((sum, sec) => sum + ((sec.groups || []).length), 0);
+            const totalQuestions = sections.reduce((sum, sec) => {
+                return sum + (sec.groups || []).reduce((inner, g) => {
+                    const direct = (g.questions || []).length;
+                    const sub = (g.subBlocks || []).reduce((acc, b) => acc + ((b.questions || []).length), 0);
+                    const table = (g.tableRows || []).reduce((acc, row) => {
+                        const cells = row?.cells || [];
+                        return acc + cells.filter(c => c && typeof c.questionNumber === 'number').length;
+                    }, 0);
+                    return inner + direct + sub + table;
+                }, 0);
+            }, 0);
+
+            return [
+                `Title: ${payload.exam?.title || '(empty)'}`,
+                `Skill: ${skill || '(empty)'}`,
+                `Sections: ${sections.length}`,
+                `Groups: ${totalGroups}`,
+                `Questions(found): ${totalQuestions}`
+            ].join('\n');
+        }
+
+        document.getElementById('btnPreviewJsonStructure').addEventListener('click', async () => {
+            try {
+                const payload = await readSelectedJsonFile();
+                showJsonFeedback(summarizeStructure(payload));
+            } catch (error) {
+                showJsonFeedback(error.message || 'Không thể đọc file JSON.', true);
+            }
+        });
+
+        document.getElementById('btnUploadExamJson').addEventListener('click', async () => {
+            const btn = document.getElementById('btnUploadExamJson');
+            btn.disabled = true;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang upload...';
+
+            try {
+                const payload = await readSelectedJsonFile();
+                const response = await adminImportExamJson(payload);
+                const exam = response?.data || response;
+
+                if (exam?.title) {
+                    document.getElementById('testTitle').value = exam.title;
+                }
+                if (exam?.skill) {
+                    document.getElementById('testSkill').value = String(exam.skill).toLowerCase();
+                }
+                if (exam?.duration) {
+                    document.getElementById('testDuration').value = exam.duration;
+                }
+
+                const examId = exam?.id ? `ID: ${exam.id}` : 'ID: n/a';
+                showJsonFeedback(`Upload thành công. ${examId}\n${summarizeStructure(payload)}`);
+                alert('Upload đề thành công. Bạn có thể sang trang Danh sách đề thi để kiểm tra.');
+            } catch (error) {
+                showJsonFeedback(error.message || 'Upload thất bại.', true);
+                alert(`Upload thất bại: ${error.message || 'Unknown error'}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        document.getElementById('btnUploadExamExcel').addEventListener('click', async () => {
+            const file = excelFileInput.files[0];
+            if (!file) {
+                alert('Vui lòng chọn file Excel trước khi upload.');
+                return;
+            }
+
+            const btn = document.getElementById('btnUploadExamExcel');
+            btn.disabled = true;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+
+            try {
+                const response = await adminImportExamExcel(file);
+                const exam = response?.data || response;
+
+                if (exam?.title) {
+                    document.getElementById('testTitle').value = exam.title;
+                }
+                if (exam?.skill) {
+                    document.getElementById('testSkill').value = String(exam.skill).toLowerCase();
+                }
+                if (exam?.duration) {
+                    document.getElementById('testDuration').value = exam.duration;
+                }
+
+                showJsonFeedback(`Import Excel thành công. ID: ${exam?.id || 'n/a'}\nTitle: ${exam?.title || '(empty)'}`);
+                alert('Upload Excel thành công. Đề đã được lưu vào hệ thống.');
+            } catch (error) {
+                showJsonFeedback(error.message || 'Import Excel thất bại.', true);
+                alert(`Import Excel thất bại: ${error.message || 'Unknown error'}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        async function downloadTemplate(skill) {
+            try {
+                const blob = await adminDownloadExamTemplate(skill);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${skill}_template.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert(`Tải template thất bại: ${error.message || 'Unknown error'}`);
+            }
+        }
+
+        async function downloadFullSampleTemplate(skill) {
+            try {
+                const blob = await adminDownloadFullSampleExamTemplate(skill);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${skill}_full_sample.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert(`Tải full sample thất bại: ${error.message || 'Unknown error'}`);
+            }
+        }
+
+        document.getElementById('btnDownloadReadingTemplate').addEventListener('click', () => downloadTemplate('reading'));
+        document.getElementById('btnDownloadListeningTemplate').addEventListener('click', () => downloadTemplate('listening'));
+        document.getElementById('btnDownloadReadingFullSample').addEventListener('click', () => downloadFullSampleTemplate('reading'));
+        document.getElementById('btnDownloadListeningFullSample').addEventListener('click', () => downloadFullSampleTemplate('listening'));
+
     </script>
 </body>
 </html>
+

@@ -25,6 +25,19 @@ async function apiFetch(endpoint, options = {}) {
             return null;
         }
 
+        if (response.status === 403) {
+            const isAdminEndpoint = endpoint.startsWith('/admin/');
+            const currentUser = JSON.parse(localStorage.getItem('aimhigh_currentUser') || '{}');
+            const role = String(currentUser?.role || '').toUpperCase();
+            const errorData = await response.json().catch(() => ({}));
+
+            if (isAdminEndpoint && role !== 'ADMIN') {
+                throw new Error('Bạn chưa có quyền ADMIN. Vui lòng đăng nhập bằng tài khoản ADMIN để dùng chức năng này.');
+            }
+
+            throw new Error(errorData.message || 'Bạn không có quyền truy cập chức năng này (HTTP 403).');
+        }
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP ${response.status}`);
@@ -49,10 +62,17 @@ async function apiLogin(email, password) {
         method: 'POST',
         body: JSON.stringify({ email, password })
     });
-    if (data?.token) {
-        localStorage.setItem('aimhigh_token', data.token);
+    if (data?.accessToken) {
+        localStorage.setItem('aimhigh_token', data.accessToken);
+        if (data?.refreshToken) {
+            localStorage.setItem('aimhigh_refreshToken', data.refreshToken);
+        }
         localStorage.setItem('aimhigh_loggedIn', 'true');
-        localStorage.setItem('aimhigh_currentUser', JSON.stringify(data.user));
+        localStorage.setItem('aimhigh_currentUser', JSON.stringify({
+            email: data.email,
+            name: data.name,
+            role: data.role
+        }));
     }
     return data;
 }
@@ -66,10 +86,14 @@ async function apiRegister(userData) {
         method: 'POST',
         body: JSON.stringify(userData)
     });
-    if (data?.token) {
-        localStorage.setItem('aimhigh_token', data.token);
+    if (data?.accessToken) {
+        localStorage.setItem('aimhigh_token', data.accessToken);
         localStorage.setItem('aimhigh_loggedIn', 'true');
-        localStorage.setItem('aimhigh_currentUser', JSON.stringify(data.user));
+        localStorage.setItem('aimhigh_currentUser', JSON.stringify({
+            email: data.email,
+            name: data.name,
+            role: data.role
+        }));
     }
     return data;
 }
@@ -78,12 +102,19 @@ async function apiRegister(userData) {
  * Đăng xuất
  */
 async function apiLogout() {
+    const refreshToken = localStorage.getItem('aimhigh_refreshToken');
     try {
-        await apiFetch('/auth/logout', { method: 'POST' });
+        if (refreshToken) {
+            await apiFetch('/auth/logout', {
+                method: 'POST',
+                body: JSON.stringify({ refreshToken })
+            });
+        }
     } catch (e) {
         // Silent fail
     } finally {
         localStorage.removeItem('aimhigh_token');
+        localStorage.removeItem('aimhigh_refreshToken');
         localStorage.removeItem('aimhigh_loggedIn');
         localStorage.removeItem('aimhigh_currentUser');
         window.location.href = 'login.html';
@@ -299,7 +330,7 @@ async function adminUploadMedia(file, type = 'audio') {
  * @param {object} testData - { title, skill, duration, difficulty, description, passage, questions, status }
  */
 async function adminCreateTest(testData) {
-    return apiFetch('/admin/tests', {
+    return apiFetch('/admin/exams', {
         method: 'POST',
         body: JSON.stringify(testData)
     });
@@ -311,7 +342,7 @@ async function adminCreateTest(testData) {
  * @param {object} testData
  */
 async function adminUpdateTest(testId, testData) {
-    return apiFetch(`/admin/tests/${testId}`, {
+    return apiFetch(`/admin/exams/${testId}`, {
         method: 'PUT',
         body: JSON.stringify(testData)
     });
@@ -323,7 +354,7 @@ async function adminUpdateTest(testId, testData) {
  * @param {string} status - 'published' | 'draft' | 'archived'
  */
 async function adminUpdateTestStatus(testId, status) {
-    return apiFetch(`/admin/tests/${testId}/status`, {
+    return apiFetch(`/admin/exams/${testId}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status })
     });
@@ -334,7 +365,7 @@ async function adminUpdateTestStatus(testId, status) {
  * @param {string} testId
  */
 async function adminDeleteTest(testId) {
-    return apiFetch(`/admin/tests/${testId}`, {
+    return apiFetch(`/admin/exams/${testId}`, {
         method: 'DELETE'
     });
 }
@@ -345,7 +376,62 @@ async function adminDeleteTest(testId) {
  */
 async function adminGetTests(params = {}) {
     const query = new URLSearchParams({ page: 1, limit: 10, ...params });
-    return apiFetch(`/admin/tests?${query}`);
+    return apiFetch(`/admin/exams?${query}`);
+}
+
+async function adminImportExamJson(payload) {
+    return apiFetch('/admin/exams/import/json', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function adminImportExamExcel(file) {
+    const token = localStorage.getItem('aimhigh_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE}/admin/exams/import/excel`, {
+        method: 'POST',
+        headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: formData
+    });
+
+    if (response.status === 401) {
+        localStorage.removeItem('aimhigh_loggedIn');
+        localStorage.removeItem('aimhigh_token');
+        window.location.href = 'login.html';
+        return null;
+    }
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+    return response.json();
+}
+
+async function adminDownloadExamTemplate(skill) {
+    const token = localStorage.getItem('aimhigh_token');
+    const response = await fetch(`${API_BASE}/admin/exams/template/${encodeURIComponent(skill)}`, {
+        method: 'GET',
+        headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return response.blob();
+}
+
+async function adminDownloadFullSampleExamTemplate(skill) {
+    const token = localStorage.getItem('aimhigh_token');
+    const response = await fetch(`${API_BASE}/admin/exams/template/${encodeURIComponent(skill)}/full-sample`, {
+        method: 'GET',
+        headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return response.blob();
 }
 
 /**
@@ -411,6 +497,12 @@ async function adminGetDashboardStats() {
 
 // ===== EXAM SESSION API (Listening & Reading) =====
 
+function normalizeAttemptMode(mode) {
+    const raw = String(mode || '').trim().toUpperCase();
+    if (raw === 'REAL' || raw === 'EXAM') return 'EXAM';
+    return 'PRACTICE';
+}
+
 /**
  * Lấy dữ liệu đề thi (đã strip correctAnswer)
  * @param {number} examId
@@ -420,14 +512,22 @@ async function getExamData(examId) {
 }
 
 /**
+ * Lấy danh sách đề thi cho trang practice
+ */
+async function getExamList() {
+    return apiFetch('/exams');
+}
+
+/**
  * Bắt đầu phiên thi mới
  * @param {number} examId
  * @param {string} mode - 'practice' | 'real'
  */
 async function startAttempt(examId, mode = 'practice') {
+    const backendMode = normalizeAttemptMode(mode);
     return apiFetch('/attempts/start', {
         method: 'POST',
-        body: JSON.stringify({ examId, mode })
+        body: JSON.stringify({ examId, mode: backendMode })
     });
 }
 
@@ -465,63 +565,86 @@ async function submitAttemptAnswers(attemptId, answers) {
 }
 
 /**
- * Tạo highlight trong Reading practice
+ * Lấy kết quả bài làm theo attempt
  * @param {number} attemptId
- * @param {object} payload - { passageId, startOffset, endOffset, color, note }
  */
-async function createPracticeHighlight(attemptId, payload) {
-    return apiFetch(`/attempts/${attemptId}/highlights`, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    });
+async function getAttemptResult(attemptId) {
+    return apiFetch(`/attempts/${attemptId}/result`);
 }
 
 /**
- * Lấy danh sách highlight của attempt
- * @param {number} attemptId
- * @param {number|null} passageId
+ * Lấy lịch sử các lần làm bài của user hiện tại
  */
-async function getPracticeHighlights(attemptId, passageId = null) {
-    const query = passageId ? `?passageId=${passageId}` : '';
-    return apiFetch(`/attempts/${attemptId}/highlights${query}`);
+async function getMyAttempts() {
+    return apiFetch('/users/me/attempts');
 }
 
-/**
- * Xóa highlight
- * @param {number} highlightId
- */
-async function deletePracticeHighlight(highlightId) {
-    return apiFetch(`/highlights/${highlightId}`, {
-        method: 'DELETE'
-    });
-}
+// ===== NOTE & HIGHLIGHT API =====
 
-/**
- * Tạo note theo question (API backend hiện tại yêu cầu questionId)
- * @param {number} attemptId
- * @param {object} payload - { questionId, content }
- */
-async function createPracticeNote(attemptId, payload) {
+async function createNote(attemptId, questionId, content) {
     return apiFetch(`/attempts/${attemptId}/notes`, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ questionId, content })
+    });
+}
+async function updateNote(noteId, content) {
+    return apiFetch(`/notes/${noteId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ content })
     });
 }
 
-/**
- * Lấy notes theo attempt
- * @param {number} attemptId
- */
-async function getPracticeNotes(attemptId) {
+async function getAttemptNotes(attemptId) {
     return apiFetch(`/attempts/${attemptId}/notes`);
 }
 
-/**
- * Xóa note
- * @param {number} noteId
- */
-async function deletePracticeNote(noteId) {
-    return apiFetch(`/notes/${noteId}`, {
+async function deleteNote(noteId) {
+    return apiFetch(`/notes/${noteId}`, { method: 'DELETE' });
+}
+
+async function createHighlight(attemptId, passageId, startOffset, endOffset, note) {
+    return apiFetch(`/attempts/${attemptId}/highlights`, {
+        method: 'POST',
+        body: JSON.stringify({ passageId, startOffset, endOffset, note })
+    });
+}
+
+async function getAttemptHighlights(attemptId, passageId = null) {
+    const suffix = passageId == null ? '' : `?passageId=${encodeURIComponent(passageId)}`;
+    return apiFetch(`/attempts/${attemptId}/highlights${suffix}`);
+}
+
+async function updateHighlightNote(highlightId, note) {
+    return apiFetch(`/highlights/${highlightId}/note`, {
+        method: 'PATCH',
+        body: JSON.stringify({ note })
+    });
+}
+
+async function deleteHighlight(highlightId) {
+    return apiFetch(`/highlights/${highlightId}`, { method: 'DELETE' });
+}
+
+// ===== USER VOCABULARY API =====
+
+async function apiLookupVocab(word) {
+    return apiFetch(`/vocabulary/lookup?word=${encodeURIComponent(word)}`);
+}
+
+async function apiSaveUserVocab(vocabId, note) {
+    return apiFetch(`/user-vocabulary`, {
+        method: 'POST',
+        body: JSON.stringify({ vocabId, note })
+    });
+}
+
+async function apiGetUserVocab(learned = null) {
+    const suffix = learned == null ? '' : `?learned=${encodeURIComponent(Boolean(learned))}`;
+    return apiFetch(`/user-vocabulary${suffix}`);
+}
+
+async function apiDeleteUserVocab(id) {
+    return apiFetch(`/user-vocabulary/${id}`, {
         method: 'DELETE'
     });
 }

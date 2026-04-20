@@ -1,4 +1,4 @@
-// ===== AUTH.JS - Xử lý đăng nhập / đăng ký =====
+﻿// ===== AUTH.JS - Xử lý đăng nhập / đăng ký =====
 
 /**
  * Kiểm tra định dạng email hợp lệ
@@ -91,7 +91,9 @@ function handleLogin(e) {
             localStorage.setItem('aimhigh_remember', 'true');
         }
 
-        window.location.href = 'dashboard.html';
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect');
+        window.location.href = redirect || 'dashboard.html';
     }, 800);
 }
 
@@ -149,7 +151,9 @@ function handleRegister(e) {
         localStorage.setItem('aimhigh_loggedIn', 'true');
         localStorage.setItem('aimhigh_currentUser', JSON.stringify(newUser));
 
-        window.location.href = 'dashboard.html';
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect');
+        window.location.href = redirect || 'dashboard.html';
     }, 1000);
 }
 
@@ -258,3 +262,4 @@ function updatePasswordStrengthUI(password) {
     });
     if (label) label.textContent = password.length ? (labels[strength] || 'Nhập mật khẩu') : 'Nhập mật khẩu';
 }
+

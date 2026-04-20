@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -16,319 +16,329 @@
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
+                <span class="brand-name">AimHigh</span>
             </a>
             <div class="d-flex align-items-center gap-2">
                 <a href="dashboard.html" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-grid-1x2"></i> Dashboard
-                </a>
-                <a href="listening.html" class="btn btn-primary btn-sm">
-                    <i class="bi bi-play-fill"></i> Bài thi khác
                 </a>
             </div>
         </div>
     </nav>
 
     <div style="padding-top:80px;">
-        <div class="container py-4">
+        <div class="container py-3 result-shell">
 
             <!-- Result Header -->
-            <div class="result-header-card mb-4">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <span class="test-badge listening"><i class="bi bi-headphones"></i> Listening</span>
-                            <span class="text-muted small"><i class="bi bi-calendar3"></i> 06/03/2025</span>
+            <div class="result-header-card mb-3">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                        <h2 class="result-title" id="resultTitle">Kết quả bài thi</h2>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                            <span id="skillBadge" class="test-badge listening"><i class="bi bi-headphones"></i> Listening</span>
+                            <span id="resultMeta" class="text-muted small">Hoàn thành</span>
+                            <span id="resultDate" class="text-muted small"></span>
                         </div>
-                        <h1 id="resultTitle" class="result-title">Cambridge IELTS 18 - Test 1 Listening</h1>
-                        <p class="text-muted">Hoàn thành lúc 10:32 AM • Thời gian làm bài: 28:45</p>
                     </div>
-                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                        <div class="d-flex gap-2 justify-content-lg-end">
-                            <button class="btn btn-outline-primary" onclick="window.print()">
-                                <i class="bi bi-printer"></i> In kết quả
-                            </button>
-                            <a href="listening.html" class="btn btn-primary">
-                                <i class="bi bi-arrow-repeat"></i> Làm lại
-                            </a>
-                        </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <a id="backToExamBtn" href="practice.html?skill=reading" class="btn btn-outline-secondary btn-sm" onclick="goBackToExam(event)">
+                            <i class="bi bi-arrow-left"></i> Quay lại giao diện bài
+                        </a>
+                        <a id="topRetryExactBtn" href="practice.html?skill=listening" class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-repeat"></i> Làm lại
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Score Overview -->
-            <div class="row g-4 mb-4">
-                <!-- Main Score -->
-                <div class="col-lg-4">
-                    <div class="score-main-card">
-                        <div class="score-main-label">Band Score</div>
-                        <div class="score-main-circle">
-                            <svg viewBox="0 0 160 160">
-                                <circle class="score-circle-bg" cx="80" cy="80" r="70"/>
-                                <circle class="score-circle-fill" cx="80" cy="80" r="70"
-                                        stroke-dasharray="439.8" stroke-dashoffset="110"/>
-                            </svg>
-                            <div class="score-main-number">
-                                <span id="bandScore">7.0</span>
-                                <small>/ 9.0</small>
-                            </div>
-                        </div>
-                        <div class="score-main-label-text">Xuất sắc</div>
-                        <div class="score-main-stars">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
-                            <i class="bi bi-star"></i>
+            <!-- Score Overview (YouPass-like) -->
+            <div class="row g-3 mb-3">
+                <div class="col-lg-6">
+                    <div class="yp-art-card">
+                        <div class="yp-art-title" id="bandFeedback">Bình tĩnh nhé, mình luyện tiếp thôi</div>
+                        <div class="yp-art-sub">Band <strong id="bandScore">0.0</strong>/9.0</div>
+                        <div class="yp-art-stars" id="bandStars"></div>
+                        <div class="yp-art-blob">
+                            <div class="yp-art-emoji">📘</div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Stats Breakdown -->
-                <div class="col-lg-8">
-                    <div class="row g-3 h-100">
-                        <div class="col-6">
-                            <div class="stat-breakdown-card correct">
-                                <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
-                                <div class="stat-number" id="correctCount">32</div>
-                                <div class="stat-label">Câu đúng</div>
-                                <div class="stat-percent">80%</div>
-                            </div>
+                <div class="col-lg-6">
+                    <div class="yp-summary-card">
+                        <div class="yp-summary-head">
+                            <h5>Kết quả làm bài</h5>
+                            <div class="yp-summary-time">Thời gian làm bài <strong id="timeSpentTop">--:--</strong></div>
                         </div>
-                        <div class="col-6">
-                            <div class="stat-breakdown-card wrong">
-                                <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
-                                <div class="stat-number" id="wrongCount">8</div>
-                                <div class="stat-label">Câu sai</div>
-                                <div class="stat-percent">20%</div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="section-scores-card">
-                                <h5>Điểm theo Section</h5>
-                                <div class="section-bars">
-                                    <div class="section-bar-item">
-                                        <span class="section-name">Section 1</span>
-                                        <div class="section-progress">
-                                            <div class="section-fill" style="width:90%;background:var(--success-color)"></div>
-                                        </div>
-                                        <span class="section-score">9/10</span>
-                                    </div>
-                                    <div class="section-bar-item">
-                                        <span class="section-name">Section 2</span>
-                                        <div class="section-progress">
-                                            <div class="section-fill" style="width:80%;background:var(--success-color)"></div>
-                                        </div>
-                                        <span class="section-score">8/10</span>
-                                    </div>
-                                    <div class="section-bar-item">
-                                        <span class="section-name">Section 3</span>
-                                        <div class="section-progress">
-                                            <div class="section-fill" style="width:70%;background:var(--writing-color)"></div>
-                                        </div>
-                                        <span class="section-score">7/10</span>
-                                    </div>
-                                    <div class="section-bar-item">
-                                        <span class="section-name">Section 4</span>
-                                        <div class="section-progress">
-                                            <div class="section-fill" style="width:80%;background:var(--success-color)"></div>
-                                        </div>
-                                        <span class="section-score">8/10</span>
-                                    </div>
+                        <div class="yp-summary-body">
+                            <div class="yp-ring-wrap">
+                                <svg viewBox="0 0 160 160" class="yp-ring-svg">
+                                    <circle class="score-circle-bg" cx="80" cy="80" r="70"></circle>
+                                    <circle id="scoreCircleFill" class="score-circle-fill" cx="80" cy="80" r="70" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+                                </svg>
+                                <div class="yp-ring-center">
+                                    <div><span id="summaryCorrect">0</span>/<span id="summaryTotal">0</span></div>
+                                    <small>câu đúng</small>
                                 </div>
                             </div>
+                            <div class="yp-legend">
+                                <div class="yp-legend-item ok"><span>Đúng</span><strong><span id="correctCount">0</span> câu</strong><em id="correctPercent">0%</em></div>
+                                <div class="yp-legend-item bad"><span>Sai</span><strong><span id="wrongCount">0</span> câu</strong><em id="wrongPercent">0%</em></div>
+                                <div class="yp-legend-item skip"><span>Bỏ qua</span><strong><span id="skippedCount">0</span> câu</strong><em id="skippedPercent">0%</em></div>
+                            </div>
                         </div>
+                        <button class="yp-detail-btn" onclick="scrollToDetails()">Xem giải thích chi tiết</button>
                     </div>
                 </div>
             </div>
 
-            <!-- AI Analysis -->
-            <div class="ai-analysis-card mb-4">
-                <div class="ai-analysis-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-robot" style="font-size:1.5rem;color:var(--primary-color);"></i>
-                        <h4>Phân tích từ AI</h4>
-                    </div>
-                    <span class="badge bg-primary">Powered by Gemini</span>
+            <div class="section-scores-card mb-3">
+                <h5>Thống kê theo phần</h5>
+                <div class="section-bars" id="sectionBars">
+                    <div class="text-muted small">Đang tải...</div>
                 </div>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="analysis-item strength">
-                            <i class="bi bi-hand-thumbs-up-fill"></i>
-                            <h5>Điểm mạnh</h5>
-                            <ul>
-                                <li>Section 1 xuất sắc (9/10)</li>
-                                <li>Nghe tốt các con số và tên riêng</li>
-                                <li>Hoàn thành trong thời gian cho phép</li>
-                            </ul>
-                        </div>
+            </div>
+
+            
+
+
+            <div id="detailsSection" class="questions-review-card mb-3">
+                <div class="questions-review-header mb-3">
+                    <h4>Bảng dữ liệu chi tiết</h4>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <button id="filterAll" class="filter-btn-sm active" onclick="filterQuestions(this, 'all')">Tất cả (0)</button>
+                        <button id="filterCorrect" class="filter-btn-sm" onclick="filterQuestions(this, 'correct')">Đúng (0)</button>
+                        <button id="filterWrong" class="filter-btn-sm" onclick="filterQuestions(this, 'wrong')">Sai (0)</button>
+                        <button id="filterSkipped" class="filter-btn-sm" onclick="filterQuestions(this, 'skipped')">Bỏ qua (0)</button>
                     </div>
-                    <div class="col-md-4">
-                        <div class="analysis-item weakness">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <h5>Cần cải thiện</h5>
-                            <ul>
-                                <li>Section 3 có nhiều câu sai nhất</li>
-                                <li>Câu hỏi dạng matching còn yếu</li>
-                                <li>Cần luyện nghe academic discourse</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="analysis-item suggestion">
-                            <i class="bi bi-lightbulb-fill"></i>
-                            <h5>Gợi ý tiếp theo</h5>
-                            <ul>
-                                <li>Luyện Section 3 & 4 nhiều hơn</li>
-                                <li>Nghe podcast BBC 15 phút/ngày</li>
-                                <li>Làm Cambridge 17 Test 2</li>
-                            </ul>
-                        </div>
-                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0" id="typeStatsTable">
+                        <thead>
+                            <tr>
+                                <th>Loại câu hỏi</th>
+                                <th class="text-center">Số câu hỏi</th>
+                                <th class="text-center">Đúng</th>
+                                <th class="text-center">Sai</th>
+                                <th class="text-center">Bỏ qua</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Đang tải dữ liệu...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Questions Review -->
-            <div class="questions-review-card">
-                <div class="questions-review-header">
-                    <h4>Chi tiết câu hỏi</h4>
-                    <div class="d-flex gap-2">
-                        <button class="filter-btn-sm active" onclick="filterQuestions(this,'all')">Tất cả (40)</button>
-                        <button class="filter-btn-sm" onclick="filterQuestions(this,'correct')">Đúng (32)</button>
-                        <button class="filter-btn-sm" onclick="filterQuestions(this,'wrong')">Sai (8)</button>
-                    </div>
+            <div class="questions-review-card mb-3">
+                <div class="questions-review-header mb-3">
+                    <h4>Chi tiết từng câu hỏi</h4>
+                    <a id="retryExactBtn" href="practice.html?skill=listening" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-arrow-repeat"></i> Làm lại đề này
+                    </a>
                 </div>
-
-                <!-- Section 1 -->
-                <div class="question-section-group">
-                    <div class="question-section-title">
-                        <span>Section 1</span>
-                        <span class="section-score-badge correct">9/10</span>
-                    </div>
-                    <div id="questionsList">
-                        <!-- Q1 Correct -->
-                        <div class="question-item correct-q" data-status="correct">
-                            <div class="q-number correct"><span>1</span></div>
-                            <div class="q-content">
-                                <div class="q-text">The customer's reference number is ____.</div>
-                                <div class="q-answers">
-                                    <span class="user-answer correct-ans"><i class="bi bi-check-circle-fill"></i> Đáp án của bạn: <strong>JH490</strong></span>
-                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>JH490</strong></span>
-                                </div>
-                                <button class="btn-explain" onclick="toggleExplain(this)">
-                                    <i class="bi bi-chevron-down"></i> Xem giải thích
-                                </button>
-                                <div class="explain-content" style="display:none;">
-                                    <p>Người nói đánh vần rõ ràng "J-H-4-9-0". Cần chú ý khi nghe các ký tự và số được đọc từng chữ cái.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q2 Correct -->
-                        <div class="question-item correct-q" data-status="correct">
-                            <div class="q-number correct"><span>2</span></div>
-                            <div class="q-content">
-                                <div class="q-text">The delivery will arrive on ____.</div>
-                                <div class="q-answers">
-                                    <span class="user-answer correct-ans"><i class="bi bi-check-circle-fill"></i> Đáp án của bạn: <strong>Thursday</strong></span>
-                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>Thursday</strong></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q3 Wrong -->
-                        <div class="question-item wrong-q" data-status="wrong">
-                            <div class="q-number wrong"><span>3</span></div>
-                            <div class="q-content">
-                                <div class="q-text">The address is ____ Victoria Road.</div>
-                                <div class="q-answers">
-                                    <span class="user-answer wrong-ans"><i class="bi bi-x-circle-fill"></i> Đáp án của bạn: <strong>14</strong></span>
-                                    <span class="correct-answer"><i class="bi bi-check-circle-fill"></i> Đáp án đúng: <strong>40</strong></span>
-                                </div>
-                                <button class="btn-explain" onclick="toggleExplain(this)">
-                                    <i class="bi bi-chevron-down"></i> Xem giải thích
-                                </button>
-                                <div class="explain-content" style="display:none;">
-                                    <p><strong>Giải thích:</strong> Người nói nói "forty" (40), không phải "fourteen" (14). Đây là lỗi phổ biến do phát âm tương tự. Cần phân biệt -teen vs -ty trong Listening.</p>
-                                    <p><strong>Tip:</strong> Khi nghe số, hãy chú ý âm cuối: "-teen" (13-19) có trọng âm ở âm tiết cuối, còn "-ty" (20,30...) có trọng âm ở đầu.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q4-Q10 Correct (collapsed) -->
-                        <div class="question-item correct-q" data-status="correct">
-                            <div class="q-number correct"><span>4</span></div>
-                            <div class="q-content">
-                                <div class="q-text">The customer wants to pay by ____.</div>
-                                <div class="q-answers">
-                                    <span class="user-answer correct-ans"><i class="bi bi-check-circle-fill"></i> Đáp án của bạn: <strong>credit card</strong></span>
-                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>credit card</strong></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="question-item correct-q" data-status="correct">
-                            <div class="q-number correct"><span>5</span></div>
-                            <div class="q-content">
-                                <div class="q-text">The total cost is ____.</div>
-                                <div class="q-answers">
-                                    <span class="user-answer correct-ans"><i class="bi bi-check-circle-fill"></i> Đáp án của bạn: <strong>£85</strong></span>
-                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>£85</strong></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div id="questionsList">
+                    <div class="text-muted">Đang tải dữ liệu câu hỏi...</div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="d-flex justify-content-center gap-3 mt-4 pb-4">
-                <a href="listening.html" class="btn btn-outline-primary btn-lg">
-                    <i class="bi bi-arrow-repeat"></i> Làm lại bài này
-                </a>
-                <a href="dashboard.html" class="btn btn-outline-secondary btn-lg">
-                    <i class="bi bi-grid-1x2"></i> Về Dashboard
-                </a>
-                <a href="listening.html" class="btn btn-primary btn-lg">
-                    <i class="bi bi-play-fill"></i> Bài thi tiếp theo
-                </a>
-            </div>
+           
         </div>
     </div>
 
     <style>
+        .result-shell {
+            max-width: 1080px;
+        }
+
+        .yp-art-card {
+            background: linear-gradient(145deg, #5a63d1 0%, #4b55be 100%);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: #f8fafc;
+            box-shadow: var(--shadow-md);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .yp-art-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .yp-art-sub {
+            font-size: 0.92rem;
+            opacity: 0.95;
+        }
+        .yp-art-stars i {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            margin-right: 2px;
+        }
+        .yp-art-blob {
+            align-self: center;
+            width: 180px;
+            height: 150px;
+            border-radius: 45% 55% 50% 50%;
+            background: radial-gradient(circle at 30% 35%, #f59e0b, #ea580c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .yp-art-emoji {
+            font-size: 3.2rem;
+            transform: rotate(-10deg);
+            user-select: none;
+        }
+        .yp-summary-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: var(--shadow-md);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .yp-summary-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .yp-summary-head h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .yp-summary-time {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .yp-summary-body {
+            display: grid;
+            grid-template-columns: 170px 1fr;
+            gap: 14px;
+            align-items: center;
+        }
+        .yp-ring-wrap {
+            width: 170px;
+            height: 170px;
+            position: relative;
+        }
+        .yp-ring-svg {
+            width: 170px;
+            height: 170px;
+            transform: rotate(-90deg);
+        }
+        .yp-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #334155;
+            line-height: 1.1;
+        }
+        .yp-ring-center small {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .yp-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .yp-legend-item {
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 8px;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .yp-legend-item.ok span { color: var(--success-color); }
+        .yp-legend-item.bad span { color: var(--error-color); }
+        .yp-legend-item.skip span { color: #64748b; }
+        .yp-legend-item strong {
+            font-size: 0.95rem;
+            color: #0f172a;
+        }
+        .yp-legend-item em {
+            font-style: normal;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+        .yp-detail-btn {
+            margin-top: 12px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 10px 14px;
+            align-self: center;
+        }
+        .yp-recommend {
+            border: 2px dashed #22c55e;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+        .yp-vote-icons {
+            display: flex;
+            gap: 12px;
+            color: #64748b;
+            font-size: 1rem;
+        }
+
         /* Result Header */
         .result-header-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 28px 32px;
+            padding: 16px 20px;
             box-shadow: var(--shadow-md);
         }
         .result-title {
-            font-size: 1.75rem;
+            font-size: 1.35rem;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         /* Score Main Card */
         .score-main-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 32px 24px;
+            padding: 20px 16px;
             box-shadow: var(--shadow-md);
             text-align: center;
             height: 100%;
+            min-height: 300px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        .score-main-label { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .score-main-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
         .score-main-circle {
             position: relative;
-            width: 180px;
-            height: 180px;
-            margin-bottom: 16px;
+            width: 146px;
+            height: 146px;
+            margin-bottom: 10px;
         }
         .score-main-circle svg { width: 100%; transform: rotate(-90deg); }
         .score-circle-bg { fill: none; stroke: var(--border-color); stroke-width: 8; }
@@ -340,43 +350,87 @@
             transform: translate(-50%, -50%);
             text-align: center;
         }
-        .score-main-number span { display: block; font-size: 3rem; font-weight: 800; color: var(--primary-color); line-height: 1; }
-        .score-main-number small { font-size: 1rem; color: var(--text-secondary); }
-        .score-main-label-text { font-size: 1.125rem; font-weight: 600; color: var(--success-color); margin-bottom: 8px; }
-        .score-main-stars i { color: var(--accent-color); font-size: 1.25rem; }
+        .score-main-number span { display: block; font-size: 2.2rem; font-weight: 800; color: var(--primary-color); line-height: 1; }
+        .score-main-number small { font-size: 0.95rem; color: var(--text-secondary); }
+        .score-main-label-text { font-size: 1rem; font-weight: 600; color: var(--success-color); margin-bottom: 6px; }
+        .score-main-stars i { color: var(--accent-color); font-size: 1rem; }
 
         /* Stat Breakdown */
         .stat-breakdown-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 14px 12px;
             box-shadow: var(--shadow-md);
             text-align: center;
             height: 100%;
+            min-height: 170px;
         }
-        .stat-breakdown-card.correct .stat-icon { color: var(--success-color); font-size: 2rem; margin-bottom: 8px; }
-        .stat-breakdown-card.wrong .stat-icon { color: var(--error-color); font-size: 2rem; margin-bottom: 8px; }
-        .stat-number { font-size: 2.5rem; font-weight: 800; }
+        .stat-breakdown-card.correct .stat-icon { color: var(--success-color); font-size: 1.7rem; margin-bottom: 4px; }
+        .stat-breakdown-card.wrong .stat-icon { color: var(--error-color); font-size: 1.7rem; margin-bottom: 4px; }
+        .stat-breakdown-card.skipped .stat-icon { color: #64748b; font-size: 1.7rem; margin-bottom: 4px; }
+        .stat-number { font-size: 2rem; font-weight: 800; }
         .stat-breakdown-card.correct .stat-number { color: var(--success-color); }
         .stat-breakdown-card.wrong .stat-number { color: var(--error-color); }
-        .stat-label { font-size: 0.875rem; color: var(--text-secondary); }
-        .stat-percent { font-size: 1.125rem; font-weight: 600; margin-top: 4px; }
+        .stat-breakdown-card.skipped .stat-number { color: #64748b; }
+        .stat-label { font-size: 0.82rem; color: var(--text-secondary); }
+        .stat-percent { font-size: 1rem; font-weight: 600; margin-top: 2px; }
 
         /* Section Scores */
         .section-scores-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 20px 24px;
+            padding: 14px 16px;
             box-shadow: var(--shadow-md);
             height: 100%;
         }
-        .section-scores-card h5 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 16px; }
+        .section-scores-card h5 { font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
         .section-bars { display: flex; flex-direction: column; gap: 10px; }
-        .section-bar-item { display: flex; align-items: center; gap: 12px; }
-        .section-name { font-size: 0.875rem; color: var(--text-secondary); width: 80px; flex-shrink: 0; }
+        .section-bar-item { display: flex; align-items: center; gap: 8px; }
+        .section-name { font-size: 0.82rem; color: var(--text-secondary); width: 78px; flex-shrink: 0; }
         .section-progress { flex: 1; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
         .section-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
-        .section-score { font-size: 0.875rem; font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+        .section-score { font-size: 0.8rem; font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+
+        @media (max-width: 991px) {
+            .yp-art-card,
+            .yp-summary-card {
+                min-height: 260px;
+            }
+            .yp-summary-body {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
+            .score-main-card {
+                min-height: 260px;
+                padding: 16px 12px;
+            }
+            .score-main-circle {
+                width: 130px;
+                height: 130px;
+            }
+            .stat-breakdown-card {
+                min-height: 140px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .yp-recommend {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .result-header-card {
+                padding: 18px 16px;
+            }
+            .result-title {
+                font-size: 1.35rem;
+            }
+            .score-main-number span {
+                font-size: 2rem;
+            }
+            .section-name {
+                width: 64px;
+            }
+        }
 
         /* AI Analysis */
         .ai-analysis-card {
@@ -412,8 +466,15 @@
         .questions-review-card {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 28px;
+            padding: 16px;
             box-shadow: var(--shadow-md);
+        }
+        #typeStatsTable thead th {
+            background: #f5f6fa;
+            font-size: 0.875rem;
+        }
+        #typeStatsTable td {
+            font-size: 0.9rem;
         }
         .questions-review-header {
             display: flex;
@@ -466,6 +527,7 @@
         }
         .question-item.correct-q { background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.15); }
         .question-item.wrong-q { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.15); }
+        .question-item.skipped-q { background: rgba(100,116,139,0.06); border: 1px solid rgba(100,116,139,0.2); }
         .q-number {
             width: 36px;
             height: 36px;
@@ -479,6 +541,7 @@
         }
         .q-number.correct { background: var(--success-color); color: white; }
         .q-number.wrong { background: var(--error-color); color: white; }
+        .q-number.skipped { background: #64748b; color: white; }
         .q-content { flex: 1; }
         .q-text { font-weight: 500; margin-bottom: 8px; color: var(--text-primary); }
         .q-answers { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
@@ -492,6 +555,7 @@
         }
         .user-answer.correct-ans { background: rgba(16,185,129,0.1); color: var(--success-color); }
         .user-answer.wrong-ans { background: rgba(239,68,68,0.1); color: var(--error-color); }
+        .user-answer.skipped-ans { background: rgba(100,116,139,0.12); color: #334155; }
         .correct-answer { background: rgba(16,185,129,0.1); color: var(--success-color); }
         .btn-explain {
             background: none;
@@ -526,9 +590,21 @@
             color: white;
             background: var(--listening-color);
         }
+        .test-badge.reading {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: var(--reading-color);
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
     <script>
         function toggleExplain(btn) {
             const explainDiv = btn.nextElementSibling;
@@ -552,17 +628,370 @@
                     item.style.display = item.dataset.status === 'correct' ? 'flex' : 'none';
                 } else if (filter === 'wrong') {
                     item.style.display = item.dataset.status === 'wrong' ? 'flex' : 'none';
+                } else if (filter === 'skipped') {
+                    item.style.display = item.dataset.status === 'skipped' ? 'flex' : 'none';
                 }
             });
         }
 
-        // Load result from localStorage if available
-        const savedResult = JSON.parse(localStorage.getItem('aimhigh_lastResult'));
-        if (savedResult) {
-            document.getElementById('resultTitle').textContent = savedResult.title || 'Cambridge IELTS 18 - Test 1 Listening';
-            document.getElementById('bandScore').textContent = savedResult.band || '7.0';
-            document.getElementById('correctCount').textContent = savedResult.correct || '32';
-            document.getElementById('wrongCount').textContent = savedResult.wrong || '8';
+        function scrollToDetails() {
+            const el = document.getElementById('detailsSection');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function goBackToExam(event) {
+            const hasHistory = document.referrer && window.history.length > 1;
+            if (!hasHistory) return;
+            event.preventDefault();
+            window.history.back();
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function setHtml(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = value;
+        }
+
+        function calcResultStats(blocks) {
+            const allQuestions = getAllQuestions(blocks);
+            const total = allQuestions.length;
+            const skipped = allQuestions.filter(q => q.isSkipped).length;
+            const correct = allQuestions.filter(q => q.isCorrect).length;
+            const wrong = Math.max(0, total - correct - skipped);
+            return { total, correct, wrong, skipped };
+        }
+
+        function setActionLinks(result) {
+            const skill = String(result?.skill || 'LISTENING').toUpperCase();
+            const skillSlug = skill === 'READING' ? 'reading' : 'listening';
+            const examId = result?.examId;
+
+            const exactHref = examId ? `${skillSlug}.html?examId=${examId}&mode=practice` : `practice.html?skill=${skillSlug}`;
+            const nextHref = `practice.html?skill=${skillSlug}`;
+
+            ['topRetryExactBtn', 'retryExactBtn'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('href', exactHref);
+            });
+
+            const backBtn = document.getElementById('backToExamBtn');
+            if (backBtn) backBtn.setAttribute('href', exactHref);
+
+            const nextBtn = document.getElementById('nextExamBtn');
+            if (nextBtn) nextBtn.setAttribute('href', nextHref);
+        }
+
+        function formatSecondsToMmSs(sec) {
+            if (sec == null || Number.isNaN(Number(sec)) || Number(sec) < 0) return '--:--';
+            sec = Number(sec);
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function hasDetailedResultData(result) {
+            if (!result || typeof result !== 'object') return false;
+            const hasSummary = Number.isFinite(Number(result.totalQuestions)) && Number(result.totalQuestions) > 0;
+            const hasBlocks = (Array.isArray(result.parts) && result.parts.length > 0)
+                || (Array.isArray(result.passages) && result.passages.length > 0);
+            const hasTitle = typeof result.examTitle === 'string' && result.examTitle.trim().length > 0;
+            return hasSummary || hasBlocks || hasTitle;
+        }
+
+        async function fetchAttemptResultWithRetry(attemptId, maxRetry = 3) {
+            let lastError = null;
+            for (let i = 0; i < maxRetry; i++) {
+                try {
+                    const res = await getAttemptResult(attemptId);
+                    const payload = res?.data || res;
+                    if (hasDetailedResultData(payload)) {
+                        return payload;
+                    }
+                } catch (e) {
+                    lastError = e;
+                }
+                await delay(450 * (i + 1));
+            }
+            if (lastError) throw lastError;
+            return null;
+        }
+
+        function getBandFeedback(score) {
+            const s = Number(score || 0);
+            if (s < 4.0) return { label: 'Yếu - Cần cố gắng', stars: 1, color: 'var(--error-color)' };
+            if (s < 5.0) return { label: 'Trung bình', stars: 2, color: '#f59e0b' };
+            if (s <= 6.5) return { label: 'Khá', stars: 3, color: '#f59e0b' };
+            if (s <= 8.0) return { label: 'Tốt', stars: 4, color: 'var(--success-color)' };
+            return { label: 'Xuất sắc', stars: 5, color: 'var(--success-color)' };
+        }
+
+        function renderBandStars(stars) {
+            const full = Math.max(0, Math.min(5, Math.floor(stars)));
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += `<i class="bi ${i < full ? 'bi-star-fill' : 'bi-star'}"></i>`;
+            }
+            return html;
+        }
+
+        function getAttemptIdFromContext() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromQuery = urlParams.get('attemptId');
+            if (fromQuery) return Number(fromQuery);
+            const fromStorage = localStorage.getItem('lastResultAttemptId');
+            return fromStorage ? Number(fromStorage) : null;
+        }
+
+        function getAttemptCandidates() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromQuery = Number(urlParams.get('attemptId'));
+            const fromStorage = Number(localStorage.getItem('lastResultAttemptId'));
+            const raw = [fromQuery, fromStorage].filter(v => Number.isFinite(v) && v > 0);
+            return [...new Set(raw)];
+        }
+
+        function flattenQuestionBlocks(result) {
+            if (result.skill === 'LISTENING') {
+                return (result.parts || []).map(part => ({
+                    label: part.label || `Section ${part.sectionNumber || ''}`.trim(),
+                    totalQuestions: part.totalQuestions || (part.questions || []).length,
+                    correctCount: part.correctCount || 0,
+                    questions: part.questions || []
+                }));
+            }
+            return (result.passages || []).map((passage, idx) => ({
+                label: passage.label || `Passage ${passage.passageOrder || idx + 1}`,
+                totalQuestions: passage.totalQuestions || (passage.questions || []).length,
+                correctCount: passage.correctCount || 0,
+                questions: passage.questions || []
+            }));
+        }
+
+        function renderSectionBars(blocks) {
+            const sectionBars = document.getElementById('sectionBars');
+            if (!sectionBars) return;
+            sectionBars.innerHTML = blocks.map(block => {
+                const total = Math.max(1, block.totalQuestions || 0);
+                const correct = Math.max(0, block.correctCount || 0);
+                const pct = Math.round((correct / total) * 100);
+                const color = pct >= 75 ? 'var(--success-color)' : (pct >= 50 ? 'var(--writing-color)' : 'var(--error-color)');
+                return `
+                    <div class="section-bar-item">
+                        <span class="section-name">${block.label}</span>
+                        <div class="section-progress">
+                            <div class="section-fill" style="width:${pct}%;background:${color}"></div>
+                        </div>
+                        <span class="section-score">${correct}/${total}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderQuestions(blocks) {
+            const host = document.getElementById('questionsList');
+            if (!host) return;
+
+            host.innerHTML = blocks.map(block => {
+                const total = block.totalQuestions || block.questions.length;
+                const correct = block.correctCount || 0;
+                const itemsHtml = block.questions.map(q => {
+                    const isSkipped = !!q.isSkipped;
+                    const isCorrect = !!q.isCorrect;
+                    const status = isSkipped ? 'skipped' : (isCorrect ? 'correct' : 'wrong');
+                    const userAns = q.isSkipped ? '(Bỏ qua)' : (q.userAnswer || '(Trống)');
+                    const expl = q.explanation || 'Chưa có giải thích cho câu này.';
+                    const explainHtml = String(expl)
+                        .replaceAll('&', '&amp;')
+                        .replaceAll('<', '&lt;')
+                        .replaceAll('>', '&gt;')
+                        .replaceAll('\n', '<br>');
+                    const typeLabel = q.questionType || 'Other';
+                    return `
+                        <div class="question-item ${isSkipped ? 'skipped-q' : (isCorrect ? 'correct-q' : 'wrong-q')}" data-status="${status}">
+                            <div class="q-number ${isSkipped ? 'skipped' : (isCorrect ? 'correct' : 'wrong')}"><span>${q.questionNumber}</span></div>
+                            <div class="q-content">
+                                <div class="q-text">${q.questionText || '(Không có nội dung câu hỏi)'}</div>
+                                <div style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:8px;">Loại câu: <strong>${typeLabel}</strong></div>
+                                <div class="q-answers">
+                                    <span class="user-answer ${isSkipped ? 'skipped-ans' : (isCorrect ? 'correct-ans' : 'wrong-ans')}">
+                                        <i class="bi ${isSkipped ? 'bi-dash-circle-fill' : (isCorrect ? 'bi-check-circle-fill' : 'bi-x-circle-fill')}"></i>
+                                        Đáp án của bạn: <strong>${userAns}</strong>
+                                    </span>
+                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>${q.correctAnswer || '(Trống)'}</strong></span>
+                                </div>
+                                <button class="btn-explain" onclick="toggleExplain(this)">
+                                    <i class="bi bi-chevron-down"></i> Xem giải thích
+                                </button>
+                                <div class="explain-content" style="display:none;">
+                                    <p>${explainHtml}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="question-section-group">
+                        <div class="question-section-title">
+                            <span>${block.label}</span>
+                            <span class="section-score-badge correct">${correct}/${total}</span>
+                        </div>
+                        ${itemsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getAllQuestions(blocks) {
+            return blocks.flatMap(block => block.questions || []);
+        }
+
+        function renderTypeStatsTable(blocks) {
+            const tableBody = document.querySelector('#typeStatsTable tbody');
+            if (!tableBody) return;
+
+            const questions = getAllQuestions(blocks);
+            if (!questions.length) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chưa có dữ liệu câu hỏi</td></tr>';
+                return;
+            }
+
+            const grouped = new Map();
+            questions.forEach(q => {
+                const type = (q.questionType || 'Other').trim();
+                if (!grouped.has(type)) {
+                    grouped.set(type, { total: 0, correct: 0, wrong: 0, skipped: 0 });
+                }
+                const item = grouped.get(type);
+                item.total += 1;
+                if (q.isSkipped) {
+                    item.skipped += 1;
+                } else if (q.isCorrect) {
+                    item.correct += 1;
+                } else {
+                    item.wrong += 1;
+                }
+            });
+
+            tableBody.innerHTML = Array.from(grouped.entries()).map(([type, stat]) => `
+                <tr>
+                    <td><strong>${type}</strong></td>
+                    <td class="text-center">${stat.total}</td>
+                    <td class="text-center text-success fw-semibold">${stat.correct}</td>
+                    <td class="text-center text-danger fw-semibold">${stat.wrong}</td>
+                    <td class="text-center text-secondary fw-semibold">${stat.skipped}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderResultData(result) {
+            const blocks = flattenQuestionBlocks(result);
+            const stats = calcResultStats(blocks);
+            const totalFromResult = Number(result.totalQuestions || 0);
+            const total = stats.total > 0 ? stats.total : totalFromResult;
+            const correct = stats.total > 0 ? stats.correct : Number(result.totalCorrect || 0);
+            const wrongFromResult = Number(result.totalWrong || 0);
+            const skipped = stats.total > 0
+                ? stats.skipped
+                : Math.max(0, total - correct - wrongFromResult);
+            const wrong = stats.total > 0
+                ? stats.wrong
+                : Math.max(0, total - correct - skipped);
+            const bandScore = Number(result.bandScore || 0);
+            const progressRatio = Math.max(0, Math.min(1, bandScore / 9));
+            const feedback = getBandFeedback(bandScore);
+
+            setText('resultTitle', result.examTitle || 'Kết quả bài thi');
+            setText('bandScore', bandScore.toFixed(1));
+            setText('summaryCorrect', String(correct));
+            setText('summaryTotal', String(total));
+            setText('correctCount', correct);
+            setText('wrongCount', wrong);
+            setText('skippedCount', skipped);
+            setText('correctPercent', `${total > 0 ? Math.round((correct/total)*100) : 0}%`);
+            setText('wrongPercent', `${total > 0 ? Math.round((wrong/total)*100) : 0}%`);
+            setText('skippedPercent', `${total > 0 ? Math.round((skipped/total)*100) : 0}%`);
+            setText('resultMeta', `Hoàn thành • Thời gian làm bài: ${formatSecondsToMmSs(result.timeSpent)}`);
+            setText('timeSpentTop', formatSecondsToMmSs(result.timeSpent));
+            setText('bandFeedback', feedback.label);
+            const bandFeedback = document.getElementById('bandFeedback');
+            if (bandFeedback) bandFeedback.style.color = feedback.color;
+            setHtml('bandStars', renderBandStars(feedback.stars));
+
+            const now = new Date();
+            setHtml('resultDate', `<i class="bi bi-calendar3"></i> ${now.toLocaleDateString('vi-VN')}`);
+
+            const dash = 439.8;
+            const offset = dash - (dash * progressRatio);
+            const ring = document.getElementById('scoreCircleFill');
+            if (ring) {
+                ring.setAttribute('stroke-dashoffset', String(offset));
+            }
+
+            const badge = document.getElementById('skillBadge');
+            if (badge) {
+                if (result.skill === 'READING') {
+                    badge.className = 'test-badge reading';
+                    badge.innerHTML = '<i class="bi bi-book"></i> Reading';
+                } else {
+                    badge.className = 'test-badge listening';
+                    badge.innerHTML = '<i class="bi bi-headphones"></i> Listening';
+                }
+            }
+
+            setText('filterAll', `Tất cả (${total})`);
+            setText('filterCorrect', `Đúng (${correct})`);
+            setText('filterWrong', `Sai (${wrong})`);
+            setText('filterSkipped', `Bỏ qua (${skipped})`);
+
+            renderSectionBars(blocks);
+            renderTypeStatsTable(blocks);
+            renderQuestions(blocks);
+            setActionLinks(result);
+        }
+
+        async function initResultPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const attemptIdFromQuery = Number(urlParams.get('attemptId'));
+            const hasQueryAttempt = Number.isFinite(attemptIdFromQuery) && attemptIdFromQuery > 0;
+            const candidates = hasQueryAttempt ? [attemptIdFromQuery] : getAttemptCandidates();
+
+            for (const attemptId of candidates) {
+                try {
+                    const result = await fetchAttemptResultWithRetry(attemptId, 4);
+                    if (hasDetailedResultData(result)) {
+                        localStorage.setItem('lastResultAttemptId', String(attemptId));
+                        localStorage.setItem('aimhigh_lastResult', JSON.stringify(result));
+                        renderResultData(result);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn(`Không thể lấy kết quả từ API cho attemptId=${attemptId}:`, e.message);
+                }
+            }
+
+            const savedResult = JSON.parse(localStorage.getItem('aimhigh_lastResult') || 'null');
+            const savedAttemptId = Number(savedResult?.attemptId || localStorage.getItem('lastResultAttemptId'));
+            const isSameAttempt = !hasQueryAttempt || (savedAttemptId > 0 && savedAttemptId === attemptIdFromQuery);
+            if (isSameAttempt && hasDetailedResultData(savedResult)) {
+                renderResultData(savedResult);
+                return;
+            }
+
+            if (hasQueryAttempt) {
+                setText('resultMeta', 'Hoàn thành • Chưa đồng bộ kịp kết quả cho bài vừa nộp. Vui lòng tải lại sau 1-2 giây.');
+                return;
+            }
+
+            setText('resultMeta', 'Hoàn thành • Đang đồng bộ kết quả...');
         }
 
         // Animate score circle on load
@@ -571,6 +1000,9 @@
                 document.querySelector('.score-circle-fill').style.transition = 'stroke-dashoffset 1.5s ease';
             }, 100);
         });
+
+        initResultPage();
     </script>
 </body>
 </html>
+

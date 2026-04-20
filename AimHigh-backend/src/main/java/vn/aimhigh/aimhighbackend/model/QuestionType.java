@@ -6,7 +6,8 @@ import vn.aimhigh.aimhighbackend.enums.QuestionTypeName;
 
 @Entity
 @Table(name = "question_types")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -153,84 +153,13 @@
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Cambridge IELTS 18 - Test 1</strong></td>
-                                    <td>Listening</td>
-                                    <td>40</td>
-                                    <td>30 phút</td>
-                                    <td><span class="status-badge published">Published</span></td>
-                                    <td>05/03/2026</td>
-                                    <td>234</td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Nhân bản"><i class="bi bi-copy"></i></button>
-                                        <button class="btn-icon-sm danger" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Cambridge IELTS 17 - Test 2</strong></td>
-                                    <td>Reading</td>
-                                    <td>40</td>
-                                    <td>60 phút</td>
-                                    <td><span class="status-badge published">Published</span></td>
-                                    <td>01/03/2026</td>
-                                    <td>189</td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Nhân bản"><i class="bi bi-copy"></i></button>
-                                        <button class="btn-icon-sm danger" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Technology & Society - Writing Task 2</strong></td>
-                                    <td>Writing</td>
-                                    <td>2</td>
-                                    <td>60 phút</td>
-                                    <td><span class="status-badge draft">Draft</span></td>
-                                    <td>28/02/2026</td>
-                                    <td>0</td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Nhân bản"><i class="bi bi-copy"></i></button>
-                                        <button class="btn-icon-sm danger" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Speaking Part 1 - Hometown</strong></td>
-                                    <td>Speaking</td>
-                                    <td>12</td>
-                                    <td>15 phút</td>
-                                    <td><span class="status-badge archived">Archived</span></td>
-                                    <td>15/02/2026</td>
-                                    <td>456</td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Nhân bản"><i class="bi bi-copy"></i></button>
-                                        <button class="btn-icon-sm danger" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Cambridge IELTS 16 - Test 3</strong></td>
-                                    <td>Listening</td>
-                                    <td>40</td>
-                                    <td>30 phút</td>
-                                    <td><span class="status-badge published">Published</span></td>
-                                    <td>10/02/2026</td>
-                                    <td>312</td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Nhân bản"><i class="bi bi-copy"></i></button>
-                                        <button class="btn-icon-sm danger" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="testTableBody"></tbody>
                         </table>
                     </div>
 
                     <!-- Pagination -->
                     <div class="admin-pagination">
-                        <div class="admin-pagination-info">Hiển thị 1-5 / 86 đề thi</div>
+                        <div class="admin-pagination-info" id="testTableInfo">Đang tải dữ liệu...</div>
                         <div class="admin-pagination-btns">
                             <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
                             <button class="page-btn active">1</button>
@@ -247,6 +176,108 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script>
+        function formatDateTime(input) {
+            if (!input) return '--';
+            const dt = new Date(input);
+            if (Number.isNaN(dt.getTime())) return '--';
+            return dt.toLocaleDateString('vi-VN');
+        }
+
+        function statusClass(status) {
+            const s = String(status || '').toLowerCase();
+            if (s === 'published') return 'published';
+            if (s === 'draft') return 'draft';
+            return 'archived';
+        }
+
+        function renderExamRows(exams) {
+            const body = document.getElementById('testTableBody');
+            const info = document.getElementById('testTableInfo');
+            if (!body) return;
+
+            if (!Array.isArray(exams) || exams.length === 0) {
+                body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Chưa có đề thi nào</td></tr>';
+                if (info) info.textContent = 'Hiển thị 0 đề thi';
+                return;
+            }
+
+            body.innerHTML = exams.map(exam => {
+                const status = String(exam.status || 'archived').toLowerCase();
+                const nextStatus = status === 'published' ? 'archived' : 'published';
+                const toggleLabel = status === 'published' ? 'Ẩn' : 'Xuất bản';
+                return `
+                    <tr>
+                        <td><strong>${exam.title || '(Không có tên)'}</strong></td>
+                        <td>${exam.skill || '--'}</td>
+                        <td>${exam.totalQuestions || '--'}</td>
+                        <td>${exam.duration || '--'} phút</td>
+                        <td><span class="status-badge ${statusClass(status)}">${status}</span></td>
+                        <td>${formatDateTime(exam.createdAt)}</td>
+                        <td>--</td>
+                        <td>
+                            <button class="btn-icon-sm" title="Sửa" data-action="edit" data-id="${exam.id}"><i class="bi bi-pencil"></i></button>
+                            <button class="btn-icon-sm" title="${toggleLabel}" data-action="status" data-status="${nextStatus}" data-id="${exam.id}"><i class="bi bi-toggle2-off"></i></button>
+                            <button class="btn-icon-sm danger" title="Xóa" data-action="delete" data-id="${exam.id}"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            if (info) info.textContent = `Hiển thị ${exams.length} đề thi`;
+        }
+
+        async function loadAdminExams() {
+            const skill = document.getElementById('filterSkill')?.value || '';
+            const status = document.getElementById('filterStatus')?.value || '';
+            const search = document.getElementById('searchTest')?.value || '';
+
+            try {
+                const response = await adminGetTests({ skill, status, search });
+                const exams = response?.data || [];
+                renderExamRows(exams);
+            } catch (error) {
+                renderExamRows([]);
+                showToast(`Không thể tải danh sách đề: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const refresh = () => loadAdminExams();
+            document.getElementById('filterSkill')?.addEventListener('change', refresh);
+            document.getElementById('filterStatus')?.addEventListener('change', refresh);
+            document.getElementById('searchTest')?.addEventListener('input', refresh);
+
+            document.getElementById('testTableBody')?.addEventListener('click', async (e) => {
+                const btn = e.target.closest('button[data-action]');
+                if (!btn) return;
+
+                const id = btn.dataset.id;
+                const action = btn.dataset.action;
+                if (!id || !action) return;
+
+                try {
+                    if (action === 'delete') {
+                        if (!confirm('Bạn chắc chắn muốn xóa đề thi này?')) return;
+                        await adminDeleteTest(id);
+                        showToast('Xóa đề thi thành công');
+                        await loadAdminExams();
+                    } else if (action === 'status') {
+                        await adminUpdateTestStatus(id, btn.dataset.status || 'published');
+                        showToast('Cập nhật trạng thái thành công');
+                        await loadAdminExams();
+                    } else if (action === 'edit') {
+                        window.location.href = `test-builder.html?examId=${encodeURIComponent(id)}`;
+                    }
+                } catch (error) {
+                    showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
+                }
+            });
+
+            loadAdminExams();
+        });
+    </script>
 </body>
 </html>
+

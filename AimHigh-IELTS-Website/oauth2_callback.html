@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -48,7 +48,7 @@
             if (accessToken && refreshToken) {
                 // Save tokens to localStorage
                 localStorage.setItem('aimhigh_loggedIn', 'true');
-                localStorage.setItem('aimhigh_accessToken', accessToken);
+                localStorage.setItem('aimhigh_token', accessToken);
                 localStorage.setItem('aimhigh_refreshToken', refreshToken);
 
                 // Optionally save empty username/email since Google OAuth doesn't append it to URL
@@ -66,3 +66,4 @@
     </script>
 </body>
 </html>
+

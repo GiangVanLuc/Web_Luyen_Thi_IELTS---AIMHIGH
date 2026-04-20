@@ -1,0 +1,1327 @@
+﻿{
+    "sections":  [
+                     {
+                         "audioDuration":  430,
+                         "audioUrl":  "https://cdn.aimhigh.vn/audio/listening-sec1.mp3",
+                         "questionTo":  10,
+                         "transcript":  "Transcript section 1",
+                         "sectionNumber":  1,
+                         "label":  "Section 1",
+                         "groups":  [
+                                        {
+                                            "questions":  [
+                                                              {
+                                                                  "audioStart":  5,
+                                                                  "questionNumber":  1,
+                                                                  "audioEnd":  13,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q1 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q1 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q1 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q1 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 1",
+                                                                  "explanation":  "Explanation for listening question 1",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  10,
+                                                                  "questionNumber":  2,
+                                                                  "audioEnd":  18,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q2 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q2 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q2 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q2 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 2",
+                                                                  "explanation":  "Explanation for listening question 2",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  15,
+                                                                  "questionNumber":  3,
+                                                                  "audioEnd":  23,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q3 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q3 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q3 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q3 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 3",
+                                                                  "explanation":  "Explanation for listening question 3",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  20,
+                                                                  "questionNumber":  4,
+                                                                  "audioEnd":  28,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q4 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q4 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q4 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q4 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 4",
+                                                                  "explanation":  "Explanation for listening question 4",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  25,
+                                                                  "questionNumber":  5,
+                                                                  "audioEnd":  33,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q5 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q5 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q5 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q5 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 5",
+                                                                  "explanation":  "Explanation for listening question 5",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  30,
+                                                                  "questionNumber":  6,
+                                                                  "audioEnd":  38,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q6 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q6 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q6 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q6 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 6",
+                                                                  "explanation":  "Explanation for listening question 6",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  35,
+                                                                  "questionNumber":  7,
+                                                                  "audioEnd":  43,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q7 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q7 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q7 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q7 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 7",
+                                                                  "explanation":  "Explanation for listening question 7",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  40,
+                                                                  "questionNumber":  8,
+                                                                  "audioEnd":  48,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q8 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q8 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q8 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q8 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 8",
+                                                                  "explanation":  "Explanation for listening question 8",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  45,
+                                                                  "questionNumber":  9,
+                                                                  "audioEnd":  53,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q9 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q9 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q9 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q9 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 9",
+                                                                  "explanation":  "Explanation for listening question 9",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  50,
+                                                                  "questionNumber":  10,
+                                                                  "audioEnd":  58,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q10 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q10 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q10 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q10 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 10",
+                                                                  "explanation":  "Explanation for listening question 10",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              }
+                                                          ],
+                                            "title":  "Group Section 1",
+                                            "questionFrom":  1,
+                                            "questionTo":  10,
+                                            "type":  "GENERAL"
+                                        }
+                                    ],
+                         "questionFrom":  1
+                     },
+                     {
+                         "audioDuration":  440,
+                         "audioUrl":  "https://cdn.aimhigh.vn/audio/listening-sec2.mp3",
+                         "questionTo":  20,
+                         "transcript":  "Transcript section 2",
+                         "sectionNumber":  2,
+                         "label":  "Section 2",
+                         "groups":  [
+                                        {
+                                            "questions":  [
+                                                              {
+                                                                  "audioStart":  55,
+                                                                  "questionNumber":  11,
+                                                                  "audioEnd":  63,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q11 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q11 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q11 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q11 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 11",
+                                                                  "explanation":  "Explanation for listening question 11",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  60,
+                                                                  "questionNumber":  12,
+                                                                  "audioEnd":  68,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q12 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q12 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q12 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q12 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 12",
+                                                                  "explanation":  "Explanation for listening question 12",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  65,
+                                                                  "questionNumber":  13,
+                                                                  "audioEnd":  73,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q13 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q13 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q13 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q13 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 13",
+                                                                  "explanation":  "Explanation for listening question 13",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  70,
+                                                                  "questionNumber":  14,
+                                                                  "audioEnd":  78,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q14 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q14 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q14 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q14 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 14",
+                                                                  "explanation":  "Explanation for listening question 14",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  75,
+                                                                  "questionNumber":  15,
+                                                                  "audioEnd":  83,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q15 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q15 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q15 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q15 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 15",
+                                                                  "explanation":  "Explanation for listening question 15",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  80,
+                                                                  "questionNumber":  16,
+                                                                  "audioEnd":  88,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q16 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q16 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q16 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q16 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 16",
+                                                                  "explanation":  "Explanation for listening question 16",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  85,
+                                                                  "questionNumber":  17,
+                                                                  "audioEnd":  93,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q17 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q17 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q17 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q17 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 17",
+                                                                  "explanation":  "Explanation for listening question 17",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  90,
+                                                                  "questionNumber":  18,
+                                                                  "audioEnd":  98,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q18 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q18 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q18 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q18 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 18",
+                                                                  "explanation":  "Explanation for listening question 18",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  95,
+                                                                  "questionNumber":  19,
+                                                                  "audioEnd":  103,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q19 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q19 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q19 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q19 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 19",
+                                                                  "explanation":  "Explanation for listening question 19",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  100,
+                                                                  "questionNumber":  20,
+                                                                  "audioEnd":  108,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q20 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q20 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q20 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q20 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 20",
+                                                                  "explanation":  "Explanation for listening question 20",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              }
+                                                          ],
+                                            "title":  "Group Section 2",
+                                            "questionFrom":  11,
+                                            "questionTo":  20,
+                                            "type":  "GENERAL"
+                                        }
+                                    ],
+                         "questionFrom":  11
+                     },
+                     {
+                         "audioDuration":  450,
+                         "audioUrl":  "https://cdn.aimhigh.vn/audio/listening-sec3.mp3",
+                         "questionTo":  30,
+                         "transcript":  "Transcript section 3",
+                         "sectionNumber":  3,
+                         "label":  "Section 3",
+                         "groups":  [
+                                        {
+                                            "questions":  [
+                                                              {
+                                                                  "audioStart":  105,
+                                                                  "questionNumber":  21,
+                                                                  "audioEnd":  113,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q21 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q21 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q21 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q21 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 21",
+                                                                  "explanation":  "Explanation for listening question 21",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  110,
+                                                                  "questionNumber":  22,
+                                                                  "audioEnd":  118,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q22 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q22 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q22 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q22 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 22",
+                                                                  "explanation":  "Explanation for listening question 22",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  115,
+                                                                  "questionNumber":  23,
+                                                                  "audioEnd":  123,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q23 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q23 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q23 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q23 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 23",
+                                                                  "explanation":  "Explanation for listening question 23",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  120,
+                                                                  "questionNumber":  24,
+                                                                  "audioEnd":  128,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q24 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q24 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q24 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q24 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 24",
+                                                                  "explanation":  "Explanation for listening question 24",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  125,
+                                                                  "questionNumber":  25,
+                                                                  "audioEnd":  133,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q25 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q25 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q25 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q25 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 25",
+                                                                  "explanation":  "Explanation for listening question 25",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  130,
+                                                                  "questionNumber":  26,
+                                                                  "audioEnd":  138,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q26 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q26 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q26 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q26 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 26",
+                                                                  "explanation":  "Explanation for listening question 26",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  135,
+                                                                  "questionNumber":  27,
+                                                                  "audioEnd":  143,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q27 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q27 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q27 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q27 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 27",
+                                                                  "explanation":  "Explanation for listening question 27",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  140,
+                                                                  "questionNumber":  28,
+                                                                  "audioEnd":  148,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q28 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q28 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q28 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q28 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 28",
+                                                                  "explanation":  "Explanation for listening question 28",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  145,
+                                                                  "questionNumber":  29,
+                                                                  "audioEnd":  153,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q29 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q29 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q29 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q29 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 29",
+                                                                  "explanation":  "Explanation for listening question 29",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  150,
+                                                                  "questionNumber":  30,
+                                                                  "audioEnd":  158,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q30 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q30 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q30 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q30 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 30",
+                                                                  "explanation":  "Explanation for listening question 30",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              }
+                                                          ],
+                                            "title":  "Group Section 3",
+                                            "questionFrom":  21,
+                                            "questionTo":  30,
+                                            "type":  "GENERAL"
+                                        }
+                                    ],
+                         "questionFrom":  21
+                     },
+                     {
+                         "audioDuration":  460,
+                         "audioUrl":  "https://cdn.aimhigh.vn/audio/listening-sec4.mp3",
+                         "questionTo":  40,
+                         "transcript":  "Transcript section 4",
+                         "sectionNumber":  4,
+                         "label":  "Section 4",
+                         "groups":  [
+                                        {
+                                            "questions":  [
+                                                              {
+                                                                  "audioStart":  155,
+                                                                  "questionNumber":  31,
+                                                                  "audioEnd":  163,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q31 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q31 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q31 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q31 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 31",
+                                                                  "explanation":  "Explanation for listening question 31",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  160,
+                                                                  "questionNumber":  32,
+                                                                  "audioEnd":  168,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q32 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q32 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q32 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q32 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 32",
+                                                                  "explanation":  "Explanation for listening question 32",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  165,
+                                                                  "questionNumber":  33,
+                                                                  "audioEnd":  173,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q33 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q33 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q33 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q33 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 33",
+                                                                  "explanation":  "Explanation for listening question 33",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  170,
+                                                                  "questionNumber":  34,
+                                                                  "audioEnd":  178,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q34 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q34 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q34 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q34 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 34",
+                                                                  "explanation":  "Explanation for listening question 34",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  175,
+                                                                  "questionNumber":  35,
+                                                                  "audioEnd":  183,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q35 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q35 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q35 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q35 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 35",
+                                                                  "explanation":  "Explanation for listening question 35",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  180,
+                                                                  "questionNumber":  36,
+                                                                  "audioEnd":  188,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q36 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q36 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q36 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q36 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 36",
+                                                                  "explanation":  "Explanation for listening question 36",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              },
+                                                              {
+                                                                  "audioStart":  185,
+                                                                  "questionNumber":  37,
+                                                                  "audioEnd":  193,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q37 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q37 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q37 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q37 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 37",
+                                                                  "explanation":  "Explanation for listening question 37",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "A"
+                                                              },
+                                                              {
+                                                                  "audioStart":  190,
+                                                                  "questionNumber":  38,
+                                                                  "audioEnd":  198,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q38 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q38 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q38 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q38 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 38",
+                                                                  "explanation":  "Explanation for listening question 38",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "B"
+                                                              },
+                                                              {
+                                                                  "audioStart":  195,
+                                                                  "questionNumber":  39,
+                                                                  "audioEnd":  203,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q39 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q39 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q39 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q39 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 39",
+                                                                  "explanation":  "Explanation for listening question 39",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "C"
+                                                              },
+                                                              {
+                                                                  "audioStart":  200,
+                                                                  "questionNumber":  40,
+                                                                  "audioEnd":  208,
+                                                                  "choices":  [
+                                                                                  {
+                                                                                      "label":  "A",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q40 option A"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "B",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q40 option B"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "C",
+                                                                                      "isCorrect":  false,
+                                                                                      "text":  "Listening Q40 option C"
+                                                                                  },
+                                                                                  {
+                                                                                      "label":  "D",
+                                                                                      "isCorrect":  true,
+                                                                                      "text":  "Listening Q40 option D"
+                                                                                  }
+                                                                              ],
+                                                                  "questionText":  "Listening question 40",
+                                                                  "explanation":  "Explanation for listening question 40",
+                                                                  "points":  1,
+                                                                  "correctAnswer":  "D"
+                                                              }
+                                                          ],
+                                            "title":  "Group Section 4",
+                                            "questionFrom":  31,
+                                            "questionTo":  40,
+                                            "type":  "GENERAL"
+                                        }
+                                    ],
+                         "questionFrom":  31
+                     }
+                 ],
+    "exam":  {
+                 "duration":  30,
+                 "title":  "Full Sample IELTS Listening",
+                 "description":  "Full sample listening for admin import",
+                 "mode":  "FULL",
+                 "skill":  "LISTENING"
+             }
+}

@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "map_labels")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

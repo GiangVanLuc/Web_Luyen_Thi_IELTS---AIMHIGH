@@ -7,8 +7,15 @@ import java.util.List;
 import vn.aimhigh.aimhighbackend.enums.*;
 
 @Entity
-@Table(name = "attempts")
-@Data
+@Table(
+    name = "attempts",
+    indexes = {
+        @Index(name = "idx_attempts_user_exam_status", columnList = "user_id, exam_id, status"),
+        @Index(name = "idx_attempts_user_started_at", columnList = "user_id, started_at")
+    }
+)
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,20 +25,21 @@ public class Attempt {
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_id")
+    @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
     
     @Enumerated(EnumType.STRING)
     private AttemptMode mode;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private AttemptStatus status;
     
-    @Column(name = "started_at")
+    @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;
     
     @Column(name = "submitted_at")

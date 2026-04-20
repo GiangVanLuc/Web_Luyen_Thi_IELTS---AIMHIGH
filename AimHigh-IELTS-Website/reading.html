@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -34,7 +34,7 @@
             <li><a class="dropdown-item" href="practice.html?skill=speaking"><i class="bi bi-mic"></i> Speaking</a></li>
           </ul>
         </li>
-        <li class="nav-item"><a class="nav-link" href="dashboard.html#my-study-overview">My Study</a></li>
+        <li class="nav-item"><a class="nav-link" href="dashboard.html#my-study-overview">My Journal</a></li>
       </ul>
       <div class="nav-user">
         <div class="user-dropdown dropdown">
@@ -87,7 +87,7 @@
 
 <!-- PART INFO BAR (real mode only) -->
 <div class="part-info-bar" id="partInfoBar">
-  <strong id="partInfoLabel">Section 1</strong>
+  <strong id="partInfoLabel">Part 1</strong>
   <span id="partInfoSub">Read the text and answer questions 1–14</span>
 </div>
 
@@ -145,8 +145,6 @@
 <!-- BOTTOM NAV -->
 <div class="botnav" id="botnav">
   <!-- Luyện tập mode -->
-  <button class="nav-arrow" id="btnNavPrev" onclick="navPrev()" title="Part trước">&#8592;</button>
-  <button class="nav-arrow" id="btnNavNext" onclick="navNext()" title="Part tiếp theo">&#8594;</button>
   <div class="qnav" id="qnav"></div>
   <button class="btn-done" onclick="submitTest()">Hoàn thành</button>
 
@@ -222,6 +220,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/reading.js"></script>
+<script src="js/api.js"></script>
+<script src="js/reading.js?v=20260419-2"></script>
+
+    <script src="js/navbar.js"></script>
 </body>
 </html>
+

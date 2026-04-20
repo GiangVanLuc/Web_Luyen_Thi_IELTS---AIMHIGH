@@ -1,4 +1,4 @@
-/* ===== VARIABLES ===== */
+﻿/* ===== VARIABLES ===== */
 :root {
     --primary-color: #d4a017;
     --primary-dark: #8a6b00;
@@ -30,7 +30,7 @@
     --gradient-primary: linear-gradient(135deg, #d4a017 0%, #8a6b00 100%);
     --gradient-hero: linear-gradient(135deg, #2a2100 0%, #5d4e00 100%);
     
-    --font-primary: 'Be Vietnam Pro', sans-serif;
+    --font-primary: 'Be Vietnam Pro', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
     --font-display: 'Playfair Display', serif;
     
     --radius-sm: 8px;
@@ -59,6 +59,13 @@ body {
     color: var(--text-primary);
     background-color: var(--bg-primary);
     overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: var(--font-primary);
 }
 
 a {
@@ -1263,7 +1270,7 @@ img {
         .mode-option p { margin: 0; font-size: 15px; color: #64748b; }
 
         /* Responsive */
-        @media (max-width: 1499px) { .reading-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 1299px) { .reading-home-wrap { grid-template-columns: 260px 1fr; } .reading-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
         @media (max-width: 1199px) { .reading-home-wrap { grid-template-columns: 260px 1fr; } .reading-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 991px) { 
             .sidebar-toggle-btn { display: none !important; }

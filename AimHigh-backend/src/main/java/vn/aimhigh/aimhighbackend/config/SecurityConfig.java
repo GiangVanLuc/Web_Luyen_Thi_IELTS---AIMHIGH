@@ -44,8 +44,10 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST = {
             "/api/auth/**",
-            "/login/oauth2/**",      // ✅ Thêm — Google callback
-            "/oauth2/**",            // ✅ Thêm — Google redirect
+            "/api/exams",
+            "/api/exams/**",
+            "/login/oauth2/**",
+            "/oauth2/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"

@@ -1,6 +1,7 @@
 package vn.aimhigh.aimhighbackend.dto.response;
 
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,6 +20,10 @@ public class VocabularyResponse {
     private String related;
     private List<ExampleDto> examples;
     private Boolean isSaved;
+    private Long userVocabularyId;
+    private Boolean learned;
+    private String note;
+    private LocalDateTime savedAt;
 
     @Data
     @Builder

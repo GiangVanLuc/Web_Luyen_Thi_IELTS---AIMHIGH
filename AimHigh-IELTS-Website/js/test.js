@@ -1,4 +1,4 @@
-// ===== TEST.JS - Xử lý làm bài thi =====
+﻿// ===== TEST.JS - Xử lý làm bài thi =====
 
 let timerInterval = null;
 let totalSeconds = 0;
@@ -353,3 +353,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start auto-save
     startAutoSave(30);
 });
+

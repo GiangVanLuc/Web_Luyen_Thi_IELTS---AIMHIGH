@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
+    Optional<Vocabulary> findByNormalizedWord(String normalizedWord);
     Optional<Vocabulary> findByWord(String word);
     List<Vocabulary> findByTopicId(Long topicId);
 }

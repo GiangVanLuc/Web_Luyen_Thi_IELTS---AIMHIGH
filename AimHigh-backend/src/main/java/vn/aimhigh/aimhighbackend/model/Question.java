@@ -5,8 +5,19 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "questions")
-@Data
+@Table(
+    name = "questions",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_questions_exam_question_number", columnNames = {"exam_id", "question_number"})
+    },
+    indexes = {
+        @Index(name = "idx_questions_exam_id", columnList = "exam_id"),
+        @Index(name = "idx_questions_listening_part_id", columnList = "listening_part_id"),
+        @Index(name = "idx_questions_reading_passage_id", columnList = "reading_passage_id")
+    }
+)
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +27,7 @@ public class Question {
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_id")
+    @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,7 +42,7 @@ public class Question {
     @JoinColumn(name = "question_type_id")
     private QuestionType questionType;
     
-    @Column(name = "question_number")
+    @Column(name = "question_number", nullable = false)
     private Integer questionNumber;
     
     @Column(name = "question_text", columnDefinition = "TEXT")

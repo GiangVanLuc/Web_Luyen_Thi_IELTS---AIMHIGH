@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.aimhigh.aimhighbackend.dto.request.LoginRequest;
 import vn.aimhigh.aimhighbackend.dto.request.RefreshTokenRequest;
@@ -15,6 +16,7 @@ import vn.aimhigh.aimhighbackend.service.AuthenticationService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -40,13 +42,10 @@ public class AuthController {
                 authenticationService.refreshToken(request.getRefreshToken()));
     }
 
-    //  Sửa logout — lấy AccessToken từ header
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @RequestBody @Valid RefreshTokenRequest request,
             @RequestHeader("Authorization") String authHeader) {
-
-        // Lấy token từ "Bearer xxxxx"
         String accessToken = authHeader.substring(7);
         authenticationService.logout(request.getRefreshToken(), accessToken);
         return ResponseEntity.noContent().build();

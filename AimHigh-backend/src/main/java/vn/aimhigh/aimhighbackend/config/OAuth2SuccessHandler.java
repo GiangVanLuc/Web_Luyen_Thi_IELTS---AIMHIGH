@@ -52,7 +52,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken  = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        // ✅ Lưu vào Redis
+
         redisService.saveRefreshToken(user.getId(), refreshToken);
 
         String redirectUrl = String.format(

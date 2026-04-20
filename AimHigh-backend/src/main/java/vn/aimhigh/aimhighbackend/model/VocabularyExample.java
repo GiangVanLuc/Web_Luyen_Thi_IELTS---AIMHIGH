@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "vocabulary_examples")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,20 +1,25 @@
-// ===== PRACTICE.JS =====
+﻿// ===== PRACTICE.JS =====
 // Render danh sách đề thi từ API /api/exams
 // Fix: sidebar radio chỉ highlight đúng phần đang chọn
 
-const API_BASE = 'http://localhost:8080/api';
-
-let currentSubject = 'listening';
+let currentSubject = null;
 let selectedMode   = 'practice';
 let selectedExerciseTitle = '';
 let selectedExamId  = null;
+let selectedExamSkill = null;
+let selectedCardType = null;
+let selectedCardPart = null;
 let modeModal;
 let applyFilterFunc;
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const skillFromUrl = urlParams.get('skill');
-    if (skillFromUrl) currentSubject = skillFromUrl;
+    if (['listening', 'reading', 'writing', 'speaking'].includes(skillFromUrl)) {
+        currentSubject = skillFromUrl;
+    }
+
+    initPracticeFilters();
 
     const modalEl = document.getElementById('modeSelectModal');
     if (modalEl) modeModal = new bootstrap.Modal(modalEl);
@@ -32,17 +37,15 @@ async function fetchExams() {
 
     let exams;
     try {
-        const token = localStorage.getItem('aimhigh_token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        const res = await fetch(`${API_BASE}/exams`, { headers });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const body = await res.json();
+        const body = await getExamList();
         exams = body.data || body;  // Hỗ trợ cả DataResponse wrapper
     } catch (err) {
-        grid.innerHTML = '<p style="padding:20px;color:#ef4444;">Không thể tải danh sách đề thi. Hãy kiểm tra Backend đang chạy.</p>';
+        const hint = String(err.message || '').includes('401')
+            ? 'Bạn chưa đăng nhập hoặc token đã hết hạn.'
+            : 'Hãy kiểm tra Backend đang chạy.';
+        grid.innerHTML = `<p style="padding:20px;color:#ef4444;">Không thể tải danh sách đề thi. ${hint}</p>`;
         console.error('Lỗi tải đề thi:', err);
+        if (applyFilterFunc) applyFilterFunc();
         return;
     }
 
@@ -55,7 +58,7 @@ async function fetchExams() {
     grid.innerHTML = '';
     exams.forEach(exam => renderExamCard(exam, grid));
 
-    initPracticeFilters();
+    if (applyFilterFunc) applyFilterFunc();
     setTimeout(scrollToActiveSubject, 50);
 }
 
@@ -66,7 +69,7 @@ async function fetchExams() {
  */
 function renderExamCard(exam, grid) {
     const skill  = (exam.skill || 'reading').toLowerCase();
-    const thumb  = exam.thumbnail || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900';
+    const thumb  = resolveExamThumbnail(exam, skill);
     const badgeTxt = exam.sourceName || exam.title;
     const totalQ = exam.totalQuestions || 40;
     const dur    = exam.duration || 60;
@@ -78,7 +81,11 @@ function renderExamCard(exam, grid) {
     fullCard.dataset.type    = 'full';
     fullCard.dataset.part    = 'full';
     fullCard.dataset.examId  = exam.id;
-    fullCard.onclick = () => openModeModal(exam.title, exam.id);
+    fullCard.onclick = () => openModeModal(exam.title, exam.id, {
+        skill,
+        type: 'full',
+        part: 'full'
+    });
     fullCard.innerHTML = `
       <div class="thumb-wrap">
         <img src="${thumb}" alt="${exam.title}" onerror="this.src='https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900'">
@@ -98,6 +105,7 @@ function renderExamCard(exam, grid) {
         const CHIP_COLORS = ['#d4a017','#8b5cf6','#0ea5e9','#ef4444'];
         exam.sections.forEach((sec, idx) => {
             const secLabel = sec.label || (skill === 'reading' ? `Passage ${sec.sectionNumber}` : `Section ${sec.sectionNumber}`);
+            const sectionThumb = resolveSectionThumbnail(sec, exam, skill);
             const card = document.createElement('article');
             card.className = 'exercise-card';
             card.dataset.subject = skill;
@@ -106,11 +114,16 @@ function renderExamCard(exam, grid) {
             card.dataset.examId  = exam.id;
             card.onclick = () => openModeModal(
                 `${exam.title} – ${secLabel}`,
-                exam.id
+                exam.id,
+                {
+                    skill,
+                    type: 'single',
+                    part: String(sec.sectionNumber || '')
+                }
             );
             card.innerHTML = `
               <div class="thumb-wrap">
-                <img src="${thumb}" alt="${secLabel}" onerror="this.src='https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900'">
+                                <img src="${sectionThumb}" alt="${secLabel}" onerror="this.src='${fallbackThumbBySkill(skill)}'">
                 <span class="exercise-badge">${eh(badgeTxt)}</span>
                 <span class="passage-chip" style="background:${CHIP_COLORS[idx % CHIP_COLORS.length]};">${eh(secLabel)}</span>
               </div>
@@ -126,12 +139,38 @@ function renderExamCard(exam, grid) {
     }
 }
 
+function fallbackThumbBySkill(skill) {
+    if (skill === 'listening') return 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=900';
+    if (skill === 'writing') return 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900';
+    if (skill === 'speaking') return 'https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=900';
+    return 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900';
+}
+
+function resolveExamThumbnail(exam, skill) {
+    return (
+        exam.thumbnailUrl
+        || exam.thumbnail
+        || exam.coverImage
+        || exam.imageUrl
+        || exam.image
+        || fallbackThumbBySkill(skill)
+    );
+}
+
+function resolveSectionThumbnail(section, exam, skill) {
+    return (
+        section?.thumbnailUrl
+        || section?.thumbnail
+        || section?.coverImage
+        || section?.imageUrl
+        || section?.image
+        || resolveExamThumbnail(exam, skill)
+    );
+}
+
 // ─── FILTERS ──────────────────────────────────────────────────────────────────
 
 function initPracticeFilters() {
-    const cards = document.querySelectorAll('.exercise-card');
-    if (!cards.length) return;
-
     const subjects = [
         { key: 'reading',   typeName: 'readingType',   partName: 'readingPassage', partWrapId: 'readingPassageWrap' },
         { key: 'listening', typeName: 'listeningType', partName: 'listeningPart',  partWrapId: 'listeningPartWrap' },
@@ -142,12 +181,24 @@ function initPracticeFilters() {
     applyFilterFunc = () => {
         // Active box bên sidebar — chỉ mở box đang active
         document.querySelectorAll('[data-subject-box]').forEach(box => {
-            const isActive = box.dataset.subjectBox === currentSubject;
+            const isActive = !!currentSubject && box.dataset.subjectBox === currentSubject;
             box.classList.toggle('active', isActive);
             // Ẩn body của box không active
             const body = box.querySelector('.subject-body');
             if (body) body.style.display = isActive ? '' : 'none';
         });
+
+        const cards = document.querySelectorAll('.exercise-card');
+        if (!cards.length) {
+            return;
+        }
+
+        if (!currentSubject) {
+            cards.forEach(card => {
+                card.style.display = '';
+            });
+            return;
+        }
 
         // Ẩn/hiện sub-options (bài lẻ vs full) cho subject đang active
         subjects.forEach(s => {
@@ -167,7 +218,7 @@ function initPracticeFilters() {
         const selectedPart   = document.querySelector(`input[name="${activeConfig.partName}"]:checked`)?.value || '1';
 
         // Lọc cards
-        document.querySelectorAll('.exercise-card').forEach(card => {
+        cards.forEach(card => {
             const match =
                 card.dataset.subject === currentSubject &&
                 (selectedType === 'full'
@@ -233,6 +284,9 @@ function setupNoReloadNavbar() {
 }
 
 function scrollToActiveSubject() {
+    if (!currentSubject) {
+        return;
+    }
     const activeBox = document.querySelector(`.subject-box[data-subject-box="${currentSubject}"]`);
     const sidebar   = document.querySelector('.reading-filter');
     if (activeBox && sidebar)
@@ -241,9 +295,12 @@ function scrollToActiveSubject() {
 
 // ─── MODAL & CHUYỂN TRANG ─────────────────────────────────────────────────────
 
-function openModeModal(title, examId) {
+function openModeModal(title, examId, options = {}) {
     selectedExerciseTitle = title;
     selectedExamId        = examId;
+    selectedExamSkill     = options.skill || null;
+    selectedCardType      = options.type || null;
+    selectedCardPart      = options.part || null;
     const titleEl = document.getElementById('modeModalTitle');
     if (titleEl) titleEl.textContent = title;
     selectModeOption('practice');
@@ -261,19 +318,46 @@ function startActualTest() {
     localStorage.setItem('currentExamMode',  selectedMode);
     localStorage.setItem('currentExamId',    selectedExamId);
 
-    if (currentSubject === 'reading') {
-        const selectedType    = document.querySelector('input[name="readingType"]:checked')?.value || 'single';
-        const selectedPassage = document.querySelector('input[name="readingPassage"]:checked')?.value || '1';
-        localStorage.setItem('currentExamSection', selectedType === 'full' ? 'full' : selectedPassage);
-        window.location.href = 'reading.html';
+    const subject = selectedExamSkill || currentSubject || 'reading';
+    localStorage.setItem('currentExamSkill', subject);
 
-    } else if (currentSubject === 'listening') {
-        const selectedType    = document.querySelector('input[name="listeningType"]:checked')?.value || 'full';
-        const selectedSection = document.querySelector('input[name="listeningPart"]:checked')?.value || '1';
-        localStorage.setItem('currentExamSection', selectedType === 'full' ? 'full' : selectedSection);
-        window.location.href = 'listening.html';
+    if (subject === 'reading') {
+        const selectedType = selectedCardType
+            || document.querySelector('input[name="readingType"]:checked')?.value
+            || 'single';
+        const selectedPassage = selectedCardPart
+            || document.querySelector('input[name="readingPassage"]:checked')?.value
+            || '1';
+        const section = selectedType === 'full' ? 'full' : selectedPassage;
+        localStorage.setItem('currentExamSection', section);
 
-    } else if (currentSubject === 'writing') {
+        const params = new URLSearchParams({
+            examId: String(selectedExamId),
+            section,
+            mode: selectedMode,
+            title: selectedExerciseTitle
+        });
+        window.location.href = `reading.html?${params.toString()}`;
+
+    } else if (subject === 'listening') {
+        const selectedType = selectedCardType
+            || document.querySelector('input[name="listeningType"]:checked')?.value
+            || 'full';
+        const selectedSection = selectedCardPart
+            || document.querySelector('input[name="listeningPart"]:checked')?.value
+            || '1';
+        const section = selectedType === 'full' ? 'full' : selectedSection;
+        localStorage.setItem('currentExamSection', section);
+
+        const params = new URLSearchParams({
+            examId: String(selectedExamId),
+            section,
+            mode: selectedMode,
+            title: selectedExerciseTitle
+        });
+        window.location.href = `listening.html?${params.toString()}`;
+
+    } else if (subject === 'writing') {
         window.location.href = 'writing.html';
     } else {
         window.location.href = 'speaking.html';

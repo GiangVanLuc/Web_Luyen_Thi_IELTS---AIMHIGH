@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "matching_items")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

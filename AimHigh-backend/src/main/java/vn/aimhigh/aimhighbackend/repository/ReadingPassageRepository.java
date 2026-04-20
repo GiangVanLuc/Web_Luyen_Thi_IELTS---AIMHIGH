@@ -7,5 +7,6 @@ import java.util.List;
 
 @Repository
 public interface ReadingPassageRepository extends JpaRepository<ReadingPassage, Long> {
+    List<ReadingPassage> findByExamIdOrderBySectionNumberAscPassageOrderInSectionAscIdAsc(Long examId);
     List<ReadingPassage> findByExamIdOrderByPassageOrder(Long examId);
 }

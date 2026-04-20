@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,7 @@
                         <li><a class="dropdown-item active" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
                         <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="login.html" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        <li><a class="dropdown-item" href="#" id="logoutLink"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
                     </ul>
                 </div>
             </div>
@@ -35,40 +35,10 @@
     </nav>
 
     <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
-            <div class="sidebar-menu">
-                <a href="dashboard.html" class="menu-item">
-                    <i class="bi bi-grid-1x2"></i><span>Tổng quan</span>
-                </a>
-                <a href="listening.html" class="menu-item">
-                    <i class="bi bi-headphones"></i><span>Listening</span>
-                </a>
-                <a href="reading.html" class="menu-item">
-                    <i class="bi bi-book"></i><span>Reading</span>
-                </a>
-                <a href="writing.html" class="menu-item">
-                    <i class="bi bi-pencil"></i><span>Writing</span>
-                </a>
-                <a href="speaking.html" class="menu-item">
-                    <i class="bi bi-mic"></i><span>Speaking</span>
-                </a>
-                <a href="vocabulary.html" class="menu-item">
-                    <i class="bi bi-bookmark"></i><span>Từ vựng</span>
-                </a>
-                <div class="menu-divider"></div>
-                <a href="profile.html" class="menu-item active">
-                    <i class="bi bi-person-circle"></i><span>Hồ sơ cá nhân</span>
-                </a>
-                <a href="login.html" class="menu-item" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span>
-                </a>
-            </div>
-        </aside>
-
         <!-- Main Content -->
-        <main class="dashboard-main" style="background:var(--bg-secondary);">
-            <div class="dashboard-container" style="max-width:900px;">
+        <main class="dashboard-main profile-page-main">
+            <div class="container">
+                <div class="dashboard-container profile-container">
                 <div class="dashboard-header">
                     <div>
                         <p class="welcome-text">Cài đặt tài khoản</p>
@@ -86,7 +56,7 @@
                                 <label class="avatar-upload-btn" for="avatarInput" title="Thay đổi ảnh">
                                     <i class="bi bi-camera-fill"></i>
                                 </label>
-                                <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
+                                <input type="file" id="avatarInput" accept="image/*" style="display:none">
                             </div>
                             <h3 id="profileName" class="profile-name">Nguyễn Thảo</h3>
                             <p id="profileEmail" class="profile-email">nguyen.thao@email.com</p>
@@ -95,47 +65,48 @@
                             </div>
                         </div>
 
-                        <!-- Stats Card -->
                         <div class="profile-card">
                             <h5 class="card-section-title">Thống kê học tập</h5>
                             <ul class="stats-list">
                                 <li>
-                                    <i class="bi bi-calendar3-event text-primary"></i>
+                                    <i class="bi bi-journal-check text-success"></i>
                                     <div>
-                                        <div class="stat-label">Ngày tham gia</div>
-                                        <div class="stat-value">01/01/2025</div>
+                                        <div class="stat-label">Tổng số lần luyện</div>
+                                        <div class="stat-value" id="statTotalAttempts">0</div>
                                     </div>
                                 </li>
                                 <li>
-                                    <i class="bi bi-journal-check" style="color:var(--listening-color)"></i>
+                                    <i class="bi bi-check2-circle text-primary"></i>
                                     <div>
-                                        <div class="stat-label">Bài thi đã làm</div>
-                                        <div class="stat-value">24 bài</div>
+                                        <div class="stat-label">Bài đã nộp</div>
+                                        <div class="stat-value" id="statSubmittedAttempts">0</div>
                                     </div>
                                 </li>
                                 <li>
-                                    <i class="bi bi-fire" style="color:var(--writing-color)"></i>
+                                    <i class="bi bi-graph-up-arrow text-warning"></i>
                                     <div>
-                                        <div class="stat-label">Streak hiện tại</div>
-                                        <div class="stat-value">🔥 7 ngày</div>
+                                        <div class="stat-label">Band cao nhất</div>
+                                        <div class="stat-value" id="statBestBand">0.0</div>
                                     </div>
                                 </li>
                                 <li>
-                                    <i class="bi bi-clock-history" style="color:var(--reading-color)"></i>
+                                    <i class="bi bi-activity text-info"></i>
                                     <div>
-                                        <div class="stat-label">Tổng thời gian học</div>
-                                        <div class="stat-value">48 giờ</div>
+                                        <div class="stat-label">Band trung bình</div>
+                                        <div class="stat-value" id="statAverageBand">0.0</div>
                                     </div>
                                 </li>
                                 <li>
-                                    <i class="bi bi-bookmark-star" style="color:var(--speaking-color)"></i>
+                                    <i class="bi bi-clock-history text-secondary"></i>
                                     <div>
-                                        <div class="stat-label">Từ vựng đã học</div>
-                                        <div class="stat-value">1,240 từ</div>
+                                        <div class="stat-label">Lần luyện gần nhất</div>
+                                        <div class="stat-value" id="statLastPractice">Chưa có dữ liệu</div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
+
+                        
                     </div>
 
                     <!-- Right: Forms -->
@@ -143,7 +114,10 @@
                         <!-- Personal Info Form -->
                         <div class="profile-card mb-4">
                             <h5 class="card-section-title">Thông tin cá nhân</h5>
-                            <form id="profileForm" onsubmit="saveProfile(event)">
+                            <form id="profileForm">
+                                <div class="alert alert-warning d-none" id="profileBackendNotice" role="alert">
+                                    Không kết nối được backend, trang đang dùng dữ liệu cục bộ trên trình duyệt.
+                                </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-500">Họ và tên</label>
@@ -156,6 +130,10 @@
                                     <div class="col-12">
                                         <label class="form-label fw-500">Email</label>
                                         <input type="email" class="profile-input" id="emailField" value="nguyen.thao@email.com" placeholder="Email">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-500">URL ảnh đại diện (tuỳ chọn)</label>
+                                        <input type="url" class="profile-input" id="avatarUrlField" placeholder="https://example.com/avatar.jpg">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-500">Mục tiêu điểm IELTS</label>
@@ -177,12 +155,15 @@
                                         <label class="form-label fw-500">Giới thiệu bản thân</label>
                                         <textarea class="profile-input" id="bio" rows="3" placeholder="Mô tả ngắn về bạn và mục tiêu IELTS...">Sinh viên đại học, đang luyện thi IELTS để chuẩn bị cho chương trình học bổng quốc tế.</textarea>
                                     </div>
+                                    <div class="col-12">
+                                        <small class="text-muted">Các trường Số điện thoại, Mục tiêu, Ngày thi dự kiến và Giới thiệu đang được lưu cục bộ trên trình duyệt hiện tại.</small>
+                                    </div>
                                 </div>
                                 <div class="d-flex gap-3 mt-4">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-primary" id="saveProfileBtn">
                                         <i class="bi bi-check2"></i> Lưu thay đổi
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                                    <button type="button" class="btn btn-outline-secondary" id="resetProfileBtn">
                                         Hủy
                                     </button>
                                 </div>
@@ -191,12 +172,12 @@
 
                         <!-- Change Password -->
                         <div class="profile-card mb-4">
-                            <div class="d-flex justify-content-between align-items-center" style="cursor:pointer;" onclick="togglePasswordSection()">
+                            <div class="d-flex justify-content-between align-items-center" style="cursor:pointer;" id="passwordAccordionToggle">
                                 <h5 class="card-section-title mb-0">Đổi mật khẩu</h5>
                                 <i class="bi bi-chevron-down" id="passwordToggleIcon"></i>
                             </div>
                             <div id="passwordSection" style="display:none;margin-top:20px;">
-                                <form onsubmit="changePassword(event)">
+                                <form id="passwordForm">
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <label class="form-label fw-500">Mật khẩu hiện tại</label>
@@ -209,7 +190,7 @@
                                             <label class="form-label fw-500">Mật khẩu mới</label>
                                             <div class="input-wrapper">
                                                 <i class="bi bi-lock"></i>
-                                                <input type="password" class="profile-input ps-5" id="newPass" placeholder="Mật khẩu mới" oninput="checkPasswordStrength(this.value)">
+                                                <input type="password" class="profile-input ps-5" id="newPass" placeholder="Mật khẩu mới">
                                             </div>
                                             <div class="password-strength mt-2">
                                                 <div class="strength-bars">
@@ -229,50 +210,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mt-3">
+                                    <button type="submit" class="btn btn-primary mt-3" id="savePasswordBtn">
                                         <i class="bi bi-shield-check"></i> Cập nhật mật khẩu
                                     </button>
                                 </form>
                             </div>
                         </div>
 
-                        <!-- Notifications Settings -->
-                        <div class="profile-card">
-                            <h5 class="card-section-title">Cài đặt thông báo</h5>
-                            <div class="settings-list">
-                                <div class="setting-item">
-                                    <div>
-                                        <div class="setting-title">Nhắc nhở học tập hàng ngày</div>
-                                        <div class="setting-desc">Nhận thông báo nhắc nhở luyện thi mỗi ngày</div>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" checked id="dailyReminder">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <div>
-                                        <div class="setting-title">Kết quả bài thi</div>
-                                        <div class="setting-desc">Nhận email khi có kết quả AI chấm bài</div>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" checked id="testResults">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <div>
-                                        <div class="setting-title">Bài thi mới</div>
-                                        <div class="setting-desc">Thông báo khi có đề thi mới được thêm vào</div>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="newTests">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                     </div>
+                </div>
                 </div>
             </div>
         </main>
@@ -305,8 +251,10 @@
         .menu-item.active { background: rgba(37,99,235,0.1); color: var(--primary-color); }
         .menu-item i { font-size: 1.25rem; }
         .menu-divider { height: 1px; background: var(--border-color); margin: 16px 0; }
-        .dashboard-main { flex: 1; margin-left: 260px; background: var(--bg-secondary); min-height: 100vh; }
-        .dashboard-container { padding: 24px; }
+        .dashboard-main { flex: 1; margin-left: 0; background: var(--bg-secondary); min-height: 100vh; }
+        .profile-page-main { padding-bottom: 24px; }
+        .dashboard-container { padding: 24px 0; }
+        .profile-container { max-width: 900px; margin: 0 auto; }
         .dashboard-header { margin-bottom: 24px; }
         .welcome-text { color: var(--text-secondary); font-size: 0.9375rem; margin-bottom: 4px; }
         .dashboard-title { font-size: 1.75rem; font-weight: 700; margin: 0; }
@@ -476,6 +424,7 @@
         @media (max-width: 991px) {
             .dashboard-sidebar { display: none; }
             .dashboard-main { margin-left: 0; }
+            .dashboard-container { padding: 18px 0; }
         }
 
         /* Success Toast */
@@ -499,111 +448,8 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Load profile from localStorage
-        const user = JSON.parse(localStorage.getItem('aimhigh_user') || '{}');
-        if (user.name) {
-            document.getElementById('fullName').value = user.name;
-            document.getElementById('profileName').textContent = user.name;
-            document.getElementById('navName').textContent = user.name;
-            const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-            document.getElementById('profileAvatar').textContent = initials;
-            document.getElementById('navAvatar').textContent = initials;
-        }
-        if (user.email) {
-            document.getElementById('emailField').value = user.email;
-            document.getElementById('profileEmail').textContent = user.email;
-        }
-
-        function saveProfile(e) {
-            e.preventDefault();
-            const name = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('emailField').value.trim();
-            const updatedUser = { ...user, name, email };
-            localStorage.setItem('aimhigh_user', JSON.stringify(updatedUser));
-            document.getElementById('profileName').textContent = name;
-            document.getElementById('navName').textContent = name;
-            document.getElementById('profileEmail').textContent = email;
-            const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-            document.getElementById('profileAvatar').textContent = initials;
-            showToast('Đã lưu thay đổi thành công!');
-        }
-
-        function resetForm() {
-            if (user.name) document.getElementById('fullName').value = user.name;
-            if (user.email) document.getElementById('emailField').value = user.email;
-        }
-
-        function togglePasswordSection() {
-            const section = document.getElementById('passwordSection');
-            const icon = document.getElementById('passwordToggleIcon');
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                icon.className = 'bi bi-chevron-up';
-            } else {
-                section.style.display = 'none';
-                icon.className = 'bi bi-chevron-down';
-            }
-        }
-
-        function checkPasswordStrength(password) {
-            const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
-            const label = document.getElementById('strengthLabel');
-            let strength = 0;
-            if (password.length >= 8) strength++;
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[^A-Za-z0-9]/.test(password)) strength++;
-            bars.forEach((bar, i) => {
-                const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
-                bar.style.background = i < strength ? colors[strength - 1] : 'var(--border-color)';
-            });
-            const labels = ['', 'Yếu', 'Trung bình', 'Mạnh', 'Rất mạnh'];
-            label.textContent = labels[strength] || 'Nhập mật khẩu';
-        }
-
-        function changePassword(e) {
-            e.preventDefault();
-            const newPass = document.getElementById('newPass').value;
-            const confirmPass = document.getElementById('confirmPass').value;
-            if (newPass !== confirmPass) {
-                alert('Mật khẩu xác nhận không khớp!');
-                return;
-            }
-            if (newPass.length < 6) {
-                alert('Mật khẩu phải có ít nhất 6 ký tự!');
-                return;
-            }
-            const updatedUser = { ...user, password: newPass };
-            localStorage.setItem('aimhigh_user', JSON.stringify(updatedUser));
-            showToast('Đã cập nhật mật khẩu!');
-            document.getElementById('currentPass').value = '';
-            document.getElementById('newPass').value = '';
-            document.getElementById('confirmPass').value = '';
-        }
-
-        function uploadAvatar(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const avatar = document.getElementById('profileAvatar');
-                avatar.innerHTML = `<img src="${evt.target.result}" alt="Avatar">`;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function logout() {
-            localStorage.removeItem('aimhigh_loggedIn');
-        }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-success';
-            toast.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${message}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-    </script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/profile.js"></script>
 </body>
 </html>
