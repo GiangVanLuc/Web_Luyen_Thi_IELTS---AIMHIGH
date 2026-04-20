@@ -86,7 +86,7 @@
                                 <div class="yp-legend-item skip"><span>Bỏ qua</span><strong><span id="skippedCount">0</span> câu</strong><em id="skippedPercent">0%</em></div>
                             </div>
                         </div>
-                        <button class="yp-detail-btn" onclick="scrollToDetails()">Xem giải thích chi tiết</button>
+                        <button class="yp-detail-btn" onclick="openDetailedReview()">Xem giải thích chi tiết</button>
                     </div>
                 </div>
             </div>
@@ -606,6 +606,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api.js"></script>
     <script>
+        let activeResultData = null;
+
         function toggleExplain(btn) {
             const explainDiv = btn.nextElementSibling;
             const icon = btn.querySelector('i');
@@ -637,6 +639,40 @@
         function scrollToDetails() {
             const el = document.getElementById('detailsSection');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function buildSkillReviewUrl(result) {
+            const attemptId = Number(result?.attemptId || getAttemptIdFromContext());
+            const examId = Number(result?.examId || 0);
+            const skill = String(result?.skill || '').toUpperCase();
+            if (!Number.isFinite(attemptId) || attemptId <= 0) return null;
+
+            const params = new URLSearchParams();
+            if (Number.isFinite(examId) && examId > 0) {
+                params.set('examId', String(examId));
+            }
+            params.set('mode', 'review');
+            params.set('attemptId', String(attemptId));
+
+            if (skill === 'READING') {
+                return `reading.html?${params.toString()}`;
+            }
+            if (skill === 'LISTENING') {
+                return `listening.html?${params.toString()}`;
+            }
+
+            return null;
+        }
+
+        function openDetailedReview() {
+            const result = activeResultData || JSON.parse(localStorage.getItem('aimhigh_lastResult') || 'null');
+            const reviewUrl = buildSkillReviewUrl(result);
+            if (reviewUrl) {
+                window.location.href = reviewUrl;
+                return;
+            }
+
+            scrollToDetails();
         }
 
         function goBackToExam(event) {
@@ -701,6 +737,7 @@
             if (!result || typeof result !== 'object') return false;
             const hasSummary = Number.isFinite(Number(result.totalQuestions)) && Number(result.totalQuestions) > 0;
             const hasBlocks = (Array.isArray(result.parts) && result.parts.length > 0)
+                || (Array.isArray(result.sections) && result.sections.length > 0)
                 || (Array.isArray(result.passages) && result.passages.length > 0);
             const hasTitle = typeof result.examTitle === 'string' && result.examTitle.trim().length > 0;
             return hasSummary || hasBlocks || hasTitle;
@@ -760,12 +797,25 @@
 
         function flattenQuestionBlocks(result) {
             if (result.skill === 'LISTENING') {
-                return (result.parts || []).map(part => ({
-                    label: part.label || `Section ${part.sectionNumber || ''}`.trim(),
-                    totalQuestions: part.totalQuestions || (part.questions || []).length,
-                    correctCount: part.correctCount || 0,
-                    questions: part.questions || []
-                }));
+                const listeningBlocks = (Array.isArray(result.sections) && result.sections.length > 0)
+                    ? result.sections
+                    : (result.parts || []);
+
+                return listeningBlocks.map(part => {
+                    const directQuestions = Array.isArray(part.questions) ? part.questions : [];
+                    const groupQuestions = Array.isArray(part.groups)
+                        ? part.groups.flatMap(group => Array.isArray(group?.questions) ? group.questions : [])
+                        : [];
+                    const questions = directQuestions.length ? directQuestions : groupQuestions;
+                    const correctFromQuestions = questions.filter(q => q && q.isCorrect && !q.isSkipped).length;
+
+                    return {
+                        label: part.label || `Section ${part.sectionNumber || ''}`.trim(),
+                        totalQuestions: part.totalQuestions || questions.length,
+                        correctCount: Number.isFinite(Number(part.correctCount)) ? Number(part.correctCount) : correctFromQuestions,
+                        questions
+                    };
+                });
             }
             return (result.passages || []).map((passage, idx) => ({
                 label: passage.label || `Passage ${passage.passageOrder || idx + 1}`,
@@ -773,6 +823,28 @@
                 correctCount: passage.correctCount || 0,
                 questions: passage.questions || []
             }));
+        }
+
+        function resolveCorrectAnswerForDisplay(question) {
+            const direct = String(question?.correctAnswer || '').trim();
+            if (direct) return direct;
+
+            const choices = Array.isArray(question?.choices) ? question.choices : [];
+            const correctChoice = choices.find(choice => choice?.isCorrect === true);
+            if (correctChoice) {
+                const label = String(correctChoice.label || '').trim();
+                const text = String(correctChoice.text || '').trim();
+                if (label && text && label.toUpperCase() !== text.toUpperCase()) {
+                    return `${label}. ${text}`;
+                }
+                return label || text;
+            }
+
+            const explanation = String(question?.explanation || '');
+            const match = explanation.match(/đáp án đúng(?:\s*là)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i)
+                || explanation.match(/correct answer(?:\s*is)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i);
+            const extracted = String(match?.[1] || '').trim();
+            return extracted || '(Chưa cập nhật)';
         }
 
         function renderSectionBars(blocks) {
@@ -807,6 +879,7 @@
                     const isCorrect = !!q.isCorrect;
                     const status = isSkipped ? 'skipped' : (isCorrect ? 'correct' : 'wrong');
                     const userAns = q.isSkipped ? '(Bỏ qua)' : (q.userAnswer || '(Trống)');
+                    const correctAnswer = resolveCorrectAnswerForDisplay(q);
                     const expl = q.explanation || 'Chưa có giải thích cho câu này.';
                     const explainHtml = String(expl)
                         .replaceAll('&', '&amp;')
@@ -825,7 +898,7 @@
                                         <i class="bi ${isSkipped ? 'bi-dash-circle-fill' : (isCorrect ? 'bi-check-circle-fill' : 'bi-x-circle-fill')}"></i>
                                         Đáp án của bạn: <strong>${userAns}</strong>
                                     </span>
-                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>${q.correctAnswer || '(Trống)'}</strong></span>
+                                    <span class="correct-answer"><i class="bi bi-check2"></i> Đáp án đúng: <strong>${correctAnswer}</strong></span>
                                 </div>
                                 <button class="btn-explain" onclick="toggleExplain(this)">
                                     <i class="bi bi-chevron-down"></i> Xem giải thích
@@ -893,6 +966,8 @@
         }
 
         function renderResultData(result) {
+            activeResultData = result;
+
             const blocks = flattenQuestionBlocks(result);
             const stats = calcResultStats(blocks);
             const totalFromResult = Number(result.totalQuestions || 0);
@@ -944,6 +1019,18 @@
                 } else {
                     badge.className = 'test-badge listening';
                     badge.innerHTML = '<i class="bi bi-headphones"></i> Listening';
+                }
+            }
+
+            const detailBtn = document.querySelector('.yp-detail-btn');
+            if (detailBtn) {
+                const skill = String(result.skill || '').toUpperCase();
+                if (skill === 'READING') {
+                    detailBtn.textContent = 'Xem đối chiếu trong bài đọc';
+                } else if (skill === 'LISTENING') {
+                    detailBtn.textContent = 'Xem đối chiếu trong bài nghe';
+                } else {
+                    detailBtn.textContent = 'Xem giải thích chi tiết';
                 }
             }
 

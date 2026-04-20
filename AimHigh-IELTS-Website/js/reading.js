@@ -6,7 +6,9 @@
 const urlParams = new URLSearchParams(window.location.search);
 const examSection = urlParams.get('section') || localStorage.getItem('currentExamSection') || 'full';
 const examId = parseInt(urlParams.get('examId') || localStorage.getItem('currentExamId') || '1', 10);
-const examModeFromContext = urlParams.get('mode') || localStorage.getItem('currentExamMode') || 'practice';
+const rawExamModeFromContext = String(urlParams.get('mode') || localStorage.getItem('currentExamMode') || 'practice').toLowerCase();
+const isReviewMode = rawExamModeFromContext === 'review';
+const examModeFromContext = rawExamModeFromContext === 'real' ? 'real' : 'practice';
 const examTitleFromContext = urlParams.get('title') || localStorage.getItem('currentExamTitle') || '';
 
 // Section config (sẽ được điền sau khi fetch)
@@ -25,6 +27,17 @@ let autoSaveInt = null; // Interval auto-save
 const ATTEMPT_META_KEY = 'currentAttemptMeta';
 let questionIdMap = new Map();
 let questionNumberMap = new Map();
+let reviewResultData = null;
+let reviewQuestionMap = new Map();
+let reviewQuestionOrder = [];
+let activeReviewQuestion = null;
+let activeReviewPassageFocus = null;
+const REVIEW_HIGHLIGHT_STOPWORDS = new Set([
+    'the', 'and', 'for', 'with', 'that', 'this', 'from', 'into', 'than', 'then', 'what', 'when', 'where', 'which',
+    'your', 'their', 'there', 'have', 'were', 'was', 'are', 'is', 'to', 'of', 'in', 'on', 'at', 'by', 'an', 'a',
+    'dap', 'an', 'dung', 'cau', 'buoc', 'xem', 'lai', 'cho', 'khi', 'cua', 'trong', 'voi', 'nhung', 'duoc', 'khong', 'nay',
+    'đáp', 'án', 'đúng', 'câu', 'bước', 'xem', 'lại', 'cho', 'khi', 'của', 'trong', 'với', 'những', 'được', 'không', 'này'
+]);
 
 function rememberQuestionId(question) {
     const qNum = Number(question?.questionNumber);
@@ -240,6 +253,737 @@ async function resolveDetailedResult(attemptIdValue, submitResult, maxRetry = 4)
     return submitResult;
 }
 
+function getReviewAttemptIdFromContext() {
+    const queryAttemptId = Number(urlParams.get('attemptId'));
+    if (Number.isFinite(queryAttemptId) && queryAttemptId > 0) return queryAttemptId;
+
+    const lastAttemptId = Number(localStorage.getItem('lastResultAttemptId'));
+    if (Number.isFinite(lastAttemptId) && lastAttemptId > 0) return lastAttemptId;
+
+    return null;
+}
+
+function formatDurationHhMmSs(totalSeconds) {
+    const sec = Number(totalSeconds);
+    if (!Number.isFinite(sec) || sec < 0) return '00:00:00';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.floor(sec % 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function normalizeReviewAnswer(value) {
+    return String(value == null ? '' : value).trim().toUpperCase();
+}
+
+function buildReviewQuestionMap(result) {
+    const map = new Map();
+    const blocks = Array.isArray(result?.passages)
+        ? result.passages
+        : (Array.isArray(result?.parts) ? result.parts : []);
+
+    blocks.forEach((block) => {
+        (block?.questions || []).forEach((question) => {
+            const qNum = Number(question?.questionNumber);
+            if (!Number.isFinite(qNum) || qNum <= 0) return;
+            map.set(qNum, question);
+        });
+    });
+
+    return map;
+}
+
+function normalizeAnswerForComparison(value) {
+    const raw = normalizeReviewAnswer(value);
+    const letterMatch = raw.match(/^([A-Z])(?:[\s.)]|$)/);
+    if (letterMatch) return letterMatch[1];
+    return raw;
+}
+
+function extractQuotedAnswerFromExplanation(explanation) {
+    const text = String(explanation || '');
+    if (!text) return '';
+
+    const patterns = [
+        /đáp án đúng(?:\s*là)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i,
+        /correct answer(?:\s*is)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i,
+        /\b(?:đáp án|answer)\b[^\n]*?["“']([^"”']{1,80})["”']/i
+    ];
+
+    for (const regex of patterns) {
+        const matched = text.match(regex);
+        const candidate = String(matched?.[1] || '').trim();
+        if (candidate) return candidate;
+    }
+
+    return '';
+}
+
+function resolveCorrectAnswerForReview(resultQuestion) {
+    const direct = String(resultQuestion?.correctAnswer || '').trim();
+    if (direct) return direct;
+
+    const choices = Array.isArray(resultQuestion?.choices) ? resultQuestion.choices : [];
+    const correctChoice = choices.find(choice => choice?.isCorrect === true);
+    if (correctChoice) {
+        const label = String(correctChoice.label || '').trim();
+        const text = String(correctChoice.text || '').trim();
+        if (label && text && label.toUpperCase() !== text.toUpperCase()) {
+            return `${label}. ${text}`;
+        }
+        return label || text;
+    }
+
+    return extractQuotedAnswerFromExplanation(resultQuestion?.explanation);
+}
+
+function isFillLikeQuestionType(questionType) {
+    const t = String(questionType || '').toLowerCase();
+    return t.includes('completion') || t.includes('fill') || t.includes('sentence') || t.includes('table') || t.includes('summary');
+}
+
+function getReviewQuestionContainer(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return null;
+
+    const card = document.getElementById(`qi${qNum}`);
+    if (card) return card;
+
+    const input = document.getElementById(`q${qNum}`);
+    if (input) {
+        return input.closest('.fill-line') || input.closest('.qinp-wrap') || input.parentElement;
+    }
+
+    const badge = document.getElementById(`b${qNum}`);
+    if (badge) {
+        return badge.closest('.fill-line') || badge.parentElement;
+    }
+
+    return null;
+}
+
+function findReviewQuestionOrderIndex(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return -1;
+    return reviewQuestionOrder.findIndex(item => item === qNum);
+}
+
+function getQuestionStatusClass(resultQuestion) {
+    if (!resultQuestion) return 'review-skipped';
+    if (resultQuestion.isSkipped) return 'review-skipped';
+    return resultQuestion.isCorrect ? 'review-correct' : 'review-wrong';
+}
+
+function getQuestionStatusLabel(resultQuestion) {
+    if (!resultQuestion) return 'Bỏ qua';
+    if (resultQuestion.isSkipped) return 'Bỏ qua';
+    return resultQuestion.isCorrect ? 'Đúng' : 'Sai';
+}
+
+function clearActivePassageFocus() {
+    if (!activeReviewPassageFocus) return;
+    const parent = activeReviewPassageFocus.parentNode;
+    if (!parent) {
+        activeReviewPassageFocus = null;
+        return;
+    }
+    while (activeReviewPassageFocus.firstChild) {
+        parent.insertBefore(activeReviewPassageFocus.firstChild, activeReviewPassageFocus);
+    }
+    parent.removeChild(activeReviewPassageFocus);
+    activeReviewPassageFocus = null;
+}
+
+function collectReviewKeywords(question) {
+    const bucket = [];
+    const explanation = String(question?.explanation || '');
+
+    const quoteRegex = /["'“”]([^"'“”]{4,120})["'“”]/g;
+    let match;
+    while ((match = quoteRegex.exec(explanation)) !== null) {
+        const raw = String(match[1] || '').trim();
+        if (raw.length >= 4) bucket.push(raw);
+    }
+
+    const fromQuestion = String(question?.questionText || '')
+        .replace(/<[^>]*>/g, ' ')
+        .split(/[^\p{L}\p{N}]+/u)
+        .map(w => w.trim())
+        .filter(w => w.length >= 4);
+
+    bucket.push(...fromQuestion.slice(0, 12));
+
+    const unique = [];
+    const seen = new Set();
+    bucket.forEach((item) => {
+        const normalized = item.toLowerCase();
+        if (seen.has(normalized)) return;
+        seen.add(normalized);
+        unique.push(item);
+    });
+
+    return unique.slice(0, 12);
+}
+
+function tokenizeForReviewHighlight(text, minLength = 4) {
+    return String(text || '')
+        .toLowerCase()
+        .replace(/<[^>]*>/g, ' ')
+        .split(/[^\p{L}\p{N}]+/u)
+        .map((item) => item.trim())
+        .filter((item) => item.length >= minLength && !REVIEW_HIGHLIGHT_STOPWORDS.has(item));
+}
+
+function pushHighlightCandidate(candidates, seen, text, weight) {
+    const raw = String(text || '').trim();
+    if (raw.length < 3) return;
+
+    const normalized = raw.toLowerCase();
+    if (seen.has(normalized)) return;
+
+    seen.add(normalized);
+    candidates.push({ text: raw, normalized, weight: Number(weight) || 0 });
+}
+
+function buildPassageHighlightCandidates(resultQuestion) {
+    const candidates = [];
+    const seen = new Set();
+
+    const correctAnswerRaw = String(resolveCorrectAnswerForReview(resultQuestion) || '').trim();
+    const correctAnswerText = correctAnswerRaw.replace(/^[A-Z](?:\s*[.):-]\s*|\s+)/, '').trim();
+    if (correctAnswerText) {
+        pushHighlightCandidate(candidates, seen, correctAnswerText, 34);
+        tokenizeForReviewHighlight(correctAnswerText, 4)
+            .slice(0, 8)
+            .forEach((token) => pushHighlightCandidate(candidates, seen, token, 18));
+    }
+    if (correctAnswerRaw && correctAnswerRaw.toLowerCase() !== correctAnswerText.toLowerCase()) {
+        pushHighlightCandidate(candidates, seen, correctAnswerRaw, 20);
+    }
+
+    const explanation = String(resultQuestion?.explanation || '');
+    const quoteRegex = /["'“”]([^"'“”]{4,140})["'“”]/g;
+    let match;
+    while ((match = quoteRegex.exec(explanation)) !== null) {
+        const quote = String(match[1] || '').trim();
+        if (!quote) continue;
+        pushHighlightCandidate(candidates, seen, quote, 26);
+        tokenizeForReviewHighlight(quote, 4)
+            .slice(0, 6)
+            .forEach((token) => pushHighlightCandidate(candidates, seen, token, 14));
+    }
+
+    tokenizeForReviewHighlight(resultQuestion?.questionText, 5)
+        .slice(0, 14)
+        .forEach((token) => pushHighlightCandidate(candidates, seen, token, 11));
+
+    tokenizeForReviewHighlight(explanation, 5)
+        .slice(0, 10)
+        .forEach((token) => pushHighlightCandidate(candidates, seen, token, 8));
+
+    return candidates.slice(0, 32);
+}
+
+function getVisiblePassageRoots() {
+    const visiblePassageRoots = Array.from(document.querySelectorAll('#passagePanel [data-section]'))
+        .filter((el) => el.style.display !== 'none');
+    return visiblePassageRoots.length ? visiblePassageRoots : [document.getElementById('passageText')];
+}
+
+function isBoundaryCharForHighlight(charValue) {
+    return !charValue || /[^\p{L}\p{N}]/u.test(charValue);
+}
+
+function isKeywordBoundaryMatch(textLower, index, length) {
+    const prevChar = textLower[index - 1];
+    const nextChar = textLower[index + length];
+    return isBoundaryCharForHighlight(prevChar) && isBoundaryCharForHighlight(nextChar);
+}
+
+function computeContextSupportScore(contextLower, supportTerms, activeNeedle) {
+    let score = 0;
+    for (const term of supportTerms) {
+        if (!term || term === activeNeedle) continue;
+        if (contextLower.includes(term)) {
+            score += term.length >= 6 ? 2 : 1;
+            if (score >= 14) break;
+        }
+    }
+    return score;
+}
+
+function resolveSentenceLikeRange(text, matchStart, matchEnd) {
+    const source = String(text || '');
+    if (!source) return { start: matchStart, end: matchEnd };
+
+    const delimiters = new Set(['.', '!', '?', ';', '\n']);
+
+    let start = matchStart;
+    while (start > 0 && !delimiters.has(source[start - 1])) start--;
+
+    let end = matchEnd;
+    while (end < source.length && !delimiters.has(source[end])) end++;
+    if (end < source.length) end++;
+
+    while (start < matchStart && /\s/.test(source[start])) start++;
+    while (end > matchEnd && /\s/.test(source[end - 1])) end--;
+
+    const length = end - start;
+    if (length < 18 || length > 280) {
+        return { start: matchStart, end: matchEnd };
+    }
+
+    return { start, end };
+}
+
+function highlightTextNodeRange(node, start, end) {
+    if (!node) return null;
+    const source = String(node.textContent || '');
+    if (!source) return null;
+
+    const safeStart = Math.max(0, Math.min(start, source.length - 1));
+    const safeEnd = Math.max(safeStart + 1, Math.min(end, source.length));
+    if (safeStart >= safeEnd) return null;
+
+    const range = document.createRange();
+    range.setStart(node, safeStart);
+    range.setEnd(node, safeEnd);
+
+    const marker = document.createElement('mark');
+    marker.className = 'review-focus-highlight';
+    try {
+        range.surroundContents(marker);
+    } catch (_) {
+        const fragment = range.extractContents();
+        marker.appendChild(fragment);
+        range.insertNode(marker);
+    }
+
+    return marker;
+}
+
+function findAndHighlightPassageForQuestion(resultQuestion) {
+    const roots = getVisiblePassageRoots();
+    const candidates = buildPassageHighlightCandidates(resultQuestion);
+    if (!candidates.length) return false;
+
+    const supportTerms = Array.from(new Set(
+        candidates.flatMap((candidate) => tokenizeForReviewHighlight(candidate.text, 4))
+    )).slice(0, 20);
+
+    let best = null;
+
+    for (const root of roots) {
+        if (!root) continue;
+
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const text = String(node?.textContent || '').trim();
+                if (!text) return NodeFilter.FILTER_REJECT;
+                if (node.parentElement?.closest('.review-focus-highlight')) return NodeFilter.FILTER_REJECT;
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        });
+
+        let current;
+        while ((current = walker.nextNode())) {
+            const source = String(current.textContent || '');
+            const sourceLower = source.toLowerCase();
+
+            for (const candidate of candidates) {
+                const needle = candidate.normalized;
+                if (needle.length < 3) continue;
+
+                let searchFrom = 0;
+                while (searchFrom < sourceLower.length) {
+                    const index = sourceLower.indexOf(needle, searchFrom);
+                    if (index === -1) break;
+                    searchFrom = index + Math.max(1, needle.length);
+
+                    if (!isKeywordBoundaryMatch(sourceLower, index, needle.length)) continue;
+
+                    const contextStart = Math.max(0, index - 120);
+                    const contextEnd = Math.min(sourceLower.length, index + needle.length + 120);
+                    const contextLower = sourceLower.slice(contextStart, contextEnd);
+
+                    let score = candidate.weight;
+                    score += Math.min(14, computeContextSupportScore(contextLower, supportTerms, needle));
+                    score += Math.min(8, Math.floor(needle.length / 6));
+                    if (needle.includes(' ')) score += 4;
+                    if (needle.length <= 4) score -= 2;
+
+                    if (!best || score > best.score) {
+                        best = {
+                            node: current,
+                            text: source,
+                            start: index,
+                            end: index + needle.length,
+                            score
+                        };
+                    }
+                }
+            }
+        }
+    }
+
+    if (!best) return false;
+
+    const expandedRange = resolveSentenceLikeRange(best.text, best.start, best.end);
+    const marker = highlightTextNodeRange(best.node, expandedRange.start, expandedRange.end)
+        || highlightTextNodeRange(best.node, best.start, best.end);
+    if (!marker) return false;
+
+    activeReviewPassageFocus = marker;
+    marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return true;
+}
+
+function findAndHighlightPassageKeyword(keyword) {
+    const key = String(keyword || '').trim();
+    if (key.length < 3) return false;
+
+    const roots = getVisiblePassageRoots();
+
+    const needle = key.toLowerCase();
+
+    for (const root of roots) {
+        if (!root) continue;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const text = String(node?.textContent || '').trim();
+                if (!text) return NodeFilter.FILTER_REJECT;
+                if (node.parentElement?.closest('.review-focus-highlight')) return NodeFilter.FILTER_REJECT;
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        });
+
+        let current;
+        while ((current = walker.nextNode())) {
+            const source = String(current.textContent || '');
+            const index = source.toLowerCase().indexOf(needle);
+            if (index === -1) continue;
+
+            const range = document.createRange();
+            range.setStart(current, index);
+            range.setEnd(current, index + key.length);
+            const marker = document.createElement('mark');
+            marker.className = 'review-focus-highlight';
+            try {
+                range.surroundContents(marker);
+            } catch (_) {
+                const fragment = range.extractContents();
+                marker.appendChild(fragment);
+                range.insertNode(marker);
+            }
+            activeReviewPassageFocus = marker;
+            marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function jumpToPassageForQuestion(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+
+    if (!document.body.classList.contains('real-mode')) {
+        const parts = getPracticeParts();
+        const targetPartIdx = parts.findIndex(p => qNum >= p.from && qNum <= p.to);
+        if (targetPartIdx >= 0 && targetPartIdx !== currentNavPart) {
+            switchPracticePart(targetPartIdx);
+        }
+    }
+
+    clearActivePassageFocus();
+    const resultQuestion = reviewQuestionMap.get(qNum);
+    const found = findAndHighlightPassageForQuestion(resultQuestion)
+        || collectReviewKeywords(resultQuestion).some((keyword) => findAndHighlightPassageKeyword(keyword));
+
+    if (!found) {
+        const passageText = document.getElementById('passageText');
+        if (passageText) passageText.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function closeReviewDetailPanel() {
+    const panel = document.getElementById('reviewDetailPanel');
+    if (panel) panel.remove();
+}
+
+function ensureReviewDetailPanel() {
+    const qPanel = document.querySelector('.qpanel');
+    const qScroll = document.getElementById('qScroll');
+    const host = qPanel || qScroll;
+    if (!host) return null;
+
+    let panel = document.getElementById('reviewDetailPanel');
+    if (panel) return panel;
+
+    panel = document.createElement('div');
+    panel.id = 'reviewDetailPanel';
+    panel.className = 'review-detail-panel';
+    panel.innerHTML = `
+        <div class="review-detail-head">
+            <strong id="reviewDetailTitle">Giải thích đáp án</strong>
+            <div class="review-detail-actions">
+                <button type="button" class="review-locate-btn" id="reviewLocateBtn">Xem vị trí</button>
+                <button type="button" class="review-close-btn" id="reviewCloseBtn" title="Đóng" aria-label="Đóng"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="review-detail-meta" id="reviewDetailMeta">Chọn một câu hỏi để xem chi tiết.</div>
+        <div class="review-detail-body" id="reviewDetailBody">Bấm vào câu hỏi ở phía trên để đối chiếu đáp án và giải thích.</div>
+    `;
+
+    host.appendChild(panel);
+
+    const locateBtn = panel.querySelector('#reviewLocateBtn');
+    if (locateBtn) {
+        locateBtn.addEventListener('click', () => {
+            if (!Number.isFinite(activeReviewQuestion) || activeReviewQuestion <= 0) return;
+            jumpToPassageForQuestion(activeReviewQuestion);
+        });
+    }
+
+    const closeBtn = panel.querySelector('#reviewCloseBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeReviewDetailPanel());
+    }
+
+    return panel;
+}
+
+function renderReviewKeywordList(resultQuestion) {
+    const keywords = collectReviewKeywords(resultQuestion).slice(0, 6);
+    if (!keywords.length) {
+        return '<span class="review-keyword-chip">(Không có keyword nổi bật)</span>';
+    }
+    return keywords.map((keyword) => `<span class="review-keyword-chip">${eh(keyword)}</span>`).join('');
+}
+
+function ensureReviewOpenButton(questionContainer, questionNumber) {
+    if (!questionContainer) return;
+
+    let button = questionContainer.querySelector('.review-open-detail-btn');
+    if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'review-open-detail-btn';
+        button.innerHTML = '<i class="bi bi-journal-text"></i>';
+        questionContainer.appendChild(button);
+    }
+
+    const qNum = Number(questionNumber);
+    const title = `Xem giải thích câu ${qNum}`;
+    button.setAttribute('title', title);
+    button.setAttribute('aria-label', title);
+
+    if (!button.dataset.bound) {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            showReviewDetail(qNum, { highlight: true });
+        });
+        button.dataset.bound = 'true';
+    }
+}
+
+function showReviewDetail(questionNumber, options = {}) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+
+    const detailPanel = ensureReviewDetailPanel();
+    if (!detailPanel) return;
+
+    const resultQuestion = reviewQuestionMap.get(qNum);
+    if (!resultQuestion) return;
+
+    activeReviewQuestion = qNum;
+
+    document.querySelectorAll('.review-active').forEach((el) => el.classList.remove('review-active'));
+    const activeQuestionEl = getReviewQuestionContainer(qNum);
+    if (activeQuestionEl) activeQuestionEl.classList.add('review-active');
+
+    const titleEl = document.getElementById('reviewDetailTitle');
+    const metaEl = document.getElementById('reviewDetailMeta');
+    const bodyEl = document.getElementById('reviewDetailBody');
+    if (!titleEl || !metaEl || !bodyEl) return;
+
+    titleEl.textContent = `Câu ${qNum} - Giải thích đáp án`;
+
+    const userAnswer = String(resultQuestion.userAnswer || '').trim() || '(Bỏ qua)';
+    const correctAnswer = resolveCorrectAnswerForReview(resultQuestion) || 'Chưa cập nhật đáp án';
+    const statusLabel = getQuestionStatusLabel(resultQuestion);
+    const questionType = String(resultQuestion.questionType || 'Other');
+    const questionText = String(resultQuestion.questionText || '(Không có nội dung câu hỏi)');
+
+    metaEl.innerHTML = `
+        <span class="review-state ${getQuestionStatusClass(resultQuestion)}">${statusLabel}</span>
+        <span class="review-meta-chip">Loại câu: <strong>${eh(questionType)}</strong></span>
+        <span class="review-meta-chip">Bạn chọn: <strong>${eh(userAnswer)}</strong></span>
+        <span class="review-meta-chip review-meta-chip-correct">Đáp án đúng: <strong>${eh(correctAnswer)}</strong></span>
+    `;
+
+    const explanation = String(resultQuestion.explanation || 'Chưa có giải thích cho câu hỏi này.').trim();
+    bodyEl.innerHTML = `
+        <div class="review-step">
+            <div class="review-step-title">Bước 1: Khoanh vùng từ khóa</div>
+            <div class="review-step-keywords">${renderReviewKeywordList(resultQuestion)}</div>
+        </div>
+        <div class="review-step">
+            <div class="review-step-title">Bước 2: Đối chiếu lời giải</div>
+            <div class="review-step-content">${eh(explanation).replace(/\n/g, '<br>')}</div>
+        </div>
+        <div class="review-step">
+            <div class="review-step-title">Bước 3: Xem lại câu gốc</div>
+            <div class="review-step-content">${eh(questionText)}</div>
+        </div>
+    `;
+
+    if (options.highlight !== false) {
+        jumpToPassageForQuestion(qNum);
+    }
+}
+
+function addReviewCorrectHint(questionNumber, anchorElement, answerText) {
+    if (!anchorElement) return;
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+
+    const hintId = `review-hint-${qNum}`;
+    let hint = document.getElementById(hintId);
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = hintId;
+        hint.className = 'review-correct-hint';
+        anchorElement.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent = `Đáp án đúng: ${answerText || 'Chưa cập nhật đáp án'}`;
+}
+
+function decorateReviewQuestion(questionNumber, resultQuestion) {
+    const qNum = Number(questionNumber);
+    const questionContainer = getReviewQuestionContainer(qNum);
+    if (!questionContainer) return;
+
+    const statusClass = getQuestionStatusClass(resultQuestion);
+    const correctAnswerText = resolveCorrectAnswerForReview(resultQuestion);
+    const correctNormalized = normalizeAnswerForComparison(correctAnswerText);
+    const userNormalized = normalizeAnswerForComparison(resultQuestion?.userAnswer);
+
+    questionContainer.classList.add('review-question', statusClass);
+    ensureReviewOpenButton(questionContainer, qNum);
+
+    questionContainer.querySelectorAll('.ropt input[type="radio"]').forEach((inputEl) => {
+        inputEl.disabled = true;
+        const optionValue = normalizeAnswerForComparison(inputEl.value);
+        if (optionValue && optionValue === userNormalized) {
+            inputEl.checked = true;
+        }
+
+        const optionEl = inputEl.closest('.ropt');
+        if (!optionEl) return;
+        if (optionValue && optionValue === correctNormalized) {
+            optionEl.classList.add('review-correct-option');
+        }
+        if (!resultQuestion?.isCorrect && userNormalized && optionValue === userNormalized) {
+            optionEl.classList.add('review-wrong-option');
+        }
+    });
+
+    const directInput = document.getElementById(`q${qNum}`);
+    if (directInput) {
+        directInput.disabled = true;
+        directInput.classList.add('review-answer-input');
+        if (resultQuestion?.isSkipped) directInput.classList.add('review-skipped-field');
+        else if (resultQuestion?.isCorrect) directInput.classList.add('review-correct-field');
+        else directInput.classList.add('review-wrong-field');
+    }
+
+    const slot = document.getElementById(`ms${qNum}`);
+    if (slot) slot.disabled = true;
+
+    questionContainer.querySelectorAll('.match-chip').forEach((chip) => {
+        chip.disabled = true;
+    });
+
+    const shouldShowHint = directInput
+        || isFillLikeQuestionType(resultQuestion?.questionType)
+        || resultQuestion?.isSkipped
+        || !resultQuestion?.isCorrect;
+
+    if (shouldShowHint) {
+        addReviewCorrectHint(qNum, directInput || questionContainer, correctAnswerText);
+    }
+
+    const navButton = document.getElementById(`nb${qNum}`);
+    if (navButton) {
+        navButton.classList.add(statusClass);
+    }
+}
+
+function goToPracticeFromReview() {
+    if (reviewResultData?.examId) {
+        window.location.href = `reading.html?examId=${reviewResultData.examId}&mode=practice`;
+        return;
+    }
+    window.location.href = 'practice.html?skill=reading';
+}
+
+function applyReviewMode(result) {
+    if (!hasDetailedResultData(result)) {
+        console.warn('Thiếu dữ liệu chi tiết để bật chế độ review.');
+        return;
+    }
+
+    reviewResultData = result;
+    reviewQuestionMap = buildReviewQuestionMap(result);
+
+    const examTitle = result?.examTitle || examTitleFromContext || cfg.label;
+    const titleEl = document.querySelector('.exam-title');
+    if (titleEl) titleEl.textContent = examTitle;
+
+    const totalQuestions = Number(result?.totalQuestions || TOTAL || reviewQuestionMap.size || 0);
+    const totalCorrect = Number(result?.totalCorrect || 0);
+
+    const snInfo = document.querySelector('.sn-info');
+    if (snInfo) {
+        snInfo.innerHTML = `Đối chiếu kết quả &nbsp;|&nbsp; <strong>${totalCorrect}/${totalQuestions}</strong> câu đúng`;
+    }
+
+    const timerEl = document.getElementById('timer');
+    if (timerEl) {
+        timerEl.textContent = formatDurationHhMmSs(result?.timeSpent);
+    }
+
+    const doneBtn = document.querySelector('.btn-done');
+    if (doneBtn) {
+        doneBtn.textContent = 'Làm bài khác';
+        doneBtn.onclick = () => goToPracticeFromReview();
+    }
+
+    reviewQuestionMap.forEach((resultQuestion, qNum) => {
+        const userAnswer = String(resultQuestion?.userAnswer || '').trim();
+        if (userAnswer) {
+            pa(qNum, userAnswer);
+        }
+        decorateReviewQuestion(qNum, resultQuestion);
+    });
+
+    const sortedQuestionNumbers = Array.from(reviewQuestionMap.keys()).sort((a, b) => a - b);
+    reviewQuestionOrder = sortedQuestionNumbers.slice();
+    const firstWrong = sortedQuestionNumbers.find((qNum) => {
+        const question = reviewQuestionMap.get(qNum);
+        return question && !question.isSkipped && !question.isCorrect;
+    });
+    const firstQuestion = firstWrong || sortedQuestionNumbers[0];
+
+    if (Number.isFinite(firstQuestion) && firstQuestion > 0) {
+        goQ(firstQuestion);
+    }
+}
+
 // Vocab Constants
 const VOCAB_STORAGE_KEY = 'aimhigh_vocab';
 const VOCAB_GROUPS_KEY = 'aimhigh_vocab_groups';
@@ -247,7 +991,9 @@ let selectedWord = '';
 
 // ─── BOOTSTRAP ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-    if (examModeFromContext === 'real') {
+    if (isReviewMode) {
+        document.body.classList.add('practice-mode', 'review-mode');
+    } else if (examModeFromContext === 'real') {
         document.body.classList.add('real-mode');
     } else {
         document.body.classList.add('practice-mode');
@@ -268,16 +1014,37 @@ async function loadExam() {
     }
 
     // --- Khởi tạo phiên thi (Attempt) ---
-    try {
-        const examMode = examModeFromContext;
-        const attemptRes = await startAttempt(examId, examMode);
-        const attemptData = attemptRes.data || attemptRes;
-        attemptId = attemptData.id;
-        saveAttemptContext(attemptId);
-        console.log('Phiên thi đã khởi tạo. AttemptId:', attemptId);
-    } catch (err) {
-        console.warn('Không thể tạo phiên thi (có thể đang có phiên chưa hoàn thành):', err.message);
-        attemptId = await ensureAttemptIdReady();
+    if (isReviewMode) {
+        attemptId = getReviewAttemptIdFromContext();
+        if (!attemptId) {
+            document.getElementById('qScroll').innerHTML =
+                '<p style="padding:30px;color:#ef4444;">Thiếu attemptId để mở chế độ đối chiếu kết quả.</p>';
+            return;
+        }
+
+        try {
+            reviewResultData = await resolveDetailedResult(attemptId, null, 5);
+            if (!hasDetailedResultData(reviewResultData)) {
+                const fallback = JSON.parse(localStorage.getItem('aimhigh_lastResult') || 'null');
+                if (Number(fallback?.attemptId) === attemptId && hasDetailedResultData(fallback)) {
+                    reviewResultData = fallback;
+                }
+            }
+        } catch (err) {
+            console.warn('Không thể tải kết quả chi tiết cho chế độ review:', err?.message || err);
+        }
+    } else {
+        try {
+            const examMode = examModeFromContext;
+            const attemptRes = await startAttempt(examId, examMode);
+            const attemptData = attemptRes.data || attemptRes;
+            attemptId = attemptData.id;
+            saveAttemptContext(attemptId);
+            console.log('Phiên thi đã khởi tạo. AttemptId:', attemptId);
+        } catch (err) {
+            console.warn('Không thể tạo phiên thi (có thể đang có phiên chưa hoàn thành):', err.message);
+            attemptId = await ensureAttemptIdReady();
+        }
     }
 
     // ── Build config theo section được chọn ──────────────────────────────────
@@ -304,7 +1071,10 @@ async function loadExam() {
 
     // ── Mode ─────────────────────────────────────────────────────────────────
     const examMode = examModeFromContext;
-    if (examMode === 'real') {
+    if (isReviewMode) {
+        buildNav();
+        applyReviewMode(reviewResultData);
+    } else if (examMode === 'real') {
         document.body.classList.add('real-mode');
         initRealMode();
     } else {
@@ -313,13 +1083,17 @@ async function loadExam() {
     }
 
     // ── Auto-save progress mỗi 60 giây ───────────────────────────────────
-    startAutoSave();
+    if (!isReviewMode) {
+        startAutoSave();
 
-    // ── Khôi phục tiến độ nếu user F5 ────────────────────────────────────
-    await restoreProgress();
+        // ── Khôi phục tiến độ nếu user F5 ────────────────────────────────────
+        await restoreProgress();
+    }
 
     // ── Khôi phục ghi chú/highlight của attempt hiện tại ─────────────────
-    await restorePracticeAnnotations();
+    if (attemptId) {
+        await restorePracticeAnnotations();
+    }
 
     // Restore highlights cho từ đã lưu từ vựng
     await restoreHighlights();
@@ -1689,6 +2463,10 @@ document.addEventListener('mousedown',e=>{
 
 // ─── SUBMIT ───────────────────────────────────────────────────────────────────
 function submitTest(){
+    if (isReviewMode) {
+        goToPracticeFromReview();
+        return;
+    }
     const c=Object.values(ans).filter(a=>a&&a.trim()).length;
     document.getElementById('mA').textContent=c;
     document.getElementById('mU').textContent=TOTAL-c;
@@ -1697,6 +2475,7 @@ function submitTest(){
 }
 
 async function confirmSub(){
+    if (isReviewMode) return;
     clearInterval(timerInt);
     if (autoSaveInt) clearInterval(autoSaveInt);
     
@@ -1753,6 +2532,7 @@ async function confirmSub(){
 
 // ─── AUTO SAVE PROGRESS ──────────────────────────────────────────────────────
 function startAutoSave() {
+    if (isReviewMode) return;
     if (!attemptId) return;
     
     autoSaveInt = setInterval(async () => {
@@ -1775,6 +2555,7 @@ function startAutoSave() {
 
 // ─── RESTORE PROGRESS (khi F5) ──────────────────────────────────────────────
 async function restoreProgress() {
+    if (isReviewMode) return;
     if (!attemptId) return;
     try {
         const res = await getAttemptProgress(attemptId);

@@ -6,7 +6,9 @@
 const urlParams = new URLSearchParams(window.location.search);
 const examSection = urlParams.get('section') || localStorage.getItem('currentExamSection') || 'full';
 const examId = parseInt(urlParams.get('examId') || localStorage.getItem('currentExamId') || '1', 10);
-const examModeFromContext = urlParams.get('mode') || localStorage.getItem('currentExamMode') || 'practice';
+const rawExamModeFromContext = String(urlParams.get('mode') || localStorage.getItem('currentExamMode') || 'practice').toLowerCase();
+const isReviewMode = rawExamModeFromContext === 'review';
+const examModeFromContext = rawExamModeFromContext === 'real' ? 'real' : 'practice';
 const examTitleFromContext = urlParams.get('title') || localStorage.getItem('currentExamTitle') || '';
 
 const SEC_CFG = {
@@ -28,6 +30,10 @@ let autoSaveInt = null; // Interval auto-save
 const ATTEMPT_META_KEY = 'currentAttemptMeta';
 let questionIdMap = new Map();
 let questionNumberMap = new Map();
+let reviewResultData = null;
+let reviewQuestionMap = new Map();
+let reviewQuestionOrder = [];
+let activeReviewQuestion = null;
 
 function rememberQuestionId(question) {
     const qNum = Number(question?.questionNumber);
@@ -153,6 +159,480 @@ function isRealMode() {
     return String(examModeFromContext || '').toLowerCase() === 'real';
 }
 
+function getReviewAttemptIdFromContext() {
+    const fromUrl = Number(urlParams.get('attemptId'));
+    if (Number.isFinite(fromUrl) && fromUrl > 0) return fromUrl;
+
+    const fromLocal = Number(localStorage.getItem('lastResultAttemptId'));
+    if (Number.isFinite(fromLocal) && fromLocal > 0) return fromLocal;
+
+    return null;
+}
+
+function formatDurationHhMmSs(totalSeconds) {
+    const seconds = Number(totalSeconds);
+    if (!Number.isFinite(seconds) || seconds < 0) return '00:00:00';
+    const safe = Math.floor(seconds);
+    const h = Math.floor(safe / 3600);
+    const m = Math.floor((safe % 3600) / 60);
+    const s = safe % 60;
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+function getResultBlocksForReview(result) {
+    if (!result || typeof result !== 'object') return [];
+    const blocks = [];
+
+    if (Array.isArray(result.sections)) blocks.push(...result.sections);
+    if (Array.isArray(result.parts)) blocks.push(...result.parts);
+    if (Array.isArray(result.passages)) blocks.push(...result.passages);
+
+    return blocks;
+}
+
+function hasDetailedResultData(result) {
+    const blocks = getResultBlocksForReview(result);
+    return blocks.some((block) => {
+        if (Array.isArray(block?.questions) && block.questions.length > 0) return true;
+        if (Array.isArray(block?.groups)) {
+            return block.groups.some((group) => Array.isArray(group?.questions) && group.questions.length > 0);
+        }
+        return false;
+    });
+}
+
+async function resolveDetailedResult(attemptIdFromContext) {
+    if (!Number.isFinite(attemptIdFromContext) || attemptIdFromContext <= 0) return null;
+    try {
+        const response = await getAttemptResult(attemptIdFromContext);
+        const result = response?.data || response;
+        return hasDetailedResultData(result) ? result : null;
+    } catch (error) {
+        console.warn('Không lấy được dữ liệu review Listening:', error?.message || error);
+        return null;
+    }
+}
+
+function normalizeReviewAnswer(value) {
+    return String(value == null ? '' : value).trim().toUpperCase();
+}
+
+function normalizeAnswerForComparison(value) {
+    const raw = normalizeReviewAnswer(value);
+    const letterMatch = raw.match(/^([A-Z])(?:[\s.)]|$)/);
+    if (letterMatch) return letterMatch[1];
+    return raw;
+}
+
+function extractQuotedAnswerFromExplanation(explanation) {
+    const text = String(explanation || '');
+    if (!text) return '';
+
+    const patterns = [
+        /đáp án đúng(?:\s*là)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i,
+        /correct answer(?:\s*is)?\s*[:：]\s*["“']?([^"”'\n.]+)["”']?/i,
+        /\b(?:đáp án|answer)\b[^\n]*?["“']([^"”']{1,80})["”']/i
+    ];
+
+    for (const regex of patterns) {
+        const matched = text.match(regex);
+        const candidate = String(matched?.[1] || '').trim();
+        if (candidate) return candidate;
+    }
+
+    return '';
+}
+
+function resolveCorrectAnswerForReview(resultQuestion) {
+    const direct = String(resultQuestion?.correctAnswer || '').trim();
+    if (direct) return direct;
+
+    const choices = Array.isArray(resultQuestion?.choices) ? resultQuestion.choices : [];
+    const correctChoice = choices.find(choice => choice?.isCorrect === true);
+    if (correctChoice) {
+        const label = String(correctChoice.label || '').trim();
+        const text = String(correctChoice.text || '').trim();
+        if (label && text && label.toUpperCase() !== text.toUpperCase()) {
+            return `${label}. ${text}`;
+        }
+        return label || text;
+    }
+
+    return extractQuotedAnswerFromExplanation(resultQuestion?.explanation);
+}
+
+function isFillLikeQuestionType(questionType) {
+    const t = String(questionType || '').toLowerCase();
+    return t.includes('completion') || t.includes('fill') || t.includes('sentence') || t.includes('table') || t.includes('summary');
+}
+
+function getReviewQuestionContainer(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return null;
+
+    const card = document.getElementById(`qi${qNum}`);
+    if (card) return card;
+
+    const input = document.getElementById(`q${qNum}`);
+    if (input) {
+        return input.closest('.fill-line') || input.closest('.qinp-wrap') || input.parentElement;
+    }
+
+    const badge = document.getElementById(`b${qNum}`);
+    if (badge) {
+        return badge.closest('.fill-line') || badge.parentElement;
+    }
+
+    return null;
+}
+
+function buildReviewQuestionMap(result) {
+    const map = new Map();
+    const blocks = getResultBlocksForReview(result);
+
+    blocks.forEach((block) => {
+        (block?.questions || []).forEach((question) => {
+            const qNum = Number(question?.questionNumber);
+            if (!Number.isFinite(qNum) || qNum <= 0) return;
+            map.set(qNum, question);
+        });
+
+        (block?.groups || []).forEach((group) => {
+            (group?.questions || []).forEach((question) => {
+                const qNum = Number(question?.questionNumber);
+                if (!Number.isFinite(qNum) || qNum <= 0) return;
+                map.set(qNum, question);
+            });
+        });
+    });
+
+    return map;
+}
+
+function getQuestionStatusClass(resultQuestion) {
+    if (!resultQuestion) return 'review-skipped';
+    if (resultQuestion.isSkipped) return 'review-skipped';
+    return resultQuestion.isCorrect ? 'review-correct' : 'review-wrong';
+}
+
+function getQuestionStatusLabel(resultQuestion) {
+    if (!resultQuestion) return 'Bỏ qua';
+    if (resultQuestion.isSkipped) return 'Bỏ qua';
+    return resultQuestion.isCorrect ? 'Đúng' : 'Sai';
+}
+
+function collectReviewKeywords(question) {
+    const bucket = [];
+    const explanation = String(question?.explanation || '');
+
+    const quoteRegex = /["'“”]([^"'“”]{4,120})["'“”]/g;
+    let match;
+    while ((match = quoteRegex.exec(explanation)) !== null) {
+        const raw = String(match[1] || '').trim();
+        if (raw.length >= 4) bucket.push(raw);
+    }
+
+    const fromQuestion = String(question?.questionText || '')
+        .replace(/<[^>]*>/g, ' ')
+        .split(/[^\p{L}\p{N}]+/u)
+        .map(w => w.trim())
+        .filter(w => w.length >= 4);
+
+    bucket.push(...fromQuestion.slice(0, 12));
+
+    const unique = [];
+    const seen = new Set();
+    bucket.forEach((item) => {
+        const normalized = item.toLowerCase();
+        if (seen.has(normalized)) return;
+        seen.add(normalized);
+        unique.push(item);
+    });
+
+    return unique.slice(0, 12);
+}
+
+function findReviewQuestionOrderIndex(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return -1;
+    return reviewQuestionOrder.findIndex(item => item === qNum);
+}
+
+function jumpToQuestionForReview(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+    goQ(qNum);
+}
+
+function closeReviewDetailPanel() {
+    const panel = document.getElementById('reviewDetailPanel');
+    if (panel) panel.remove();
+}
+
+function ensureReviewDetailPanel() {
+    const qPanel = document.querySelector('.qpanel');
+    const qScroll = document.getElementById('qScroll');
+    const host = qPanel || qScroll;
+    if (!host) return null;
+
+    let panel = document.getElementById('reviewDetailPanel');
+    if (panel) return panel;
+
+    panel = document.createElement('div');
+    panel.id = 'reviewDetailPanel';
+    panel.className = 'review-detail-panel';
+    panel.innerHTML = `
+        <div class="review-detail-head">
+            <strong id="reviewDetailTitle">Giải thích đáp án</strong>
+            <div class="review-detail-actions">
+                <button type="button" class="review-locate-btn" id="reviewLocateBtn">Đến câu</button>
+                <button type="button" class="review-close-btn" id="reviewCloseBtn" title="Đóng" aria-label="Đóng"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="review-detail-meta" id="reviewDetailMeta">Chọn một câu hỏi để xem chi tiết.</div>
+        <div class="review-detail-body" id="reviewDetailBody">Bấm vào câu hỏi ở phía trên để đối chiếu đáp án và giải thích.</div>
+    `;
+
+    host.appendChild(panel);
+
+    const locateBtn = panel.querySelector('#reviewLocateBtn');
+    if (locateBtn) {
+        locateBtn.addEventListener('click', () => {
+            if (!Number.isFinite(activeReviewQuestion) || activeReviewQuestion <= 0) return;
+            jumpToQuestionForReview(activeReviewQuestion);
+        });
+    }
+
+    const closeBtn = panel.querySelector('#reviewCloseBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeReviewDetailPanel());
+    }
+
+    return panel;
+}
+
+function renderReviewKeywordList(resultQuestion) {
+    const keywords = collectReviewKeywords(resultQuestion).slice(0, 6);
+    if (!keywords.length) {
+        return '<span class="review-keyword-chip">(Không có keyword nổi bật)</span>';
+    }
+    return keywords.map((keyword) => `<span class="review-keyword-chip">${eh(keyword)}</span>`).join('');
+}
+
+function ensureReviewOpenButton(questionContainer, questionNumber) {
+    if (!questionContainer) return;
+
+    let button = questionContainer.querySelector('.review-open-detail-btn');
+    if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'review-open-detail-btn';
+        button.innerHTML = '<i class="bi bi-journal-text"></i>';
+        questionContainer.appendChild(button);
+    }
+
+    const qNum = Number(questionNumber);
+    const title = `Xem giải thích câu ${qNum}`;
+    button.setAttribute('title', title);
+    button.setAttribute('aria-label', title);
+
+    if (!button.dataset.bound) {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            showReviewDetail(qNum);
+        });
+        button.dataset.bound = 'true';
+    }
+}
+
+function showReviewDetail(questionNumber) {
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+
+    const detailPanel = ensureReviewDetailPanel();
+    if (!detailPanel) return;
+
+    const resultQuestion = reviewQuestionMap.get(qNum);
+    if (!resultQuestion) return;
+
+    activeReviewQuestion = qNum;
+
+    document.querySelectorAll('.review-active').forEach((el) => el.classList.remove('review-active'));
+    const activeQuestionEl = getReviewQuestionContainer(qNum);
+    if (activeQuestionEl) activeQuestionEl.classList.add('review-active');
+
+    const titleEl = document.getElementById('reviewDetailTitle');
+    const metaEl = document.getElementById('reviewDetailMeta');
+    const bodyEl = document.getElementById('reviewDetailBody');
+    if (!titleEl || !metaEl || !bodyEl) return;
+
+    titleEl.textContent = `Câu ${qNum} - Giải thích đáp án`;
+
+    const userAnswer = String(resultQuestion.userAnswer || '').trim() || '(Bỏ qua)';
+    const correctAnswer = resolveCorrectAnswerForReview(resultQuestion) || 'Chưa cập nhật đáp án';
+    const statusLabel = getQuestionStatusLabel(resultQuestion);
+    const questionType = String(resultQuestion.questionType || 'Other');
+    const questionText = String(resultQuestion.questionText || '(Không có nội dung câu hỏi)');
+
+    metaEl.innerHTML = `
+        <span class="review-state ${getQuestionStatusClass(resultQuestion)}">${statusLabel}</span>
+        <span class="review-meta-chip">Loại câu: <strong>${eh(questionType)}</strong></span>
+        <span class="review-meta-chip">Bạn chọn: <strong>${eh(userAnswer)}</strong></span>
+        <span class="review-meta-chip review-meta-chip-correct">Đáp án đúng: <strong>${eh(correctAnswer)}</strong></span>
+    `;
+
+    const explanation = String(resultQuestion.explanation || 'Chưa có giải thích cho câu hỏi này.').trim();
+    bodyEl.innerHTML = `
+        <div class="review-step">
+            <div class="review-step-title">Bước 1: Khoanh vùng từ khóa</div>
+            <div class="review-step-keywords">${renderReviewKeywordList(resultQuestion)}</div>
+        </div>
+        <div class="review-step">
+            <div class="review-step-title">Bước 2: Đối chiếu lời giải</div>
+            <div class="review-step-content">${eh(explanation).replace(/\n/g, '<br>')}</div>
+        </div>
+        <div class="review-step">
+            <div class="review-step-title">Bước 3: Xem lại câu gốc</div>
+            <div class="review-step-content">${eh(questionText)}</div>
+        </div>
+    `;
+}
+
+function addReviewCorrectHint(questionNumber, anchorElement, answerText) {
+    if (!anchorElement) return;
+    const qNum = Number(questionNumber);
+    if (!Number.isFinite(qNum) || qNum <= 0) return;
+
+    const hintId = `review-hint-${qNum}`;
+    let hint = document.getElementById(hintId);
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = hintId;
+        hint.className = 'review-correct-hint';
+        anchorElement.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent = `Đáp án đúng: ${answerText || 'Chưa cập nhật đáp án'}`;
+}
+
+function decorateReviewQuestion(questionNumber, resultQuestion) {
+    const qNum = Number(questionNumber);
+    const questionContainer = getReviewQuestionContainer(qNum);
+    if (!questionContainer) return;
+
+    const statusClass = getQuestionStatusClass(resultQuestion);
+    const correctAnswerText = resolveCorrectAnswerForReview(resultQuestion);
+    const correctNormalized = normalizeAnswerForComparison(correctAnswerText);
+    const userNormalized = normalizeAnswerForComparison(resultQuestion?.userAnswer);
+
+    questionContainer.classList.add('review-question', statusClass);
+    ensureReviewOpenButton(questionContainer, qNum);
+
+    questionContainer.querySelectorAll('.ropt input[type="radio"]').forEach((inputEl) => {
+        inputEl.disabled = true;
+        const optionValue = normalizeAnswerForComparison(inputEl.value);
+        if (optionValue && optionValue === userNormalized) {
+            inputEl.checked = true;
+        }
+
+        const optionEl = inputEl.closest('.ropt');
+        if (!optionEl) return;
+        if (optionValue && optionValue === correctNormalized) {
+            optionEl.classList.add('review-correct-option');
+        }
+        if (!resultQuestion?.isCorrect && userNormalized && optionValue === userNormalized) {
+            optionEl.classList.add('review-wrong-option');
+        }
+    });
+
+    const directInput = document.getElementById(`q${qNum}`);
+    if (directInput) {
+        directInput.disabled = true;
+        directInput.classList.add('review-answer-input');
+        if (resultQuestion?.isSkipped) directInput.classList.add('review-skipped-field');
+        else if (resultQuestion?.isCorrect) directInput.classList.add('review-correct-field');
+        else directInput.classList.add('review-wrong-field');
+    }
+
+    const slot = document.getElementById(`ms${qNum}`);
+    if (slot) slot.disabled = true;
+
+    questionContainer.querySelectorAll('.match-chip').forEach((chip) => {
+        chip.disabled = true;
+    });
+
+    const shouldShowHint = directInput
+        || isFillLikeQuestionType(resultQuestion?.questionType)
+        || resultQuestion?.isSkipped
+        || !resultQuestion?.isCorrect;
+
+    if (shouldShowHint) {
+        addReviewCorrectHint(qNum, directInput || questionContainer, correctAnswerText);
+    }
+
+    const navButton = document.getElementById(`nb${qNum}`);
+    if (navButton) {
+        navButton.classList.add(statusClass);
+    }
+}
+
+function goToPracticeFromReview() {
+    if (reviewResultData?.examId) {
+        window.location.href = `listening.html?examId=${reviewResultData.examId}&mode=practice`;
+        return;
+    }
+    window.location.href = 'practice.html?skill=listening';
+}
+
+function applyReviewMode(result) {
+    if (!hasDetailedResultData(result)) {
+        console.warn('Thiếu dữ liệu chi tiết để bật chế độ review Listening.');
+        return;
+    }
+
+    reviewResultData = result;
+    reviewQuestionMap = buildReviewQuestionMap(result);
+    reviewQuestionOrder = Array.from(reviewQuestionMap.keys()).sort((a, b) => a - b);
+
+    const examTitle = result?.examTitle || examTitleFromContext || examData?.exam?.title || 'Listening Test';
+    const titleEl = document.getElementById('examTitle');
+    if (titleEl) titleEl.textContent = examTitle;
+
+    const totalQuestions = Number(result?.totalQuestions || TOTAL || reviewQuestionMap.size || 0);
+    const totalCorrect = Number(result?.totalCorrect || 0);
+    const snInfo = document.querySelector('.sn-info');
+    if (snInfo) {
+        snInfo.innerHTML = `Đối chiếu kết quả &nbsp;|&nbsp; <strong>${totalCorrect}/${totalQuestions}</strong> câu đúng`;
+    }
+
+    const timerEl = document.getElementById('timer');
+    if (timerEl) {
+        timerEl.textContent = formatDurationHhMmSs(result?.timeSpent);
+    }
+
+    const doneBtn = document.querySelector('.btn-done');
+    if (doneBtn) {
+        doneBtn.textContent = 'Làm bài khác';
+        doneBtn.onclick = () => goToPracticeFromReview();
+    }
+
+    reviewQuestionMap.forEach((resultQuestion, qNum) => {
+        const userAnswer = String(resultQuestion?.userAnswer || '').trim();
+        if (userAnswer) pa(qNum, userAnswer);
+        decorateReviewQuestion(qNum, resultQuestion);
+    });
+
+    const firstWrong = reviewQuestionOrder.find((qNum) => {
+        const question = reviewQuestionMap.get(qNum);
+        return question && !question.isSkipped && !question.isCorrect;
+    });
+    const firstQuestion = firstWrong || reviewQuestionOrder[0];
+
+    if (Number.isFinite(firstQuestion) && firstQuestion > 0) {
+        goQ(firstQuestion);
+    }
+}
+
 // Audio
 let audioElement = new Audio();
 const SPEEDS=[0.75,1,1.25,1.5,2]; let speedIdx=1;
@@ -161,7 +641,9 @@ let AUDIO_END = 1800;
 
 // ─── BOOTSTRAP ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-    if (examModeFromContext === 'real') {
+    if (isReviewMode) {
+        document.body.classList.add('practice-mode', 'review-mode');
+    } else if (examModeFromContext === 'real') {
         document.body.classList.add('real-mode');
     } else {
         document.body.classList.add('practice-mode');
@@ -182,21 +664,37 @@ async function loadExam() {
         return;
     }
 
-    // --- Khởi tạo phiên thi (Attempt) ---
-    try {
-        const examMode = examModeFromContext;
-        const attemptRes = await startAttempt(examId, examMode);
-        const attemptData = attemptRes.data || attemptRes;
-        attemptId = attemptData.id;
-        saveAttemptContext(attemptId);
-        console.log('Phiên thi Listening đã khởi tạo. AttemptId:', attemptId);
-    } catch (err) {
-        console.warn('Không thể tạo phiên thi:', err.message);
-        attemptId = getReusableAttemptId();
+    if (isReviewMode) {
+        attemptId = getReviewAttemptIdFromContext();
+        reviewResultData = await resolveDetailedResult(attemptId);
+        if (!reviewResultData) {
+            const fallback = JSON.parse(localStorage.getItem('aimhigh_lastResult') || 'null');
+            if (Number(fallback?.attemptId) === Number(attemptId) && hasDetailedResultData(fallback)) {
+                reviewResultData = fallback;
+            }
+        }
+        if (!reviewResultData) {
+            console.warn('Không tìm thấy dữ liệu chi tiết cho review Listening.');
+        }
+    } else {
+        // --- Khởi tạo phiên thi (Attempt) ---
+        try {
+            const examMode = examModeFromContext;
+            const attemptRes = await startAttempt(examId, examMode);
+            const attemptData = attemptRes.data || attemptRes;
+            attemptId = attemptData.id;
+            saveAttemptContext(attemptId);
+            console.log('Phiên thi Listening đã khởi tạo. AttemptId:', attemptId);
+        } catch (err) {
+            console.warn('Không thể tạo phiên thi:', err.message);
+            attemptId = getReusableAttemptId();
+        }
     }
 
     TOTAL    = isSingle ? (SEC_CFG[singleSec].to - SEC_CFG[singleSec].from + 1) : 40;
-    timeLeft = isRealMode() ? (isSingle ? SEC_CFG[singleSec].time : 30*60) : 0;
+    timeLeft = isReviewMode
+        ? 0
+        : (isRealMode() ? (isSingle ? SEC_CFG[singleSec].time : 30*60) : 0);
 
     renderQuestions();
 
@@ -204,22 +702,41 @@ async function loadExam() {
     updateAudioSrc();
 
     // UI
-    const title = examTitleFromContext ||
+    const title = reviewResultData?.examTitle || examTitleFromContext ||
         (isSingle ? `${examData.exam?.title} – ${SEC_CFG[singleSec].label}` : (examData.exam?.title || 'Listening Test'));
     document.getElementById('examTitle').textContent = title;
 
     const minStr = isSingle ? '8 phút' : '30 phút';
     const snInfo = document.querySelector('.sn-info');
-    if (snInfo) snInfo.innerHTML = `Đề: <strong>${title}</strong> &nbsp;|&nbsp; ${TOTAL} câu &nbsp;|&nbsp; ${minStr}`;
+    if (snInfo) {
+        if (isReviewMode && reviewResultData) {
+            const correct = Number(reviewResultData?.totalCorrect || 0);
+            const total = Number(reviewResultData?.totalQuestions || TOTAL || 0);
+            snInfo.innerHTML = `Đối chiếu kết quả &nbsp;|&nbsp; <strong>${correct}/${total}</strong> câu đúng`;
+        } else {
+            snInfo.innerHTML = `Đề: <strong>${title}</strong> &nbsp;|&nbsp; ${TOTAL} câu &nbsp;|&nbsp; ${minStr}`;
+        }
+    }
 
-    const h=Math.floor(timeLeft/3600), m=Math.floor((timeLeft%3600)/60), s=timeLeft%60;
-    document.getElementById('timer').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+    if (isReviewMode && reviewResultData) {
+        document.getElementById('timer').textContent = formatDurationHhMmSs(reviewResultData?.timeSpent);
+    } else {
+        const h=Math.floor(timeLeft/3600), m=Math.floor((timeLeft%3600)/60), s=timeLeft%60;
+        document.getElementById('timer').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+    }
 
     const mTotalEl=document.getElementById('mTotal'); if(mTotalEl) mTotalEl.textContent=TOTAL;
     const mUEl=document.getElementById('mU');         if(mUEl) mUEl.textContent=TOTAL;
 
-    const examMode = examModeFromContext;
-    if (examMode === 'real') {
+    if (isReviewMode) {
+        buildNav();
+        if (reviewResultData) {
+            applyReviewMode(reviewResultData);
+        }
+        return;
+    }
+
+    if (examModeFromContext === 'real') {
         initRealMode();
     } else {
         buildNav();
@@ -341,14 +858,25 @@ function renderQItem(q) {
       <div class="qi-head"><span class="qbadge">${qn}</span><span class="qtext">${eh(q.questionText||'')}</span></div>
       <div class="ropts">`;
     (q.choices||[]).forEach(c=>{
+                const display = formatChoiceDisplay(c);
         html+=`<label class="ropt">
           <input type="radio" name="q${qn}" value="${eh(c.label)}" onchange="pa(${qn},'${eh(c.label)}')">
           <span class="rcircle"></span>
-          <span class="rtext">${eh(c.label)}. ${eh(c.text)}</span>
+                    <span class="rtext">${eh(display)}</span>
         </label>`;
     });
     html+=`</div></div>`;
     return html;
+}
+
+function formatChoiceDisplay(choice) {
+        const label = String(choice?.label || '').trim();
+        const text = String(choice?.text || '').trim();
+
+        if (!label) return text;
+        if (!text) return label;
+        if (label.toUpperCase() === text.toUpperCase()) return text;
+        return `${label}. ${text}`;
 }
 
 function renderFillLine(q) {
@@ -754,6 +1282,10 @@ function toggleNote(){
 
 // ─── SUBMIT ───────────────────────────────────────────────────────────────────
 function submitTest(){
+    if (isReviewMode) {
+        goToPracticeFromReview();
+        return;
+    }
     const c=Object.values(ans).filter(a=>a&&a.trim()).length;
     document.getElementById('mA').textContent=c;
     document.getElementById('mU').textContent=TOTAL-c;
@@ -761,8 +1293,12 @@ function submitTest(){
     new bootstrap.Modal(document.getElementById('subModal')).show();
 }
 async function confirmSub(){
+    if (isReviewMode) return;
+
     clearInterval(timerInt);
-    clearInterval(audioInterval);
+    if (typeof audioInterval !== 'undefined') {
+        clearInterval(audioInterval);
+    }
     if (autoSaveInt) clearInterval(autoSaveInt);
 
     bootstrap.Modal.getInstance(document.getElementById('subModal')).hide();
@@ -811,6 +1347,7 @@ async function confirmSub(){
 
 // ─── AUTO SAVE PROGRESS ──────────────────────────────────────────────────────
 function startAutoSave() {
+    if (isReviewMode) return;
     if (!attemptId) return;
 
     autoSaveInt = setInterval(async () => {
@@ -831,6 +1368,7 @@ function startAutoSave() {
 
 // ─── RESTORE PROGRESS (khi F5) ──────────────────────────────────────────────
 async function restoreProgress() {
+    if (isReviewMode) return;
     if (!attemptId) return;
     try {
         const res = await getAttemptProgress(attemptId);
