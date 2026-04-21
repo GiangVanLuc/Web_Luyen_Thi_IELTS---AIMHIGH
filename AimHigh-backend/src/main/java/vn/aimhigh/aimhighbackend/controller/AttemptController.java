@@ -13,8 +13,8 @@ import vn.aimhigh.aimhighbackend.dto.response.AttemptResponse;
 import vn.aimhigh.aimhighbackend.dto.response.ProgressResponse;
 import vn.aimhigh.aimhighbackend.dto.response.ResultResponse;
 import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
-import vn.aimhigh.aimhighbackend.repository.UserRepository;
 import vn.aimhigh.aimhighbackend.service.AttemptService;
+import vn.aimhigh.aimhighbackend.service.UserService;
 
 import java.util.List;
 
@@ -24,13 +24,13 @@ import java.util.List;
 public class AttemptController {
 
     private final AttemptService attemptService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @PostMapping("/start")
     public ResponseEntity<ApiResponse<AttemptResponse>> startAttempt(
             @Valid @RequestBody StartAttemptRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(attemptService.startAttempt(request, userId)));
     }
 
@@ -39,7 +39,7 @@ public class AttemptController {
             @PathVariable Long id,
             @Valid @RequestBody SaveProgressRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         attemptService.saveProgress(id, request, userId);
         return ResponseEntity.ok(ApiResponse.success("Lưu tiến độ thành công"));
     }
@@ -48,7 +48,7 @@ public class AttemptController {
     public ResponseEntity<ApiResponse<List<ProgressResponse>>> getProgress(
             @PathVariable Long id,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(attemptService.getProgress(id, userId)));
     }
 
@@ -57,22 +57,7 @@ public class AttemptController {
             @PathVariable Long id,
             @Valid @RequestBody SubmitAttemptRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(attemptService.submitAttempt(id, request, userId)));
-    }
-
-    private Long requireUserId(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UnauthorizedException("Bạn cần đăng nhập để thực hiện thao tác này");
-        }
-
-        String email = authentication.getName();
-        if (email == null || email.isBlank()) {
-            throw new UnauthorizedException("Không xác định được người dùng từ token");
-        }
-
-        return userRepository.findByEmail(email)
-                .map(vn.aimhigh.aimhighbackend.model.User::getId)
-                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không hợp lệ"));
     }
 }

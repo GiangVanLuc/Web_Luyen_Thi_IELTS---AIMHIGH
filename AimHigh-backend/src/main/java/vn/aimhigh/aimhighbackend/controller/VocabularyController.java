@@ -18,7 +18,7 @@ import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyBatchResultResponse;
 import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyGroupResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
-import vn.aimhigh.aimhighbackend.repository.UserRepository;
+import vn.aimhigh.aimhighbackend.service.UserService;
 import vn.aimhigh.aimhighbackend.service.VocabularyService;
 
 import java.time.LocalDate;
@@ -30,13 +30,13 @@ import java.util.List;
 public class VocabularyController {
 
     private final VocabularyService vocabularyService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/vocabulary/lookup")
     public ResponseEntity<ApiResponse<VocabularyResponse>> lookup(
             @RequestParam String word,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(vocabularyService.lookup(word, userId)));
     }
 
@@ -44,7 +44,7 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<VocabularyResponse>> saveToVocabulary(
             @Valid @RequestBody SaveVocabularyRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         VocabularyResponse response = vocabularyService.saveToUserVocabulary(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Lưu từ vựng thành công"));
     }
@@ -62,7 +62,7 @@ public class VocabularyController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(vocabularyService.getUserVocabulary(
                 userId,
                 learned,
@@ -82,7 +82,7 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<String>> deleteUserVocabulary(
             @PathVariable Long id,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         vocabularyService.deleteUserVocabulary(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Xoá từ vựng đã lưu"));
     }
@@ -92,7 +92,7 @@ public class VocabularyController {
             @PathVariable Long id,
             @Valid @RequestBody UserVocabularyStatusUpdateRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         VocabularyResponse response = vocabularyService.updateUserVocabularyStatus(id, request.getLearnLevel(), userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật trạng thái thành công"));
     }
@@ -102,7 +102,7 @@ public class VocabularyController {
             @PathVariable Long id,
             @Valid @RequestBody UserVocabularyUpdateRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         VocabularyResponse response = vocabularyService.updateUserVocabulary(id, request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật từ vựng thành công"));
     }
@@ -111,7 +111,7 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchSaveUserVocabulary(
             @Valid @RequestBody UserVocabularyBatchSaveRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         UserVocabularyBatchResultResponse response = vocabularyService.batchSaveToUserVocabulary(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Lưu hàng loạt thành công"));
     }
@@ -120,7 +120,7 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchUpdateUserVocabularyStatus(
             @Valid @RequestBody UserVocabularyBatchStatusRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         UserVocabularyBatchResultResponse response = vocabularyService.batchUpdateStatus(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật trạng thái hàng loạt thành công"));
     }
@@ -129,14 +129,14 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<UserVocabularyBatchResultResponse>> batchDeleteUserVocabulary(
             @Valid @RequestBody UserVocabularyBatchDeleteRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         UserVocabularyBatchResultResponse response = vocabularyService.batchDelete(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Xoá hàng loạt thành công"));
     }
 
     @GetMapping("/user-vocabulary-groups")
     public ResponseEntity<ApiResponse<List<UserVocabularyGroupResponse>>> getUserVocabularyGroups(Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(vocabularyService.getUserVocabularyGroups(userId)));
     }
 
@@ -144,7 +144,7 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<UserVocabularyGroupResponse>> createUserVocabularyGroup(
             @Valid @RequestBody UserVocabularyGroupCreateRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         UserVocabularyGroupResponse response = vocabularyService.createUserVocabularyGroup(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Tạo nhóm từ vựng thành công"));
     }
@@ -154,7 +154,7 @@ public class VocabularyController {
             @PathVariable Long groupId,
             @Valid @RequestBody UserVocabularyGroupUpdateRequest request,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         UserVocabularyGroupResponse response = vocabularyService.renameUserVocabularyGroup(groupId, request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Đổi tên nhóm thành công"));
     }
@@ -163,23 +163,8 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<String>> deleteUserVocabularyGroup(
             @PathVariable Long groupId,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         vocabularyService.deleteUserVocabularyGroup(groupId, userId);
         return ResponseEntity.ok(ApiResponse.success("Xoá nhóm từ vựng thành công"));
-    }
-
-    private Long requireUserId(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UnauthorizedException("Bạn cần đăng nhập để thực hiện thao tác này");
-        }
-
-        String email = authentication.getName();
-        if (email == null || email.isBlank()) {
-            throw new UnauthorizedException("Không xác định được người dùng từ token");
-        }
-
-        return userRepository.findByEmail(email)
-                .map(vn.aimhigh.aimhighbackend.model.User::getId)
-                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không hợp lệ"));
     }
 }

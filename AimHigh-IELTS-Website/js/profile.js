@@ -198,7 +198,11 @@
         }
 
         if (el.navAvatar) {
-            el.navAvatar.textContent = getInitials(name);
+            if (imageSource) {
+                el.navAvatar.innerHTML = `<img src="${escapeHtml(imageSource)}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            } else {
+                el.navAvatar.textContent = getInitials(name);
+            }
         }
     }
 
@@ -365,11 +369,28 @@
         }
 
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
             state.localPrefs.localAvatarDataUrl = String(reader.result || '');
-            saveLocalPrefs(getCurrentEmail(), state.localPrefs);
             renderAvatar(getCurrentDisplayName(), state.serverProfile?.avatarUrl, state.localPrefs.localAvatarDataUrl);
-            showToast('Đã cập nhật ảnh đại diện (lưu trên trình duyệt hiện tại)', 'info');
+            
+            try {
+                if (typeof apiUploadAvatar === 'function' && state.backendAvailable) {
+                    showToast('Đang tải ảnh lên máy chủ...', 'info');
+                    const response = await apiUploadAvatar(file);
+                    const updated = response?.data || response;
+                    if (updated && updated.avatarUrl) {
+                        state.serverProfile.avatarUrl = updated.avatarUrl;
+                        syncCurrentUser(updated);
+                        if (el.avatarUrlField) el.avatarUrlField.value = updated.avatarUrl;
+                        showToast('Cập nhật ảnh đại diện Cloudinary thành công!', 'success');
+                    }
+                } else {
+                    saveLocalPrefs(getCurrentEmail(), state.localPrefs);
+                    showToast('Đã cập nhật ảnh đại diện (lưu cục bộ do đang mất kết nối)', 'info');
+                }
+            } catch (error) {
+                showToast(error.message || 'Lỗi khi tải ảnh lên máy chủ', 'danger');
+            }
         };
         reader.onerror = () => {
             showToast('Không đọc được ảnh đại diện', 'danger');

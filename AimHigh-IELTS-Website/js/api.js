@@ -242,6 +242,26 @@ async function updateProfile(userData) {
 }
 
 /**
+ * Tải lên ảnh đại diện Avatar
+ * @param {File} file
+ */
+async function apiUploadAvatar(file) {
+    const token = localStorage.getItem('aimhigh_token');
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${API_BASE}/users/avatar`, {
+        method: 'POST',
+        headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: formData
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || `Upload failed: HTTP ${response.status}`);
+    }
+    return response.json();
+}
+
+/**
  * Lấy thống kê dashboard
  */
 async function getDashboardStats() {

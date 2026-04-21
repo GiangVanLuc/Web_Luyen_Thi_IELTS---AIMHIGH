@@ -72,7 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (navAvatars.length && currentUser.name.trim()) {
             const parts = currentUser.name.trim().split(' ');
             const initials = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0][0];
-            navAvatars.forEach(el => el.textContent = initials.toUpperCase().slice(0, 2));
+            
+            navAvatars.forEach(el => {
+                if (currentUser.avatarUrl) {
+                    const safeUrl = String(currentUser.avatarUrl).replace(/"/g, '&quot;');
+                    el.innerHTML = `<img src="${safeUrl}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    el.textContent = initials.toUpperCase().slice(0, 2);
+                }
+            });
         }
     }
 });

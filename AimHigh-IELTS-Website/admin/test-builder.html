@@ -344,6 +344,8 @@
         // ===== Audio Upload =====
         const audioDropZone = document.getElementById('audioDropZone');
         const audioFileInput = document.getElementById('audioFileInput');
+        let selectedAudioFile = null;
+        let uploadedAudioUrl = '';
 
         audioDropZone.addEventListener('click', () => audioFileInput.click());
 
@@ -377,10 +379,14 @@
                 alert('File quá lớn. Tối đa 50MB.');
                 return;
             }
+
+            selectedAudioFile = file;
+            uploadedAudioUrl = '';
+
             const url = URL.createObjectURL(file);
             document.getElementById('audioPlayer').src = url;
             document.getElementById('audioFileName').textContent = file.name;
-            document.getElementById('audioFileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            document.getElementById('audioFileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB • Chưa tải lên cloud';
             document.getElementById('audioDropZone').style.display = 'none';
             document.getElementById('audioPreviewContainer').style.display = '';
         }
@@ -390,6 +396,35 @@
             document.getElementById('audioDropZone').style.display = '';
             document.getElementById('audioPreviewContainer').style.display = 'none';
             audioFileInput.value = '';
+            selectedAudioFile = null;
+            uploadedAudioUrl = '';
+        }
+
+        async function ensureAudioUploadedToCloud() {
+            if (contentTypeSelect.value !== 'audio') {
+                return null;
+            }
+
+            if (uploadedAudioUrl) {
+                return uploadedAudioUrl;
+            }
+
+            if (!selectedAudioFile) {
+                return null;
+            }
+
+            const result = await adminUploadMedia(selectedAudioFile, 'audio');
+            const payload = result?.data || result || {};
+            const url = payload?.url;
+
+            if (!url) {
+                throw new Error('Không nhận được URL audio sau khi upload lên Cloudflare R2.');
+            }
+
+            uploadedAudioUrl = url;
+            const sizeLabel = (selectedAudioFile.size / (1024 * 1024)).toFixed(2) + ' MB';
+            document.getElementById('audioFileSize').textContent = `${sizeLabel} • Đã tải lên cloud`;
+            return uploadedAudioUrl;
         }
 
         // ===== Question Builder =====
@@ -491,14 +526,28 @@
         }
 
         // ===== Save / Publish =====
-        document.getElementById('btnSaveDraft').addEventListener('click', () => {
+        document.getElementById('btnSaveDraft').addEventListener('click', async () => {
+            try {
+                await ensureAudioUploadedToCloud();
+            } catch (error) {
+                alert(`Upload audio thất bại: ${error.message || 'Unknown error'}`);
+                return;
+            }
+
             const data = collectTestData();
             data.status = 'draft';
             console.log('Save draft:', data);
             alert('Đã lưu nháp thành công!');
         });
 
-        document.getElementById('btnPublish').addEventListener('click', () => {
+        document.getElementById('btnPublish').addEventListener('click', async () => {
+            try {
+                await ensureAudioUploadedToCloud();
+            } catch (error) {
+                alert(`Upload audio thất bại: ${error.message || 'Unknown error'}`);
+                return;
+            }
+
             const data = collectTestData();
             if (!data.title || !data.skill) {
                 alert('Vui lòng nhập đầy đủ thông tin đề thi.');
@@ -540,6 +589,7 @@
                 duration: parseInt(document.getElementById('testDuration').value) || 0,
                 difficulty: document.getElementById('testDifficulty').value,
                 description: document.getElementById('testDesc').value,
+                audioUrl: uploadedAudioUrl || null,
                 passage: quill.root.innerHTML,
                 questions
             };

@@ -8,8 +8,8 @@ import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
 import vn.aimhigh.aimhighbackend.dto.response.AttemptResponse;
 import vn.aimhigh.aimhighbackend.dto.response.ResultResponse;
 import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
-import vn.aimhigh.aimhighbackend.repository.UserRepository;
 import vn.aimhigh.aimhighbackend.service.ResultService;
+import vn.aimhigh.aimhighbackend.service.UserService;
 
 import java.util.List;
 
@@ -19,34 +19,19 @@ import java.util.List;
 public class ResultController {
 
     private final ResultService resultService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/attempts/{id}/result")
     public ResponseEntity<ApiResponse<ResultResponse>> getResult(
             @PathVariable Long id,
             Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(resultService.getResult(id, userId)));
     }
 
     @GetMapping("/users/me/attempts")
     public ResponseEntity<ApiResponse<List<AttemptResponse>>> getMyAttempts(Authentication authentication) {
-        Long userId = requireUserId(authentication);
+        Long userId = userService.requireUser(authentication).getId();
         return ResponseEntity.ok(ApiResponse.success(resultService.getMyAttempts(userId)));
-    }
-
-    private Long requireUserId(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UnauthorizedException("Bạn cần đăng nhập để xem kết quả");
-        }
-
-        String email = authentication.getName();
-        if (email == null || email.isBlank()) {
-            throw new UnauthorizedException("Không xác định được người dùng từ token");
-        }
-
-        return userRepository.findByEmail(email)
-                .map(vn.aimhigh.aimhighbackend.model.User::getId)
-                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không hợp lệ"));
     }
 }
