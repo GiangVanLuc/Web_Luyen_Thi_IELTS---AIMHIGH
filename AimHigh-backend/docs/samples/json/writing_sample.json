@@ -1,0 +1,49 @@
+{
+  "exam": {
+    "title": "IELTS Writing Sample Test",
+    "skill": "WRITING",
+    "duration": 60,
+    "totalQuestions": 2,
+    "description": "Sample Writing test with Task 1 and Task 2 prompts."
+  },
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Writing Task 1",
+      "questionFrom": 1,
+      "questionTo": 1,
+      "groups": [
+        {
+          "groupTitle": "Task 1",
+          "instruction": "You should spend about 20 minutes on this task.",
+          "questions": [
+            {
+              "questionNumber": 1,
+              "prompt": "The table below shows the percentage of students choosing different university subjects in three years. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 2,
+      "label": "Writing Task 2",
+      "questionFrom": 2,
+      "questionTo": 2,
+      "groups": [
+        {
+          "groupTitle": "Task 2",
+          "instruction": "You should spend about 40 minutes on this task.",
+          "questions": [
+            {
+              "questionNumber": 2,
+              "topic": "Some people believe that technology has made communication between people less personal. Others think it has helped people communicate more effectively. Discuss both views and give your own opinion.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

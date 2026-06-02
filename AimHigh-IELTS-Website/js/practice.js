@@ -179,6 +179,9 @@ function initPracticeFilters() {
     ];
 
     applyFilterFunc = () => {
+        const grid = document.getElementById('readingCardGrid');
+        const filterEmpty = ensureFilterEmptyState(grid);
+
         // Active box bên sidebar — chỉ mở box đang active
         document.querySelectorAll('[data-subject-box]').forEach(box => {
             const isActive = !!currentSubject && box.dataset.subjectBox === currentSubject;
@@ -188,8 +191,9 @@ function initPracticeFilters() {
             if (body) body.style.display = isActive ? '' : 'none';
         });
 
-        const cards = document.querySelectorAll('.exercise-card');
+        const cards = Array.from(document.querySelectorAll('.exercise-card'));
         if (!cards.length) {
+            showFilterEmptyState(filterEmpty, 'Chưa có đề thi nào. Hãy import và publish đề qua trang Admin.');
             return;
         }
 
@@ -197,7 +201,28 @@ function initPracticeFilters() {
             cards.forEach(card => {
                 card.style.display = '';
             });
+            hideFilterEmptyState(filterEmpty);
             return;
+        }
+
+        // Đọc filter đang active
+        const activeConfig   = subjects.find(s => s.key === currentSubject) || subjects[0];
+        let selectedType     = document.querySelector(`input[name="${activeConfig.typeName}"]:checked`)?.value || 'single';
+        const selectedPart   = document.querySelector(`input[name="${activeConfig.partName}"]:checked`)?.value || '1';
+        const hasSelectedSingle = cards.some(card =>
+            card.dataset.subject === currentSubject &&
+            card.dataset.type === 'single' &&
+            card.dataset.part === selectedPart
+        );
+        const hasFull = cards.some(card =>
+            card.dataset.subject === currentSubject &&
+            card.dataset.type === 'full'
+        );
+
+        if (selectedType === 'single' && !hasSelectedSingle && hasFull) {
+            const fullRadio = document.querySelector(`input[name="${activeConfig.typeName}"][value="full"]`);
+            if (fullRadio) fullRadio.checked = true;
+            selectedType = 'full';
         }
 
         // Ẩn/hiện sub-options (bài lẻ vs full) cho subject đang active
@@ -208,16 +233,14 @@ function initPracticeFilters() {
                 wrap.style.display = 'none';
                 return;
             }
-            const type = document.querySelector(`input[name="${s.typeName}"]:checked`)?.value || 'single';
+            const type = s.key === currentSubject
+                ? selectedType
+                : (document.querySelector(`input[name="${s.typeName}"]:checked`)?.value || 'single');
             wrap.style.display = type === 'single' ? '' : 'none';
         });
 
-        // Đọc filter đang active
-        const activeConfig   = subjects.find(s => s.key === currentSubject) || subjects[0];
-        const selectedType   = document.querySelector(`input[name="${activeConfig.typeName}"]:checked`)?.value || 'single';
-        const selectedPart   = document.querySelector(`input[name="${activeConfig.partName}"]:checked`)?.value || '1';
-
         // Lọc cards
+        let visibleCount = 0;
         cards.forEach(card => {
             const match =
                 card.dataset.subject === currentSubject &&
@@ -225,7 +248,17 @@ function initPracticeFilters() {
                     ? card.dataset.type === 'full'
                     : card.dataset.type === 'single' && card.dataset.part === selectedPart);
             card.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
         });
+
+        if (visibleCount === 0) {
+            showFilterEmptyState(
+                filterEmpty,
+                `Chưa có đề ${getSubjectLabel(currentSubject)} đã publish. Hãy import đề hoặc chuyển đề sang trạng thái Published trong Admin.`
+            );
+        } else {
+            hideFilterEmptyState(filterEmpty);
+        }
     };
 
     // Listeners — khi chọn radio trong 1 subject, tự set currentSubject
@@ -263,6 +296,39 @@ function initPracticeFilters() {
     });
 
     applyFilterFunc();
+}
+
+function ensureFilterEmptyState(grid) {
+    if (!grid) return null;
+    let empty = grid.querySelector('.practice-filter-empty');
+    if (!empty) {
+        empty = document.createElement('div');
+        empty.className = 'practice-filter-empty';
+        empty.style.cssText = 'grid-column:1/-1;padding:32px;text-align:center;color:#8a6f20;background:#fff8e1;border:1px solid #f0d277;border-radius:14px;font-weight:600;';
+        grid.appendChild(empty);
+    }
+    return empty;
+}
+
+function showFilterEmptyState(empty, message) {
+    if (!empty) return;
+    empty.textContent = message;
+    empty.style.display = 'block';
+}
+
+function hideFilterEmptyState(empty) {
+    if (!empty) return;
+    empty.style.display = 'none';
+}
+
+function getSubjectLabel(subject) {
+    const labels = {
+        listening: 'Listening',
+        reading: 'Reading',
+        writing: 'Writing',
+        speaking: 'Speaking'
+    };
+    return labels[subject] || 'thi';
 }
 
 // ─── SIDEBAR / SCROLLING ──────────────────────────────────────────────────────

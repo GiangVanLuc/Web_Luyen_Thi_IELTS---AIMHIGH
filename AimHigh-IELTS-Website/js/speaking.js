@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     let speakingQuestions = [];
     let currentQuestionIndex = 0;
     let speakingControlsBound = false;
+    const speakingAnswers = new Map();
     
     // Web Audio API cho Visualizer
     let audioContext = null;
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         attemptId = attempt?.id;
         if (attemptId) {
             localStorage.setItem('currentAttemptId', attemptId);
+            await restoreSpeakingProgress();
         }
 
         // Tự động lưu Note của Speaking sau mỗi 15 giây
@@ -219,6 +221,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <div class="collapse show">
                             ${items.map((item, localIndex) => `
                                 <div class="question-item ${partIndex === 0 && localIndex === 0 ? 'active' : ''}" data-question-index="${item.index}">
+                                    ${speakingAnswers.has(Number(item.question.questionNumber)) ? '<span class="text-success fw-bold me-1">Done</span>' : ''}
                                     ${escapeHtml(getQuestionPrompt(item.question))}
                                 </div>
                             `).join('')}
@@ -300,6 +303,70 @@ document.addEventListener('DOMContentLoaded', async function () {
         return Number(speakingQuestions[currentQuestionIndex]?.questionNumber) || 1;
     }
 
+    function buildSpeakingAnswersPayload() {
+        if (!speakingQuestions.length) {
+            return Array.from(speakingAnswers.entries()).map(([questionNumber, answerText]) => ({
+                questionNumber,
+                answerText,
+                isSkipped: !answerText
+            }));
+        }
+
+        return speakingQuestions.map(question => {
+            const questionNumber = Number(question.questionNumber);
+            const answerText = speakingAnswers.get(questionNumber) || '';
+            return {
+                questionNumber,
+                answerText,
+                isSkipped: !answerText
+            };
+        });
+    }
+
+    function findNextUnansweredIndex() {
+        if (!speakingQuestions.length) return -1;
+        const afterCurrent = speakingQuestions.findIndex((question, index) =>
+            index > currentQuestionIndex && !speakingAnswers.has(Number(question.questionNumber))
+        );
+        if (afterCurrent >= 0) return afterCurrent;
+        return speakingQuestions.findIndex(question => !speakingAnswers.has(Number(question.questionNumber)));
+    }
+
+    function getAnsweredQuestionCount() {
+        if (!speakingQuestions.length) return speakingAnswers.size;
+        return speakingQuestions.filter(question => speakingAnswers.has(Number(question.questionNumber))).length;
+    }
+
+    async function restoreSpeakingProgress() {
+        if (!attemptId) return;
+        try {
+            const progressRes = await getAttemptProgress(attemptId);
+            const list = progressRes?.data || progressRes || [];
+            if (!Array.isArray(list)) return;
+
+            list.forEach(item => {
+                const questionNumber = Number(item.questionNumber || item.questionId);
+                const answerText = String(item.answerText || '').trim();
+                if (questionNumber > 0 && /^https?:\/\//i.test(answerText)) {
+                    speakingAnswers.set(questionNumber, answerText);
+                }
+            });
+
+            if (speakingAnswers.size > 0) {
+                renderSpeakingNavigation();
+                const nextIndex = findNextUnansweredIndex();
+                showSpeakingQuestion(nextIndex >= 0 ? nextIndex : 0);
+            }
+        } catch (error) {
+            console.warn('Could not restore speaking progress:', error?.message || error);
+        }
+    }
+
+    function resetRecordButton() {
+            resetRecordButton();
+        btnRecord.classList.remove('pulsate-animation');
+    }
+
     function getQuestionPart(question) {
         const explicit = Number(question?.partNumber || question?.sectionNumber || question?.taskNumber);
         if (Number.isFinite(explicit) && explicit > 0) return explicit;
@@ -339,6 +406,27 @@ document.addEventListener('DOMContentLoaded', async function () {
         }[char]));
     }
 
+    function getSupportedAudioMimeType() {
+        if (typeof MediaRecorder === 'undefined' || typeof MediaRecorder.isTypeSupported !== 'function') {
+            return '';
+        }
+        const candidates = [
+            'audio/webm;codecs=opus',
+            'audio/webm',
+            'audio/ogg;codecs=opus',
+            'audio/ogg',
+            'audio/mp4'
+        ];
+        return candidates.find(type => MediaRecorder.isTypeSupported(type)) || '';
+    }
+
+    function getAudioFileExtension(mimeType) {
+        const normalized = String(mimeType || '').toLowerCase();
+        if (normalized.includes('ogg')) return 'ogg';
+        if (normalized.includes('mp4')) return 'mp4';
+        return 'webm';
+    }
+
     async function startRecordingFlow() {
         audioChunks = [];
         try {
@@ -346,7 +434,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             recordingStream = stream;
 
             // Thiết lập MediaRecorder
-            mediaRecorder = new MediaRecorder(stream);
+            const preferredMimeType = getSupportedAudioMimeType();
+            mediaRecorder = preferredMimeType
+                ? new MediaRecorder(stream, { mimeType: preferredMimeType })
+                : new MediaRecorder(stream);
             mediaRecorder.ondataavailable = function (e) {
                 if (e.data.size > 0) {
                     audioChunks.push(e.data);
@@ -354,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             };
 
             mediaRecorder.onstop = async function () {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || preferredMimeType || 'audio/webm' });
                 await uploadAndSubmitAudio(audioBlob);
             };
 
@@ -405,7 +496,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function uploadAndSubmitAudio(audioBlob) {
         try {
-            const file = new File([audioBlob], `speaking_${Date.now()}.webm`, { type: 'audio/webm' });
+            const mimeType = audioBlob.type || 'audio/webm';
+            const file = new File([audioBlob], `speaking_${Date.now()}.${getAudioFileExtension(mimeType)}`, { type: mimeType });
             
             // Tải tệp lên Cloudinary
             const token = localStorage.getItem('aimhigh_token');
@@ -413,7 +505,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             formData.append('file', file);
             formData.append('type', 'audio');
 
-            const uploadRes = await fetch('http://localhost:8080/api/media/upload', {
+            const uploadEndpoint = typeof API_BASE !== 'undefined'
+                ? `${API_BASE}/media/upload`
+                : 'http://localhost:8080/api/media/upload';
+            const uploadRes = await fetch(uploadEndpoint, {
                 method: 'POST',
                 headers: {
                     ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -435,13 +530,24 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Gọi chấm điểm AI
             showPremiumLoadingOverlay('Giám khảo AI Gemini đang phân tích tệp ghi âm giọng nói của bạn. Vui lòng giữ nguyên màn hình...');
 
-            const answers = [
-                {
-                    questionNumber: getCurrentSpeakingQuestionNumber(),
-                    answerText: audioUrl,
-                    isSkipped: false
-                }
-            ];
+            const currentQuestionNumber = getCurrentSpeakingQuestionNumber();
+            speakingAnswers.set(currentQuestionNumber, audioUrl);
+            if (attemptId) {
+                await saveAttemptProgress(attemptId, currentQuestionNumber, audioUrl);
+            }
+
+            renderSpeakingNavigation();
+            const answeredCount = getAnsweredQuestionCount();
+            const nextIndex = findNextUnansweredIndex();
+            if (nextIndex >= 0) {
+                removePremiumLoadingOverlay();
+                resetRecordButton();
+                showCustomToast(`Da luu cau ${answeredCount}/${speakingQuestions.length}. Hay ghi cau tiep theo.`, 'success');
+                showSpeakingQuestion(nextIndex);
+                return;
+            }
+
+            const answers = buildSpeakingAnswersPayload();
 
             const resultRes = await submitAttemptAnswers(attemptId, answers, secondsSpent);
             const result = resultRes?.data || resultRes;

@@ -1,0 +1,86 @@
+{
+  "exam": {
+    "title": "IELTS Speaking Sample Test",
+    "skill": "SPEAKING",
+    "duration": 15,
+    "totalQuestions": 6,
+    "description": "Sample Speaking test with Parts 1, 2 and 3."
+  },
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Speaking Part 1",
+      "questionFrom": 1,
+      "questionTo": 3,
+      "groups": [
+        {
+          "groupTitle": "Work and Study",
+          "questions": [
+            {
+              "questionNumber": 1,
+              "questionText": "Do you work or are you a student?",
+              "points": 1
+            },
+            {
+              "questionNumber": 2,
+              "questionText": "What do you enjoy most about your work or studies?",
+              "points": 1
+            },
+            {
+              "questionNumber": 3,
+              "questionText": "Do you prefer studying alone or with other people?",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 2,
+      "label": "Speaking Part 2",
+      "questionFrom": 4,
+      "questionTo": 4,
+      "groups": [
+        {
+          "groupTitle": "Cue Card",
+          "questions": [
+            {
+              "questionNumber": 4,
+              "prompt": "Describe a skill you would like to learn.",
+              "cuePoints": [
+                "what the skill is",
+                "why you want to learn it",
+                "how you would learn it",
+                "and explain how this skill would help you"
+              ],
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 3,
+      "label": "Speaking Part 3",
+      "questionFrom": 5,
+      "questionTo": 6,
+      "groups": [
+        {
+          "groupTitle": "Skills and Education",
+          "questions": [
+            {
+              "questionNumber": 5,
+              "questionText": "What skills are most important for young people today?",
+              "points": 1
+            },
+            {
+              "questionNumber": 6,
+              "questionText": "Should schools focus more on practical skills or academic knowledge?",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -750,7 +750,7 @@ function setCategoryTab(tab) {
     }
 
     const addGroupContainer = document.getElementById('addGroupContainer');
-    if (addGroupContainer) addGroupContainer.style.display = tab === 'custom' ? 'flex' : 'none';
+    if (addGroupContainer) addGroupContainer.style.display = tab === 'custom' ? 'grid' : 'none';
 
     const addWordBtn = document.getElementById('addWordBtn');
     if (addWordBtn) addWordBtn.style.display = tab === 'custom' ? 'inline-block' : 'none';
@@ -1281,6 +1281,34 @@ async function updateWordStatus(event, realIndex, newStatus) {
     }
 }
 
+async function syncFlashcardStatusToBackend(realIndex, newStatus) {
+    const data = getData();
+    if (!Number.isInteger(realIndex) || !data[realIndex]) return;
+
+    const backendId = Number(data[realIndex]?.backendUserVocabularyId || data[realIndex]?.backendVocabId);
+    if (!hasBackendAuthToken() || !Number.isFinite(backendId) || backendId <= 0 || typeof apiUpdateUserVocabStatus !== 'function') {
+        return;
+    }
+
+    try {
+        const response = await apiUpdateUserVocabStatus(backendId, toLearnLevelFromStatus(newStatus));
+        const payload = response?.data || response || {};
+        data[realIndex].status = toStatusFromLearnLevel(payload?.learnLevel, payload?.learned === true);
+        data[realIndex].learnLevel = normalizeLearnLevel(payload?.learnLevel);
+        data[realIndex].backendVocabId = Number.isFinite(Number(payload?.id)) ? Number(payload.id) : data[realIndex].backendVocabId || null;
+        data[realIndex].backendUserVocabularyId = Number.isFinite(Number(payload?.userVocabularyId))
+            ? Number(payload.userVocabularyId)
+            : data[realIndex].backendUserVocabularyId || null;
+        data[realIndex].backendGroupId = Number.isFinite(Number(payload?.groupId))
+            ? Number(payload.groupId)
+            : data[realIndex].backendGroupId || null;
+        saveData(data);
+        renderWordTable();
+    } catch (error) {
+        console.warn('Khong the dong bo trang thai flashcard len backend:', error?.message || error);
+    }
+}
+
 function toggleAllWords() {
     const checkAll = document.getElementById('checkAllWords');
     const checkboxes = document.querySelectorAll('.word-checkbox');
@@ -1765,8 +1793,10 @@ function processCard(newStatus) {
         const realIndex = data.findIndex(v => v.word === currentCard.word && v.group === currentCard.group);
         if (realIndex !== -1) {
             data[realIndex].status = newStatus;
+            data[realIndex].learnLevel = toLearnLevelFromStatus(newStatus);
             saveData(data);
             currentCard.status = newStatus;
+            syncFlashcardStatusToBackend(realIndex, newStatus);
         }
     }
     

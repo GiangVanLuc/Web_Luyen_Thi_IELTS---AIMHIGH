@@ -404,13 +404,17 @@
 
 .add-group-inline {
     margin-top: 14px;
-    display: flex;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
 }
 
 .add-group-inline input {
-    flex: 1;
+    min-width: 0;
+    width: 100%;
     border: 1px solid #dce4ef;
     border-radius: 10px;
     padding: 9px 12px;
@@ -424,10 +428,12 @@
 
 .add-group-inline .btn {
     white-space: nowrap;
-    min-width: 132px;
+    min-width: 128px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    padding-inline: 14px;
 }
 
 .table-panel-head {
@@ -812,7 +818,11 @@
     }
 
     .add-group-inline {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+
+    .add-group-inline .btn {
+        width: 100%;
     }
 
     .table-inline-action {

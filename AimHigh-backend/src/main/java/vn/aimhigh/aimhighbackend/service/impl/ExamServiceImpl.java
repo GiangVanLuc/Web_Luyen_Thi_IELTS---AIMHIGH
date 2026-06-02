@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 import vn.aimhigh.aimhighbackend.dto.response.*;
 import vn.aimhigh.aimhighbackend.enums.*;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ import tools.jackson.databind.node.ObjectNode;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ExamServiceImpl implements ExamService {
     private static final Pattern QUESTIONS_RANGE_PATTERN = Pattern.compile("(\\d+)\\s*[-â€“]\\s*(\\d+)");
 
@@ -77,6 +81,7 @@ public class ExamServiceImpl implements ExamService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ExamSummaryResponse createAdminExam(JsonNode request) {
         Exam exam = new Exam();
         exam.setTitle(request.path("title").asText("Untitled Exam"));
@@ -105,6 +110,7 @@ public class ExamServiceImpl implements ExamService {
         return toSummary(examRepository.save(exam));
     }
 
+    @Transactional
     public ExamSummaryResponse updateAdminExam(Long id, JsonNode request) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
@@ -137,6 +143,7 @@ public class ExamServiceImpl implements ExamService {
         return toSummary(examRepository.save(exam));
     }
 
+    @Transactional
     public ExamSummaryResponse updateAdminExamStatus(Long id, String status) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
@@ -144,6 +151,7 @@ public class ExamServiceImpl implements ExamService {
         return toSummary(examRepository.save(exam));
     }
 
+    @Transactional
     public void deleteAdminExam(Long id) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
@@ -270,14 +278,14 @@ public class ExamServiceImpl implements ExamService {
     private List<ExamSummaryResponse.SectionSummaryDto> mapSectionsSummary(Exam exam) {
         List<ExamSummaryResponse.SectionSummaryDto> sections = new ArrayList<>();
         if (exam.getExamData() == null || exam.getExamData().isBlank()) {
-            return sections;
+            return mapLegacySectionsSummary(exam);
         }
 
         try {
             JsonNode root = objectMapper.readTree(exam.getExamData());
             JsonNode sectionsNode = root.path("sections");
             if (!sectionsNode.isArray()) {
-                return sections;
+                return mapLegacySectionsSummary(exam);
             }
 
             for (JsonNode section : sectionsNode) {
@@ -300,7 +308,61 @@ public class ExamServiceImpl implements ExamService {
         }
 
         sections.sort(Comparator.comparingInt(s -> s.getSectionNumber() == null ? Integer.MAX_VALUE : s.getSectionNumber()));
-        return sections;
+        return sections.isEmpty() ? mapLegacySectionsSummary(exam) : sections;
+    }
+
+    private List<ExamSummaryResponse.SectionSummaryDto> mapLegacySectionsSummary(Exam exam) {
+        if (exam.getSkill() == Skill.LISTENING && exam.getListeningParts() != null) {
+            return exam.getListeningParts().stream()
+                    .map(part -> {
+                        Integer sectionNumber = part.getPartNumber() != null && part.getPartNumber() > 0
+                                ? part.getPartNumber()
+                                : part.getPartOrder();
+                        int[] range = inferRangeFromQuestionList(part.getQuestions() == null ? List.of() : part.getQuestions());
+                        return ExamSummaryResponse.SectionSummaryDto.builder()
+                                .sectionNumber(sectionNumber)
+                                .label(part.getTitle() == null || part.getTitle().isBlank()
+                                        ? "Section " + (sectionNumber == null ? "" : sectionNumber)
+                                        : part.getTitle())
+                                .description("Listening section")
+                                .questionFrom(range[0])
+                                .questionTo(range[1])
+                                .build();
+                    })
+                    .sorted(Comparator.comparingInt(s -> s.getSectionNumber() == null ? Integer.MAX_VALUE : s.getSectionNumber()))
+                    .collect(Collectors.toList());
+        }
+
+        if (exam.getSkill() == Skill.READING && exam.getReadingPassages() != null) {
+            Map<Integer, List<vn.aimhigh.aimhighbackend.model.ReadingPassage>> passagesBySection = new TreeMap<>();
+            for (vn.aimhigh.aimhighbackend.model.ReadingPassage passage : exam.getReadingPassages()) {
+                Integer sectionNumber = resolveReadingSectionNumber(passage);
+                if (sectionNumber == null || sectionNumber <= 0) {
+                    continue;
+                }
+                passagesBySection.computeIfAbsent(sectionNumber, ignored -> new ArrayList<>()).add(passage);
+            }
+
+            return passagesBySection.entrySet().stream()
+                    .map(entry -> {
+                        List<Question> questions = entry.getValue().stream()
+                                .flatMap(passage -> passage.getQuestions() == null
+                                        ? java.util.stream.Stream.empty()
+                                        : passage.getQuestions().stream())
+                                .collect(Collectors.toList());
+                        int[] range = inferRangeFromQuestionList(questions);
+                        return ExamSummaryResponse.SectionSummaryDto.builder()
+                                .sectionNumber(entry.getKey())
+                                .label("Passage " + entry.getKey())
+                                .description("Reading passage")
+                                .questionFrom(range[0])
+                                .questionTo(range[1])
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return List.of();
     }
 
     private int[] inferQuestionRange(JsonNode section) {
