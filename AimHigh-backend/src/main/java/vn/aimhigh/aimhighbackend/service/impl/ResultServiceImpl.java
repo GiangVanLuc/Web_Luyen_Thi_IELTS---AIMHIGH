@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import vn.aimhigh.aimhighbackend.dto.response.AttemptResponse;
 import vn.aimhigh.aimhighbackend.dto.response.ResultResponse;
 import vn.aimhigh.aimhighbackend.dto.response.QuestionResponse;
@@ -38,7 +40,7 @@ public class ResultServiceImpl implements ResultService {
         log.info("Get Result Attempt: {}", attemptId);
         
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y bÃ i thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("không tìm thấy bài thi"));
                 
         // Kiá»ƒm tra quyá»n (pháº£i lÃ  bÃ i cá»§a mÃ¬nh)
         if (!attempt.getUser().getId().equals(userId)) {
@@ -83,6 +85,20 @@ public class ResultServiceImpl implements ResultService {
                         .duration(attempt.getExam() != null ? attempt.getExam().getDuration() : null)
                         .build())
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AttemptResponse> getTestHistory(Long userId, Pageable pageable) {
+        return attemptRepository.findByUserIdOrderByStartedAtDesc(userId, pageable)
+                .map(attempt -> AttemptResponse.builder()
+                        .id(attempt.getId())
+                        .examId(attempt.getExam() != null ? attempt.getExam().getId() : null)
+                        .examTitle(attempt.getExam() != null ? attempt.getExam().getTitle() : null)
+                        .mode(attempt.getMode())
+                        .status(attempt.getStatus())
+                        .startedAt(attempt.getStartedAt())
+                        .duration(attempt.getExam() != null ? attempt.getExam().getDuration() : null)
+                        .build());
     }
 
             private List<ResultResponse.ResultPartResponse> buildPartResponses(

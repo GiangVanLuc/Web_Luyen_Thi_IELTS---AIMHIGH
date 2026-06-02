@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -182,9 +182,9 @@
                 </div>
 
                 <div class="admin-card">
-                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                    <div class="admin-card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
                         <h3 class="admin-card-title mb-0">Upload đề từ Excel</h3>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap gap-2">
                             <button class="btn-admin-outline" id="btnDownloadReadingTemplate" type="button">
                                 <i class="bi bi-download"></i> Template Reading
                             </button>
@@ -213,62 +213,80 @@
                     </div>
                 </div>
 
-                <!-- Split Screen Builder -->
-                <div class="builder-split">
-                    <!-- Left: Content Panel -->
-                    <div class="builder-panel">
-                        <div class="builder-panel-header">
-                            <span><i class="bi bi-file-earmark-music me-2"></i>Nội dung đề thi</span>
-                            <select class="form-select form-select-sm" style="width:auto;" id="contentType">
-                                <option value="audio">Upload Audio</option>
-                                <option value="passage">Nhập đoạn văn</option>
-                            </select>
-                        </div>
-                        <div class="builder-panel-body">
-                            <!-- Audio Upload -->
-                            <div id="audioSection">
-                                <div class="upload-zone" id="audioDropZone">
-                                    <i class="bi bi-cloud-arrow-up"></i>
-                                    <p><strong>Kéo thả file audio vào đây</strong></p>
-                                    <p class="upload-hint">Hỗ trợ: MP3, WAV, OGG — Tối đa 50MB</p>
-                                    <input type="file" id="audioFileInput" accept="audio/*" hidden>
-                                </div>
-                                <div id="audioPreviewContainer" style="display:none;">
-                                    <div class="audio-preview">
-                                        <i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:var(--primary-color);"></i>
-                                        <div style="flex:1;">
-                                            <div id="audioFileName" style="font-size:0.85rem;font-weight:600;"></div>
-                                            <div id="audioFileSize" style="font-size:0.75rem;color:var(--admin-text-muted);"></div>
+                <!-- IELTS Studio Multi-Section Builder -->
+                <div class="studio-builder mt-4">
+                    <!-- Part Navigation -->
+                    <div class="d-flex align-items-center mb-3 studio-tabs" id="partTabsContainer">
+                        <button class="btn btn-part active" onclick="switchPart(1)">Part 1</button>
+                        <button class="btn btn-part" onclick="switchPart(2)">Part 2</button>
+                        <button class="btn btn-part" onclick="switchPart(3)">Part 3</button>
+                        <button class="btn btn-part" onclick="switchPart(4)">Part 4</button>
+                    </div>
+
+                    <div class="builder-split">
+                        <!-- Left: Content Panel -->
+                        <div class="builder-panel">
+                            <div class="builder-panel-header">
+                                <span id="currentPartTitle"><i class="bi bi-file-earmark-music me-2"></i>Nội dung Part 1</span>
+                                <select class="form-select form-select-sm" style="width:auto;" id="contentType" disabled>
+                                    <option value="audio">Upload Audio</option>
+                                    <option value="passage">Nhập đoạn văn</option>
+                                </select>
+                            </div>
+                            <div class="builder-panel-body">
+                                <!-- Audio Upload -->
+                                <div id="audioSection">
+                                    <div class="upload-zone" id="audioDropZone" 
+                                         onclick="document.getElementById('audioFileInput').click()"
+                                         ondragover="event.preventDefault(); this.classList.add('dragover');"
+                                         ondragleave="this.classList.remove('dragover');"
+                                         ondrop="event.preventDefault(); this.classList.remove('dragover'); if(event.dataTransfer.files[0]){ let dt = new DataTransfer(); dt.items.add(event.dataTransfer.files[0]); document.getElementById('audioFileInput').files = dt.files; document.getElementById('audioFileInput').dispatchEvent(new Event('change')); }">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                        <p><strong>Kéo thả file audio cho Part này</strong></p>
+                                        <p class="upload-hint">Hỗ trợ: MP3, WAV, OGG — Tối đa 50MB</p>
+                                        <input type="file" id="audioFileInput" accept="audio/*" hidden onchange="handleAudioSelect(event)">
+                                    </div>
+                                    <div id="audioPreviewContainer" style="display:none;">
+                                        <div class="audio-preview">
+                                            <i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:var(--primary-color);"></i>
+                                            <div style="flex:1;">
+                                                <div id="audioFileName" style="font-size:0.85rem;font-weight:600;"></div>
+                                                <div id="audioFileSize" style="font-size:0.75rem;color:var(--admin-text-muted);"></div>
+                                            </div>
+                                            <audio controls id="audioPlayer"></audio>
+                                            <button class="btn-icon-sm danger ms-2" onclick="removeAudio()" title="Xóa Audio này">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
                                         </div>
-                                        <audio controls id="audioPlayer"></audio>
-                                        <button class="remove-audio" onclick="removeAudio()" title="Xóa">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Passage (Rich Text) -->
+                                <div id="passageSection" style="display:none; height:100%;">
+                                    <div class="rich-text-wrapper" style="height:100%; display:flex; flex-direction:column;">
+                                        <div id="passageEditor" style="flex:1;"></div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Passage (Rich Text) -->
-                            <div id="passageSection" style="display:none;">
-                                <div class="rich-text-wrapper">
-                                    <div id="passageEditor"></div>
+                        <!-- Right: Question Builder -->
+                        <div class="builder-panel">
+                            <div class="builder-panel-header">
+                                <span><i class="bi bi-list-nested me-2"></i>Nhóm Câu Hỏi</span>
+                                <div class="d-flex gap-2">
+                                    <button class="btn-admin-primary" onclick="addGroup()">
+                                        <i class="bi bi-plus"></i> Thêm Nhóm Mới
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Question Builder -->
-                    <div class="builder-panel">
-                        <div class="builder-panel-header">
-                            <span><i class="bi bi-list-check me-2"></i>Câu hỏi (<span id="questionCount">0</span>)</span>
-                            <button class="btn-admin-primary" onclick="addQuestion()">
-                                <i class="bi bi-plus"></i> Thêm câu hỏi
-                            </button>
-                        </div>
-                        <div class="builder-panel-body" id="questionsContainer">
-                            <div class="text-center py-5" id="emptyQuestions">
-                                <i class="bi bi-inbox" style="font-size:2.5rem;color:var(--admin-text-muted);"></i>
-                                <p style="color:var(--admin-text-muted);margin-top:12px;">Chưa có câu hỏi nào.<br>Nhấn <strong>"Thêm câu hỏi"</strong> để bắt đầu.</p>
+                            <div class="builder-panel-body" style="background:var(--admin-bg);">
+                                <div id="groupsContainer">
+                                    <!-- Rendered groups will go here -->
+                                </div>
+                                <div class="text-center py-5" id="emptyGroups">
+                                    <i class="bi bi-inbox" style="font-size:2.5rem;color:var(--admin-text-muted);"></i>
+                                    <p style="color:var(--admin-text-muted);margin-top:12px;">Part này chưa có câu hỏi nào.<br>Nhấn <strong>"Thêm Nhóm Mới"</strong> để tạo (ví dụ: Q1-5 Fill blanks).</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -310,291 +328,438 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+
     <script>
-        // ===== Content Type Switch =====
-        const contentTypeSelect = document.getElementById('contentType');
-        const audioSection = document.getElementById('audioSection');
-        const passageSection = document.getElementById('passageSection');
+        // === IELTS STUDIO APP LOGIC ===
+        class ExamState {
+            constructor() {
+                this.skill = 'listening'; // listening or reading
+                this.parts = [1,2,3,4].map(n => ({
+                    sectionNumber: n,
+                    label: `Part ${n}`,
+                    audioFile: null,
+                    audioUrl: null, // uploaded url
+                    passageContent: '',
+                    groups: [] // groups -> questions
+                }));
+                this.currentPart = 1;
+                this.globalQuestionCounter = 1; 
+            }
+        }
 
-        contentTypeSelect.addEventListener('change', function () {
-            if (this.value === 'audio') {
-                audioSection.style.display = '';
-                passageSection.style.display = 'none';
+        let state = new ExamState();
+        let quillEditor = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSkillToggle();
+            initQuill();
+            renderPart();
+
+            document.getElementById('testSkill').addEventListener('change', (e) => {
+                const isListening = e.target.value === 'listening';
+                state.skill = isListening ? 'listening' : 'reading';
+                initSkillToggle();
+                renderTabs();
+                renderPart();
+            });
+        });
+
+        function initSkillToggle() {
+            const select = document.getElementById('contentType');
+            if(state.skill === 'listening') {
+                select.value = 'audio';
+                document.getElementById('audioSection').style.display = '';
+                document.getElementById('passageSection').style.display = 'none';
             } else {
-                audioSection.style.display = 'none';
-                passageSection.style.display = '';
+                select.value = 'passage';
+                document.getElementById('audioSection').style.display = 'none';
+                document.getElementById('passageSection').style.display = '';
             }
-        });
+        }
 
-        // ===== Quill Editor =====
-        const quill = new Quill('#passageEditor', {
-            theme: 'snow',
-            placeholder: 'Nhập đoạn văn Reading tại đây...',
-            modules: {
-                toolbar: [
-                    [{ header: [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['blockquote'],
-                    ['clean']
-                ]
+        function initQuill() {
+            if(!quillEditor) {
+                quillEditor = new Quill('#passageEditor', {
+                    theme: 'snow',
+                    modules: { toolbar: [ [{ header: [1,2,3,false] }], ['bold','italic'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean'] ] }
+                });
+                quillEditor.on('text-change', () => {
+                    const part = state.parts[state.currentPart - 1];
+                    part.passageContent = quillEditor.root.innerHTML;
+                });
             }
-        });
+        }
 
-        // ===== Audio Upload =====
-        const audioDropZone = document.getElementById('audioDropZone');
-        const audioFileInput = document.getElementById('audioFileInput');
-        let selectedAudioFile = null;
-        let uploadedAudioUrl = '';
-
-        audioDropZone.addEventListener('click', () => audioFileInput.click());
-
-        audioDropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            audioDropZone.classList.add('dragover');
-        });
-
-        audioDropZone.addEventListener('dragleave', () => {
-            audioDropZone.classList.remove('dragover');
-        });
-
-        audioDropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            audioDropZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('audio/')) {
-                previewAudio(file);
+        function renderTabs() {
+            const numParts = state.skill === 'listening' ? 4 : 3;
+            // hide part 4 if reading
+            const container = document.getElementById('partTabsContainer');
+            container.innerHTML = '';
+            for(let i=1; i<=numParts; i++) {
+                const btn = document.createElement('button');
+                btn.className = `btn btn-part ${i === state.currentPart ? 'active' : ''}`;
+                btn.textContent = state.skill === 'listening' ? `Part ${i}` : `Passage ${i}`;
+                btn.onclick = () => switchPart(i);
+                container.appendChild(btn);
             }
-        });
+        }
 
-        audioFileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) {
-                previewAudio(e.target.files[0]);
+        function switchPart(partNum) {
+            state.currentPart = partNum;
+            renderTabs();
+            renderPart();
+        }
+
+        function renderPart() {
+            const part = state.parts[state.currentPart - 1];
+            
+            // Render Header Title
+            const titlePrefix = state.skill === 'listening' ? 'Nội dung Part' : 'Nội dung Passage';
+            document.getElementById('currentPartTitle').innerHTML = `<i class="bi bi-${state.skill === 'listening' ? 'file-earmark-music' : 'card-text'} me-2"></i>${titlePrefix} ${state.currentPart}`;
+
+            // Restore Audio State
+            if(state.skill === 'listening') {
+                if(part.audioFile || part.audioUrl) {
+                    document.getElementById('audioDropZone').style.display = 'none';
+                    document.getElementById('audioPreviewContainer').style.display = '';
+                    const sizeLabel = part.audioFile ? (part.audioFile.size / (1024*1024)).toFixed(2) + ' MB' : 'Đã tải lên';
+                    document.getElementById('audioFileName').textContent = part.audioFile ? part.audioFile.name : 'Audio URL';
+                    document.getElementById('audioFileSize').textContent = sizeLabel;
+                    document.getElementById('audioPlayer').src = part.audioUrl || (part.audioFile ? URL.createObjectURL(part.audioFile) : '');
+                } else {
+                    document.getElementById('audioDropZone').style.display = '';
+                    document.getElementById('audioPreviewContainer').style.display = 'none';
+                    document.getElementById('audioPlayer').src = '';
+                }
+            } else {
+                quillEditor.root.innerHTML = part.passageContent || '';
             }
-        });
 
-        function previewAudio(file) {
-            const maxSize = 50 * 1024 * 1024;
-            if (file.size > maxSize) {
-                alert('File quá lớn. Tối đa 50MB.');
-                return;
+            renderGroups();
+        }
+
+        function handleAudioSelect(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const part = state.parts[state.currentPart - 1];
+                part.audioFile = file;
+                part.audioUrl = null; // clear uploaded url so it gets re-uploaded
+                renderPart();
             }
-
-            selectedAudioFile = file;
-            uploadedAudioUrl = '';
-
-            const url = URL.createObjectURL(file);
-            document.getElementById('audioPlayer').src = url;
-            document.getElementById('audioFileName').textContent = file.name;
-            document.getElementById('audioFileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB • Chưa tải lên cloud';
-            document.getElementById('audioDropZone').style.display = 'none';
-            document.getElementById('audioPreviewContainer').style.display = '';
         }
 
         function removeAudio() {
-            document.getElementById('audioPlayer').src = '';
-            document.getElementById('audioDropZone').style.display = '';
-            document.getElementById('audioPreviewContainer').style.display = 'none';
-            audioFileInput.value = '';
-            selectedAudioFile = null;
-            uploadedAudioUrl = '';
+            const part = state.parts[state.currentPart - 1];
+            part.audioFile = null;
+            part.audioUrl = null;
+            document.getElementById('audioFileInput').value = '';
+            renderPart();
         }
 
-        async function ensureAudioUploadedToCloud() {
-            if (contentTypeSelect.value !== 'audio') {
-                return null;
-            }
-
-            if (uploadedAudioUrl) {
-                return uploadedAudioUrl;
-            }
-
-            if (!selectedAudioFile) {
-                return null;
-            }
-
-            const result = await adminUploadMedia(selectedAudioFile, 'audio');
-            const payload = result?.data || result || {};
-            const url = payload?.url;
-
-            if (!url) {
-                throw new Error('Không nhận được URL audio sau khi upload lên Cloudflare R2.');
-            }
-
-            uploadedAudioUrl = url;
-            const sizeLabel = (selectedAudioFile.size / (1024 * 1024)).toFixed(2) + ' MB';
-            document.getElementById('audioFileSize').textContent = `${sizeLabel} • Đã tải lên cloud`;
-            return uploadedAudioUrl;
-        }
-
-        // ===== Question Builder =====
-        let questionCounter = 0;
-
-        function addQuestion(type = 'radio') {
-            questionCounter++;
-            const template = document.getElementById('questionTemplate');
-            const clone = template.content.cloneNode(true);
-
-            clone.querySelector('.q-num').textContent = questionCounter;
-            clone.querySelector('.question-card').dataset.questionId = questionCounter;
-
-            const container = document.getElementById('questionsContainer');
-            document.getElementById('emptyQuestions')?.remove();
-            container.appendChild(clone);
-
-            // Add default options for radio/checkbox
-            const card = container.lastElementChild;
-            if (type === 'radio' || type === 'checkbox') {
-                for (let i = 0; i < 4; i++) {
-                    addOptionToCard(card, type);
-                }
-            }
-            card.querySelector('.add-option-btn').style.display = (type === 'text') ? 'none' : '';
-
-            updateQuestionCount();
-        }
-
-        function removeQuestion(btn) {
-            const card = btn.closest('.question-card');
-            card.remove();
-            renumberQuestions();
-            updateQuestionCount();
-
-            if (document.querySelectorAll('.question-card').length === 0) {
-                document.getElementById('questionsContainer').innerHTML = `
-                    <div class="text-center py-5" id="emptyQuestions">
-                        <i class="bi bi-inbox" style="font-size:2.5rem;color:var(--admin-text-muted);"></i>
-                        <p style="color:var(--admin-text-muted);margin-top:12px;">Chưa có câu hỏi nào.<br>Nhấn <strong>"Thêm câu hỏi"</strong> để bắt đầu.</p>
-                    </div>`;
-            }
-        }
-
-        function renumberQuestions() {
-            document.querySelectorAll('.question-card').forEach((card, i) => {
-                card.querySelector('.q-num').textContent = i + 1;
-                card.dataset.questionId = i + 1;
+        // === GROUPS & QUESTIONS RENDER ===
+        function addGroup() {
+            const part = state.parts[state.currentPart - 1];
+            part.groups.push({
+                groupTitle: 'New Question Group',
+                instruction: 'NO MORE THAN TWO WORDS',
+                questions: []
             });
-            questionCounter = document.querySelectorAll('.question-card').length;
+            renderGroups();
         }
 
-        function updateQuestionCount() {
-            document.getElementById('questionCount').textContent = document.querySelectorAll('.question-card').length;
+        function deleteGroup(groupIndex) {
+            if(confirm("Xóa nhóm này và tất cả câu hỏi bên trong?")) {
+                const part = state.parts[state.currentPart - 1];
+                part.groups.splice(groupIndex, 1);
+                renderGroups();
+            }
         }
 
-        function changeQuestionType(select) {
-            const card = select.closest('.question-card');
-            const type = select.value;
-            const optionsArea = card.querySelector('.options-area');
-            const addBtn = card.querySelector('.add-option-btn');
+        function addQuestionToGroup(groupIndex, type) {
+            const part = state.parts[state.currentPart - 1];
+            const group = part.groups[groupIndex];
+            
+            const newQ = {
+                questionNumber: findNextAvailableQuestionNumber(),
+                questionText: '',
+                correctAnswer: '',
+                type: type,
+                choices: type === 'text' ? null : [
+                    { label: 'A', text: '', isCorrect: false },
+                    { label: 'B', text: '', isCorrect: false },
+                    { label: 'C', text: '', isCorrect: false },
+                    { label: 'D', text: '', isCorrect: false }
+                ]
+            };
+            group.questions.push(newQ);
+            renderGroups();
+        }
 
-            optionsArea.innerHTML = '';
+        function deleteQuestion(groupIndex, qIndex) {
+            const part = state.parts[state.currentPart - 1];
+            part.groups[groupIndex].questions.splice(qIndex, 1);
+            renderGroups();
+        }
 
-            if (type === 'text') {
-                optionsArea.innerHTML = `
-                    <label class="form-label">Đáp án đúng</label>
-                    <input type="text" class="form-control" placeholder="Nhập đáp án đúng...">`;
-                addBtn.style.display = 'none';
+        function findNextAvailableQuestionNumber() {
+            let maxNum = 0;
+            state.parts.forEach(p => p.groups.forEach(g => g.questions.forEach(q => {
+                if(q.questionNumber > maxNum) maxNum = q.questionNumber;
+            })));
+            return maxNum + 1;
+        }
+
+        function renderGroups() {
+            const part = state.parts[state.currentPart - 1];
+            const container = document.getElementById('groupsContainer');
+            const emptyHint = document.getElementById('emptyGroups');
+            container.innerHTML = '';
+            
+            if(part.groups.length === 0) {
+                emptyHint.style.display = '';
+                return;
+            }
+            emptyHint.style.display = 'none';
+
+            part.groups.forEach((g, gIdx) => {
+                const gDiv = document.createElement('div');
+                gDiv.className = 'group-card';
+                
+                let qHtml = g.questions.map((q, qIdx) => renderQuestionHtml(gIdx, qIdx, q)).join('');
+
+                gDiv.innerHTML = `
+                    <div class="group-card-header">
+                        <div style="flex:1;">
+                            <input type="text" class="form-control form-control-sm fw-bold mb-1" style="border:none;background:transparent;padding-left:0;" value="${g.groupTitle}" placeholder="Tiêu đề nhóm (VD: Questions 1-5)" onchange="updateGroupTitle(${state.currentPart-1}, ${gIdx}, this.value)">
+                            <input type="text" class="form-control form-control-sm" style="font-size:0.75rem; border:none;background:transparent;padding-left:0;color:var(--admin-text-muted);" value="${g.instruction}" placeholder="Hướng dẫn (VD: NO MORE THAN TWO WORDS)" onchange="updateGroupInstr(${state.currentPart-1}, ${gIdx}, this.value)">
+                        </div>
+                        <div>
+                            <button class="btn-icon-sm danger" onclick="deleteGroup(${gIdx})"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="group-card-body">
+                        ${qHtml}
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="addQuestionToGroup(${gIdx}, 'text')"><i class="bi bi-text-cursor me-1"></i>Thêm câu Điền từ</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="addQuestionToGroup(${gIdx}, 'radio')"><i class="bi bi-ui-checks-grid me-1"></i>Thêm câu Trắc nghiệm</button>
+                            <button class="btn btn-sm btn-outline-secondary ms-auto" onclick="promptPasteAnswers(${gIdx})"><i class="bi bi-clipboard me-1"></i>Nhập nhanh (Paste Đáp Án)</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(gDiv);
+            });
+        }
+
+        function renderQuestionHtml(gIdx, qIdx, q) {
+            let optionsHtml = '';
+            if(q.type !== 'text' && q.choices) {
+                optionsHtml = '<div class="mt-2">';
+                q.choices.forEach((c, cIdx) => {
+                    const inputType = q.type === 'radio' ? 'radio' : 'checkbox';
+                    const isChecked = c.isCorrect ? 'checked' : '';
+                    optionsHtml += `
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <input type="${inputType}" name="q_${gIdx}_${qIdx}" ${isChecked} onchange="updateChoiceStatus(${state.currentPart-1}, ${gIdx}, ${qIdx}, ${cIdx}, this.checked)">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">${c.label}</span>
+                                <input type="text" class="form-control" value="${c.text}" onchange="updateChoiceText(${state.currentPart-1}, ${gIdx}, ${qIdx}, ${cIdx}, this.value)">
+                            </div>
+                        </div>
+                    `;
+                });
+                optionsHtml += '</div>';
             } else {
-                for (let i = 0; i < 4; i++) {
-                    addOptionToCard(card, type);
-                }
-                addBtn.style.display = '';
+                optionsHtml = `
+                    <div class="mt-2">
+                        <label>Đáp án đúng (ngăn cách bởi dấu phẩy nếu nhiều đáp án):</label>
+                        <input type="text" class="form-control form-control-sm border-success" value="${q.correctAnswer}" onchange="updateCorrectAnswer(${state.currentPart-1}, ${gIdx}, ${qIdx}, this.value)">
+                    </div>
+                `;
             }
+
+            return `
+                <div class="question-item">
+                    <button class="btn-icon-sm danger position-absolute" style="top:8px; right:8px;" onclick="deleteQuestion(${gIdx}, ${qIdx})"><i class="bi bi-x"></i></button>
+                    <div class="d-flex gap-2 align-items-center mb-2">
+                        <span class="badge bg-primary">Câu ${q.questionNumber}</span>
+                        <select class="form-select form-select-sm" style="width:150px;" onchange="changeQuestionTypeInState(${state.currentPart-1}, ${gIdx}, ${qIdx}, this.value)">
+                            <option value="text" ${q.type==='text'?'selected':''}>Điền từ (Text)</option>
+                            <option value="radio" ${q.type==='radio'?'selected':''}>Trắc nghiệm 1 ĐA</option>
+                            <option value="checkbox" ${q.type==='checkbox'?'selected':''}>Trắc nghiệm N-ĐA</option>
+                        </select>
+                    </div>
+                    <label>Câu hỏi / Văn bản (tuỳ chọn)</label>
+                    <input type="text" class="form-control form-control-sm" placeholder="Nội dung câu hỏi..." value="${q.questionText}" onchange="updateQuestionText(${state.currentPart-1}, ${gIdx}, ${qIdx}, this.value)">
+                    ${optionsHtml}
+                </div>
+            `;
         }
 
-        function addOption(btn) {
-            const card = btn.closest('.question-card');
-            const type = card.querySelector('select').value;
-            addOptionToCard(card, type);
+        // Update State Helpers
+        function updateGroupTitle(p,g,val) { state.parts[p].groups[g].groupTitle = val; }
+        function updateGroupInstr(p,g,val) { state.parts[p].groups[g].instruction = val; }
+        function updateQuestionText(p,g,q,val) { state.parts[p].groups[g].questions[q].questionText = val; }
+        function updateCorrectAnswer(p,g,q,val) { state.parts[p].groups[g].questions[q].correctAnswer = val; }
+        
+        function updateChoiceStatus(p,g,q,c,checked) { 
+            const question = state.parts[p].groups[g].questions[q];
+            if(question.type === 'radio') {
+                question.choices.forEach(ch => ch.isCorrect = false); // reset others
+            }
+            question.choices[c].isCorrect = checked; 
+            
+            // Synch correct answer string for choice questions
+            question.correctAnswer = question.choices.filter(ch => ch.isCorrect).map(ch => ch.label).join(',');
+        }
+        function updateChoiceText(p,g,q,c,val) { state.parts[p].groups[g].questions[q].choices[c].text = val; }
+
+        function changeQuestionTypeInState(p,g,q, newType) {
+            const question = state.parts[p].groups[g].questions[q];
+            question.type = newType;
+            if(newType !== 'text' && !question.choices) {
+                question.choices = ['A','B','C','D'].map(l => ({ label: l, text: '', isCorrect: false }));
+            }
+            renderGroups();
         }
 
-        function addOptionToCard(card, type) {
-            const optionsArea = card.querySelector('.options-area');
-            const idx = optionsArea.querySelectorAll('.option-row').length;
-            const inputType = type === 'checkbox' ? 'checkbox' : 'radio';
-            const groupName = 'q' + card.dataset.questionId;
-            const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-            const label = labels[idx] || (idx + 1);
-
-            const row = document.createElement('div');
-            row.className = 'option-row';
-            row.innerHTML = `
-                <input type="${inputType}" class="form-check-input" name="${groupName}" title="Đáp án đúng">
-                <input type="text" class="form-control" placeholder="Lựa chọn ${label}">
-                <span class="remove-option" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></span>`;
-            optionsArea.appendChild(row);
-        }
-
-        // ===== Save / Publish =====
-        document.getElementById('btnSaveDraft').addEventListener('click', async () => {
-            try {
-                await ensureAudioUploadedToCloud();
-            } catch (error) {
-                alert(`Upload audio thất bại: ${error.message || 'Unknown error'}`);
-                return;
-            }
-
-            const data = collectTestData();
-            data.status = 'draft';
-            console.log('Save draft:', data);
-            alert('Đã lưu nháp thành công!');
-        });
-
-        document.getElementById('btnPublish').addEventListener('click', async () => {
-            try {
-                await ensureAudioUploadedToCloud();
-            } catch (error) {
-                alert(`Upload audio thất bại: ${error.message || 'Unknown error'}`);
-                return;
-            }
-
-            const data = collectTestData();
-            if (!data.title || !data.skill) {
-                alert('Vui lòng nhập đầy đủ thông tin đề thi.');
-                return;
-            }
-            if (data.questions.length === 0) {
-                alert('Vui lòng thêm ít nhất 1 câu hỏi.');
-                return;
-            }
-            data.status = 'published';
-            console.log('Publish:', data);
-            alert('Đã xuất bản đề thi thành công!');
-        });
-
-        function collectTestData() {
-            const questions = [];
-            document.querySelectorAll('.question-card').forEach(card => {
-                const type = card.querySelector('select').value;
-                const content = card.querySelector('.mb-3 input').value;
-                const options = [];
-                let correctAnswer = null;
-
-                if (type === 'text') {
-                    correctAnswer = card.querySelector('.options-area input[type="text"]')?.value || '';
-                } else {
-                    card.querySelectorAll('.option-row').forEach(row => {
-                        const isCorrect = row.querySelector('input[type="radio"], input[type="checkbox"]').checked;
-                        const text = row.querySelector('input[type="text"]').value;
-                        options.push({ text, isCorrect });
-                    });
-                }
-
-                questions.push({ type, content, options, correctAnswer });
+        function promptPasteAnswers(gIdx) {
+            const raw = prompt("Dán danh sách đáp án dạng điền từ (Mỗi đáp án 1 dòng or phẩy). Ví dụ:\napple\nbanana\norange");
+            if(!raw) return;
+            
+            const answers = raw.split(/[\n,;]+/).map(a => a.trim()).filter(a => a);
+            const part = state.parts[state.currentPart - 1];
+            const group = part.groups[gIdx];
+            
+            answers.forEach(ans => {
+                group.questions.push({
+                    questionNumber: findNextAvailableQuestionNumber(),
+                    questionText: '',
+                    correctAnswer: ans,
+                    type: 'text',
+                    choices: null
+                });
             });
+            renderGroups();
+        }
+
+        // === SUBMIT LOGIC ===
+        async function ensureAudioUploadedToCloud_Custom() {
+            if(state.skill === 'listening') {
+                for(const part of state.parts) {
+                    if(part.audioFile && !part.audioUrl) {
+                        try {
+                            const res = await adminUploadMedia(part.audioFile, 'audio');
+                            part.audioUrl = res?.data?.url || res?.url;
+                        } catch (e) {
+                            throw new Error(`Lỗi upload audio Part ${part.sectionNumber}: ${e.message}`);
+                        }
+                    }
+                }
+            }
+        }
+
+        function collectTestData_Custom() {
+            const title = document.getElementById('testTitle').value.trim();
+            const duration = parseInt(document.getElementById('testDuration').value) || 30;
+            const desc = document.getElementById('testDesc').value.trim();
+
+            if(!title || !document.getElementById('testSkill').value) {
+                throw new Error("Vui lòng điền đủ Tên đề và Kỹ năng.");
+            }
+
+            const payloadSections = [];
+            
+            state.parts.forEach(part => {
+                const outGroups = [];
+                let partMin = Infinity;
+                let partMax = -Infinity;
+                
+                part.groups.forEach(g => {
+                    const outQ = g.questions.map(q => {
+                        partMin = Math.min(partMin, q.questionNumber);
+                        partMax = Math.max(partMax, q.questionNumber);
+                        return {
+                            questionNumber: q.questionNumber,
+                            questionText: q.questionText,
+                            correctAnswer: q.correctAnswer,
+                            choices: q.choices && q.type !== 'text' ? q.choices.map(c => ({
+                                label: c.label, text: c.text, isCorrect: !!c.isCorrect
+                            })) : undefined
+                        };
+                    });
+                    
+                    if(outQ.length > 0) {
+                        outGroups.push({
+                            groupTitle: g.groupTitle,
+                            instruction: g.instruction,
+                            questions: outQ
+                        });
+                    }
+                });
+
+                if(outGroups.length > 0) {
+                    const sec = {
+                        sectionNumber: part.sectionNumber,
+                        label: state.skill === 'listening' ? `Part ${part.sectionNumber}` : `Passage ${part.sectionNumber}`,
+                        questionFrom: partMin,
+                        questionTo: partMax,
+                        groups: outGroups
+                    };
+                    
+                    if(state.skill === 'listening') {
+                        sec.audioUrl = part.audioUrl || null;
+                    } else {
+                        sec.passages = [{
+                            title: `Passage ${part.sectionNumber}`,
+                            content: part.passageContent || ''
+                        }];
+                    }
+                    payloadSections.push(sec);
+                }
+            });
+
+            if(payloadSections.length === 0) {
+                throw new Error("Đề thi chưa có câu hỏi nào (hoặc Part chưa được tạo).");
+            }
 
             return {
-                title: document.getElementById('testTitle').value,
-                skill: document.getElementById('testSkill').value,
-                duration: parseInt(document.getElementById('testDuration').value) || 0,
-                difficulty: document.getElementById('testDifficulty').value,
-                description: document.getElementById('testDesc').value,
-                audioUrl: uploadedAudioUrl || null,
-                passage: quill.root.innerHTML,
-                questions
+                exam: {
+                    title: title,
+                    skill: state.skill.toUpperCase(),
+                    duration: duration,
+                    description: desc
+                },
+                sections: payloadSections
             };
         }
 
+        document.getElementById('btnPublish').addEventListener('click', async () => {
+            const btn = document.getElementById('btnPublish');
+            const originalText = btn.innerHTML;
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang tải audio...';
+                
+                await ensureAudioUploadedToCloud_Custom();
+                
+                const data = collectTestData_Custom();
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu CSDL...';
+                
+                const response = await adminImportExamJson(data);
+                alert('Đã tải hoàn tất đề thi 3 Tầng thành công!');
+                window.location.href = 'test-manager.html';
+                
+            } catch (error) {
+                console.error('Publish error:', error);
+                alert(`${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+        
+        // Remove old bindings from previous script
         const jsonFileInput = document.getElementById('examJsonFileInput');
         const excelFileInput = document.getElementById('examExcelFileInput');
         const jsonFeedback = document.getElementById('jsonUploadFeedback');
@@ -607,23 +772,11 @@
 
         async function readSelectedJsonFile() {
             const file = jsonFileInput.files[0];
-            if (!file) {
-                throw new Error('Vui lòng chọn file JSON trước.');
-            }
-
+            if (!file) throw new Error('Vui lòng chọn file JSON trước.');
             const raw = await file.text();
-            let payload;
-            try {
-                payload = JSON.parse(raw);
-            } catch (_error) {
-                throw new Error('File JSON không hợp lệ.');
-            }
-
-            if (!payload?.exam || !Array.isArray(payload?.sections)) {
-                throw new Error('Cấu trúc thiếu exam hoặc sections.');
-            }
-
-            return payload;
+            let p;
+            try { p = JSON.parse(raw); } catch { throw new Error('File JSON không hợp lệ.'); }
+            return p;
         }
 
         function summarizeStructure(payload) {
@@ -631,142 +784,54 @@
             const sections = payload.sections || [];
             const totalGroups = sections.reduce((sum, sec) => sum + ((sec.groups || []).length), 0);
             const totalQuestions = sections.reduce((sum, sec) => {
-                return sum + (sec.groups || []).reduce((inner, g) => {
-                    const direct = (g.questions || []).length;
-                    const sub = (g.subBlocks || []).reduce((acc, b) => acc + ((b.questions || []).length), 0);
-                    const table = (g.tableRows || []).reduce((acc, row) => {
-                        const cells = row?.cells || [];
-                        return acc + cells.filter(c => c && typeof c.questionNumber === 'number').length;
-                    }, 0);
-                    return inner + direct + sub + table;
-                }, 0);
+                return sum + (sec.groups || []).reduce((inner, g) => inner + (g.questions || []).length, 0);
             }, 0);
-
-            return [
-                `Title: ${payload.exam?.title || '(empty)'}`,
-                `Skill: ${skill || '(empty)'}`,
-                `Sections: ${sections.length}`,
-                `Groups: ${totalGroups}`,
-                `Questions(found): ${totalQuestions}`
-            ].join('\n');
+            return `Title: ${payload.exam?.title}\nSkill: ${skill}\nSections: ${sections.length}\nGroups: ${totalGroups}\nQuestions: ${totalQuestions}`;
         }
 
         document.getElementById('btnPreviewJsonStructure').addEventListener('click', async () => {
-            try {
-                const payload = await readSelectedJsonFile();
-                showJsonFeedback(summarizeStructure(payload));
-            } catch (error) {
-                showJsonFeedback(error.message || 'Không thể đọc file JSON.', true);
-            }
+            try { showJsonFeedback(summarizeStructure(await readSelectedJsonFile())); } 
+            catch (e) { showJsonFeedback(e.message, true); }
         });
 
         document.getElementById('btnUploadExamJson').addEventListener('click', async () => {
-            const btn = document.getElementById('btnUploadExamJson');
-            btn.disabled = true;
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang upload...';
-
-            try {
+             try {
                 const payload = await readSelectedJsonFile();
                 const response = await adminImportExamJson(payload);
-                const exam = response?.data || response;
-
-                if (exam?.title) {
-                    document.getElementById('testTitle').value = exam.title;
-                }
-                if (exam?.skill) {
-                    document.getElementById('testSkill').value = String(exam.skill).toLowerCase();
-                }
-                if (exam?.duration) {
-                    document.getElementById('testDuration').value = exam.duration;
-                }
-
-                const examId = exam?.id ? `ID: ${exam.id}` : 'ID: n/a';
-                showJsonFeedback(`Upload thành công. ${examId}\n${summarizeStructure(payload)}`);
-                alert('Upload đề thành công. Bạn có thể sang trang Danh sách đề thi để kiểm tra.');
-            } catch (error) {
-                showJsonFeedback(error.message || 'Upload thất bại.', true);
-                alert(`Upload thất bại: ${error.message || 'Unknown error'}`);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = original;
-            }
+                alert('Upload JSON Đề thành công.');
+            } catch (error) { alert(`Upload thất bại: ${error.message}`); }
         });
 
         document.getElementById('btnUploadExamExcel').addEventListener('click', async () => {
             const file = excelFileInput.files[0];
-            if (!file) {
-                alert('Vui lòng chọn file Excel trước khi upload.');
-                return;
-            }
-
-            const btn = document.getElementById('btnUploadExamExcel');
-            btn.disabled = true;
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
-
+            if (!file) { alert('Vui lòng chọn file Excel.'); return; }
             try {
-                const response = await adminImportExamExcel(file);
-                const exam = response?.data || response;
-
-                if (exam?.title) {
-                    document.getElementById('testTitle').value = exam.title;
-                }
-                if (exam?.skill) {
-                    document.getElementById('testSkill').value = String(exam.skill).toLowerCase();
-                }
-                if (exam?.duration) {
-                    document.getElementById('testDuration').value = exam.duration;
-                }
-
-                showJsonFeedback(`Import Excel thành công. ID: ${exam?.id || 'n/a'}\nTitle: ${exam?.title || '(empty)'}`);
-                alert('Upload Excel thành công. Đề đã được lưu vào hệ thống.');
-            } catch (error) {
-                showJsonFeedback(error.message || 'Import Excel thất bại.', true);
-                alert(`Import Excel thất bại: ${error.message || 'Unknown error'}`);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = original;
-            }
+                document.getElementById('btnUploadExamExcel').innerHTML = 'Đang xử lý...';
+                await adminImportExamExcel(file);
+                alert('Upload Excel thành công.');
+                document.getElementById('btnUploadExamExcel').innerHTML = '<i class="bi bi-file-earmark-spreadsheet"></i> Upload Excel';
+            } catch (error) { alert(`Lỗi: ${error.message}`); document.getElementById('btnUploadExamExcel').innerHTML = 'Upload Excel'; }
         });
 
         async function downloadTemplate(skill) {
             try {
                 const blob = await adminDownloadExamTemplate(skill);
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${skill}_template.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert(`Tải template thất bại: ${error.message || 'Unknown error'}`);
-            }
+                const a = document.createElement('a'); a.href = url; a.download = `${skill}_template.xlsx`; document.body.appendChild(a); a.click(); a.remove();
+            } catch (e) { alert("Lỗi tải template"); }
         }
-
         async function downloadFullSampleTemplate(skill) {
             try {
                 const blob = await adminDownloadFullSampleExamTemplate(skill);
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${skill}_full_sample.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert(`Tải full sample thất bại: ${error.message || 'Unknown error'}`);
-            }
+                const a = document.createElement('a'); a.href = url; a.download = `${skill}_full_sample.xlsx`; document.body.appendChild(a); a.click(); a.remove();
+            } catch (e) { alert("Lỗi tải sample"); }
         }
-
         document.getElementById('btnDownloadReadingTemplate').addEventListener('click', () => downloadTemplate('reading'));
         document.getElementById('btnDownloadListeningTemplate').addEventListener('click', () => downloadTemplate('listening'));
         document.getElementById('btnDownloadReadingFullSample').addEventListener('click', () => downloadFullSampleTemplate('reading'));
         document.getElementById('btnDownloadListeningFullSample').addEventListener('click', () => downloadFullSampleTemplate('listening'));
-
     </script>
+
 </body>
 </html>

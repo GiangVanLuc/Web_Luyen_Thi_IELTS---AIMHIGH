@@ -54,6 +54,10 @@ public class User implements UserDetails {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Builder.Default
+    @Column(name = "is_locked", nullable = false)
+    private Boolean isLocked = false;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -75,7 +79,7 @@ public class User implements UserDetails {
     }
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !isLocked;
     }
     @Override
     public boolean isCredentialsNonExpired() {

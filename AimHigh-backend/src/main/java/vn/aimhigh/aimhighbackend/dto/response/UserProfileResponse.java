@@ -21,5 +21,6 @@ public class UserProfileResponse {
     private Role role;
     private AuthProvider authProvider;
     private LocalDateTime createdAt;
+    private Boolean isLocked;
     private UserDashboardResponse stats;
 }

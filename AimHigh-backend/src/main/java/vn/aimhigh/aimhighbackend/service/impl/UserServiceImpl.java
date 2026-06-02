@@ -26,6 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import vn.aimhigh.aimhighbackend.enums.Role;
 
 @Service
 @RequiredArgsConstructor
@@ -124,6 +127,31 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserProfileResponse> getUsersWithPagination(Role role, String search, Pageable pageable) {
+        return userRepository.findUsersByFilter(role, search, pageable)
+                .map(user -> toProfileResponse(user, null));
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRole(Long userId, Role role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException("Không tìm thấy người dùng"));
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void toggleUserLock(Long userId, boolean isLocked) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException("Không tìm thấy người dùng"));
+        user.setIsLocked(isLocked);
+        userRepository.save(user);
+    }
+
     private UserDashboardResponse buildDashboardStats(Long userId) {
         List<Attempt> attempts = attemptRepository.findByUserIdOrderByStartedAtDesc(userId);
 
@@ -161,6 +189,7 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole())
                 .authProvider(user.getAuthProvider())
                 .createdAt(user.getCreatedAt())
+                .isLocked(user.getIsLocked())
                 .stats(stats)
                 .build();
     }

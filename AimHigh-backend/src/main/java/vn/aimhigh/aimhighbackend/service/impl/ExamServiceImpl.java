@@ -4,6 +4,7 @@ import vn.aimhigh.aimhighbackend.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 import vn.aimhigh.aimhighbackend.dto.response.*;
 import vn.aimhigh.aimhighbackend.enums.*;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
@@ -39,11 +40,11 @@ public class ExamServiceImpl implements ExamService {
         log.info("Láº¥y danh sÃ¡ch Ä‘á» thi. Skill: {}, Level: {}", skill, level);
         List<Exam> exams;
         if (skill != null && level != null) {
-            exams = examRepository.findBySkillAndLevelAndIsActive(skill, level, true);
+            exams = examRepository.findBySkillAndLevelAndStatus(skill, level, ExamStatus.PUBLISHED);
         } else if (skill != null) {
-            exams = examRepository.findBySkillAndIsActive(skill, true);
+            exams = examRepository.findBySkillAndStatus(skill, ExamStatus.PUBLISHED);
         } else {
-            exams = examRepository.findAll();
+            exams = examRepository.findByStatus(ExamStatus.PUBLISHED);
         }
 
         return exams.stream().map(this::toSummary).collect(Collectors.toList());
@@ -57,10 +58,10 @@ public class ExamServiceImpl implements ExamService {
                 .filter(exam -> skill == null || exam.getSkill() == skill)
                 .filter(exam -> {
                     if (statusNorm.isBlank()) return true;
-                    boolean active = Boolean.TRUE.equals(exam.getIsActive());
                     return switch (statusNorm) {
-                        case "published" -> active;
-                        case "draft", "archived" -> !active;
+                        case "published" -> exam.getStatus() == ExamStatus.PUBLISHED;
+                        case "draft" -> exam.getStatus() == ExamStatus.DRAFT;
+                        case "archived" -> exam.getStatus() == ExamStatus.ARCHIVED;
                         default -> true;
                     };
                 })
@@ -151,8 +152,11 @@ public class ExamServiceImpl implements ExamService {
 
     private void applyStatus(Exam exam, String status) {
         String normalized = status == null ? "published" : status.trim().toLowerCase(Locale.ROOT);
-        boolean active = "published".equals(normalized);
-        exam.setIsActive(active);
+        switch (normalized) {
+            case "draft" -> exam.setStatus(ExamStatus.DRAFT);
+            case "archived" -> exam.setStatus(ExamStatus.ARCHIVED);
+            default -> exam.setStatus(ExamStatus.PUBLISHED);
+        }
     }
 
     private <E extends Enum<E>> E parseEnumOrDefault(String raw, Class<E> enumType, E defaultValue) {
@@ -176,7 +180,7 @@ public class ExamServiceImpl implements ExamService {
                 .duration(exam.getDuration())
                 .description(exam.getDescription())
                 .thumbnail(exam.getThumbnail())
-                .status(Boolean.TRUE.equals(exam.getIsActive()) ? "published" : "archived")
+                .status(exam.getStatus() != null ? exam.getStatus().name().toLowerCase(Locale.ROOT) : "published")
                 .createdAt(exam.getCreatedAt())
                 .totalQuestions(inferExamTotalQuestions(exam))
                 .sections(mapSectionsSummary(exam))
@@ -196,10 +200,11 @@ public class ExamServiceImpl implements ExamService {
         return total > 0 ? total : 40;
     }
 
+    @Cacheable(value = "exams", key = "#examId")
     public Object getExamDetail(Long examId) {
-        log.info("Láº¥y chi tiáº¿t Ä‘á» thi ID: {}", examId);
+        log.info("Láº¥y chi tiáº¿t Ä‘á»  thi ID: {}", examId);
         Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á»  thi"));
 
         if (exam.getExamData() != null) {
             try {

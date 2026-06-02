@@ -790,7 +790,17 @@ function renderGroup(g, sec) {
         ? (g.questions || [])
         : buildFallbackQuestions(g, sec, display);
 
-    switch(display) {
+    // Auto-detect MULTIPLE_CHOICE if display is empty but choices exist
+    let effDisplay = display;
+    if (!effDisplay && sourceQuestions.length > 0) {
+        if (sourceQuestions[0].choices && Array.isArray(sourceQuestions[0].choices)) {
+            effDisplay = 'MULTIPLE_CHOICE';
+        } else {
+            effDisplay = 'FILL_BLOCK';
+        }
+    }
+
+    switch(effDisplay) {
         case 'TRUE_FALSE_NG':
         case 'MULTIPLE_CHOICE':
             sourceQuestions.forEach(q=>{ html+=renderQItem(q); });
@@ -888,6 +898,8 @@ function renderFillLine(q) {
 }
 
 // ─── AUDIO PLAYER ────────────────────────────────────────────────────────────
+let audioListenersBound = false;
+
 function updateAudioTotalTime() {
     if(audioElement.duration && !isNaN(audioElement.duration)) {
         AUDIO_END = Math.floor(audioElement.duration);
@@ -896,20 +908,32 @@ function updateAudioTotalTime() {
     }
 }
 function updateAudioSrc() {
-    const url = (examData.exam && examData.exam.audioUrl) ? examData.exam.audioUrl : 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-    audioElement.src = url;
-    audioElement.addEventListener('timeupdate', () => {
-        audioTime = Math.floor(audioElement.currentTime);
+    let activeSec = isSingle ? singleSec : (isRealMode() ? currentRealSec : currentSec);
+    let secObj = (examData && examData.sections && examData.sections.length >= activeSec) ? examData.sections[activeSec - 1] : null;
+    let url = (secObj && secObj.audioUrl) ? secObj.audioUrl : ((examData.exam && examData.exam.audioUrl) ? examData.exam.audioUrl : 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+    
+    if (audioElement.src !== url) {
+        audioElement.src = url;
+        audioTime = 0;
         updateAudioUI();
-        if(!isSingle) syncSectionLabel();
-    });
-    audioElement.addEventListener('loadedmetadata', updateAudioTotalTime);
-    audioElement.addEventListener('ended', () => {
-        audioPlaying = false;
-        document.getElementById('playIcon').className = 'bi bi-play-fill';
-    });
+        if (audioPlaying) audioElement.play();
+    }
+
+    if (!audioListenersBound) {
+        audioElement.addEventListener('timeupdate', () => {
+            audioTime = Math.floor(audioElement.currentTime);
+            updateAudioUI();
+        });
+        audioElement.addEventListener('loadedmetadata', updateAudioTotalTime);
+        audioElement.addEventListener('ended', () => {
+            audioPlaying = false;
+            document.getElementById('playIcon').className = 'bi bi-play-fill';
+        });
+        audioListenersBound = true;
+    }
 }
 function togglePlay(){
+    if (isRealMode()) return;
     audioPlaying=!audioPlaying;
     const icon=document.getElementById('playIcon');
     icon.className=audioPlaying?'bi bi-pause-fill':'bi bi-play-fill';
@@ -917,9 +941,11 @@ function togglePlay(){
     else audioElement.pause();
 }
 function skipAudio(delta){
+    if (isRealMode()) return;
     audioElement.currentTime = Math.max(0, Math.min(audioElement.duration || AUDIO_END, audioElement.currentTime + delta));
 }
 function seekAudio(e){
+    if (isRealMode()) return;
     const bar=document.getElementById('progBar');
     const rect=bar.getBoundingClientRect();
     const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
@@ -938,6 +964,7 @@ function syncSectionLabel(){
     [1,2,3,4].forEach(s=>{const box=document.getElementById('secbox'+s);if(box)box.classList.toggle('secbox-playing',s===sec);});
 }
 function cycleSpeed(){
+    if (isRealMode()) return;
     speedIdx=(speedIdx+1)%SPEEDS.length;
     document.getElementById('speedBtn').textContent=SPEEDS[speedIdx]+'×';
     audioElement.playbackRate = SPEEDS[speedIdx];
@@ -1010,6 +1037,7 @@ function switchSection(sec){
     const qs=document.getElementById('qScroll');if(qs)qs.scrollTop=0;
     [1,2,3,4].forEach(s=>{const box=document.getElementById('secbox'+s);if(box)box.classList.toggle('secbox-active',s===sec);});
     scrollToSecbox(sec); updateSecArrows();
+    updateAudioSrc();
 }
 function prevSection(){if(currentSec>1)switchSection(currentSec-1);}
 function nextSection(){if(currentSec<4)switchSection(currentSec+1);}
@@ -1084,7 +1112,9 @@ function initRealMode(){
 
 function startRealTest(){
     document.getElementById('confirmOverlay').classList.add('hidden');
+    audioPlaying = true;
     switchRealSec(currentRealSec);
+    if (audioElement && audioElement.src) audioElement.play();
     updateRealArrows();
     startTimer();
 }
@@ -1096,9 +1126,10 @@ function switchRealSec(sec){
     const r=REAL_SEC_CFG[sec];
     const lbl=document.getElementById('partInfoLabel'),sub=document.getElementById('partInfoSub');
     if(lbl)lbl.textContent=isSingle?SEC_CFG[singleSec].label:'Section '+sec;
-    if(sub)sub.textContent=r.sub;
+    if(sub)sub.textContent=Math.min(r.from,TOTAL)+`–`+Math.min(r.to,TOTAL); // Safely format string
     [1,2,3,4].forEach(s=>{const el=document.getElementById('rbs'+s);if(el)el.classList.toggle('active',s===sec);});
     updateRealBot();
+    updateAudioSrc();
 }
 function realPrevQ(){const qFrom=isSingle?SEC_CFG[singleSec].from:1;if(currentRealQ>qFrom)focusRealQ(currentRealQ-1);}
 function realNextQ(){const qTo=isSingle?SEC_CFG[singleSec].to:40;if(currentRealQ<qTo)focusRealQ(currentRealQ+1);}
@@ -1292,6 +1323,14 @@ function submitTest(){
     document.getElementById('mT').textContent=document.getElementById('timer').textContent;
     new bootstrap.Modal(document.getElementById('subModal')).show();
 }
+
+function getSubmitTimeSpentSeconds() {
+    const totalAllowed = isSingle ? SEC_CFG[singleSec].time : 30 * 60;
+    if (isRealMode()) {
+        return Math.max(0, Number(totalAllowed || 0) - Number(timeLeft || 0));
+    }
+    return Math.max(0, Number(timeLeft || 0));
+}
 async function confirmSub(){
     if (isReviewMode) return;
 
@@ -1331,7 +1370,7 @@ async function confirmSub(){
     }
 
     try {
-        const res = await submitAttemptAnswers(attemptId, answersPayload);
+        const res = await submitAttemptAnswers(attemptId, answersPayload, getSubmitTimeSpentSeconds());
         const result = res.data || res;
 
         localStorage.setItem('lastResultAttemptId', String(attemptId));

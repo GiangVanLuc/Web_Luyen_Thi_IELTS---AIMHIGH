@@ -13,9 +13,12 @@ window.addEventListener('scroll', () => {
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        if (href === '#') return; // Ignore simple '#' links
+        
+        const target = document.querySelector(href);
         if (target) {
+            e.preventDefault();
             target.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
@@ -33,7 +36,8 @@ const observerOptions = {
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
+            entry.target.style.opacity = '';
+            entry.target.style.transform = '';
             observer.unobserve(entry.target);
         }
     });
@@ -46,26 +50,6 @@ document.querySelectorAll('.feature-card, .step-card, .testimonial-card').forEac
     observer.observe(el);
 });
 
-// Add animate-in class styles
-const style = document.createElement('style');
-style.textContent = `
-    .animate-in {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-    }
-`;
-document.head.appendChild(style);
-
-// Feature card hover effect
-document.querySelectorAll('.feature-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-8px)';
-    });
-    
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0)';
-    });
-});
 
 // Typing effect for chat demo
 function typeMessage(element, text, speed = 30) {

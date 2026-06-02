@@ -20,6 +20,8 @@ import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.model.UserVocabulary;
 import vn.aimhigh.aimhighbackend.model.UserVocabularyGroup;
 import vn.aimhigh.aimhighbackend.model.Vocabulary;
+import vn.aimhigh.aimhighbackend.model.StudyLog;
+import vn.aimhigh.aimhighbackend.repository.StudyLogRepository;
 import vn.aimhigh.aimhighbackend.repository.UserRepository;
 import vn.aimhigh.aimhighbackend.repository.UserVocabularyGroupRepository;
 import vn.aimhigh.aimhighbackend.repository.UserVocabularyRepository;
@@ -48,6 +50,7 @@ public class VocabularyServiceImpl implements VocabularyService {
     private final UserVocabularyGroupRepository userVocabularyGroupRepository;
     private final VocabularyExampleRepository vocabularyExampleRepository;
     private final UserRepository userRepository;
+    private final StudyLogRepository studyLogRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -115,6 +118,16 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .note(note)
                 .build();
         UserVocabulary saved = userVocabularyRepository.save(userVocab);
+        
+        // Ghi nhật ký học tập lưu từ vựng
+        studyLogRepository.save(StudyLog.builder()
+                .user(user)
+                .activity("VOCABULARY_SAVE")
+                .detail(vocab.getWord())
+                .duration(1)
+                .createdAt(LocalDateTime.now())
+                .build());
+
         return toResponse(vocab, saved);
     }
 
@@ -484,6 +497,15 @@ public class VocabularyServiceImpl implements VocabularyService {
             userVocabulary.setLastReviewedAt(LocalDateTime.now());
             Integer current = userVocabulary.getReviewCount() == null ? 0 : userVocabulary.getReviewCount();
             userVocabulary.setReviewCount(current + 1);
+
+            // Ghi nhật ký học tập ôn tập Flashcard
+            studyLogRepository.save(StudyLog.builder()
+                    .user(userVocabulary.getUser())
+                    .activity("FLASHCARD_REVIEW")
+                    .detail(userVocabulary.getVocabulary().getWord())
+                    .duration(1)
+                    .createdAt(LocalDateTime.now())
+                    .build());
         }
     }
 

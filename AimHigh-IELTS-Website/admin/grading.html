@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -116,58 +116,26 @@
             <main class="admin-content">
                 <div class="grading-layout">
                     <!-- Left: Submission List -->
-                    <div class="submission-list">
+                    <div class="submission-list" id="submissionListContainer">
                         <div class="submission-list-header d-flex align-items-center justify-content-between">
-                            <span>Bài chờ chấm</span>
-                            <select class="form-select form-select-sm" style="width:auto;font-size:0.8rem;">
-                                <option>Tất cả</option>
-                                <option>Writing</option>
-                                <option>Speaking</option>
+                            <span>Danh sách bài thi tự luận</span>
+                            <select class="form-select form-select-sm" style="width:auto;font-size:0.8rem;" id="skillFilterSelect">
+                                <option value="ALL">Tất cả</option>
+                                <option value="WRITING">Writing</option>
+                                <option value="SPEAKING">Speaking</option>
                             </select>
                         </div>
-                        <div class="submission-item active">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="student-name">Nguyễn Thảo</span>
-                                <span class="status-badge pending" style="font-size:0.65rem;">Chờ chấm</span>
-                            </div>
-                            <div class="submission-meta">Writing Task 2 — 10 phút trước</div>
-                        </div>
-                        <div class="submission-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="student-name">Trần Minh</span>
-                                <span class="status-badge pending" style="font-size:0.65rem;">Chờ chấm</span>
-                            </div>
-                            <div class="submission-meta">Speaking Part 2 — 25 phút trước</div>
-                        </div>
-                        <div class="submission-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="student-name">Lê Hương</span>
-                                <span class="status-badge pending" style="font-size:0.65rem;">Chờ chấm</span>
-                            </div>
-                            <div class="submission-meta">Writing Task 1 — 1 giờ trước</div>
-                        </div>
-                        <div class="submission-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="student-name">Phạm Dũng</span>
-                                <span class="status-badge graded" style="font-size:0.65rem;">Đã chấm</span>
-                            </div>
-                            <div class="submission-meta">Writing Task 2 — 2 giờ trước</div>
-                        </div>
-                        <div class="submission-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="student-name">Hoàng Anh</span>
-                                <span class="status-badge graded" style="font-size:0.65rem;">Đã chấm</span>
-                            </div>
-                            <div class="submission-meta">Speaking Part 3 — 3 giờ trước</div>
+                        <div id="dynamicSubmissionList">
+                            <div class="text-center text-muted py-4">Đang tải danh sách bài nộp...</div>
                         </div>
                     </div>
 
                     <!-- Right: Grading Panel -->
-                    <div class="grading-panel">
+                    <div class="grading-panel" id="gradingPanelContainer" style="display: none;">
                         <div class="grading-panel-header">
                             <div>
-                                <h3 class="admin-card-title mb-0">Nguyễn Thảo — Writing Task 2</h3>
-                                <small style="color:var(--admin-text-muted);">Nộp lúc: 10/03/2026 14:30 • Thời gian: 38 phút</small>
+                                <h3 class="admin-card-title mb-0" id="activeSubmissionHeader">Nguyễn Thảo — Writing Task 2</h3>
+                                <small style="color:var(--admin-text-muted);" id="activeSubmissionSubHeader">Nộp lúc: 10/03/2026 14:30 • Thời gian: 38 phút</small>
                             </div>
                             <button class="btn-admin-primary" id="btnSubmitGrade">
                                 <i class="bi bi-check-lg"></i> Gửi điểm
@@ -175,24 +143,13 @@
                         </div>
                         <div class="grading-panel-body">
                             <!-- Student Answer -->
-                            <div class="admin-card" style="margin-bottom:20px;background:var(--admin-bg);">
+                            <div class="admin-card" style="margin-bottom:20px;background:var(--admin-bg);" id="studentAnswerCard">
                                 <h6 style="font-weight:700;font-size:0.9rem;margin-bottom:12px;">
                                     <i class="bi bi-file-text me-1"></i>Bài làm của học viên
                                 </h6>
-                                <p style="font-size:0.875rem;line-height:1.8;color:var(--text-primary);">
-                                    <strong>Đề bài:</strong> Some people believe that technology has made our lives more complex, while others feel it has simplified things. Discuss both views and give your own opinion.
-                                </p>
-                                <hr>
-                                <p style="font-size:0.875rem;line-height:1.8;">
-                                    In the modern era, technology has become an integral part of our daily lives. While some argue that technological advancements have complicated our existence, others contend that they have streamlined various aspects of life. In my opinion, while technology does introduce certain complexities, its overall impact has been overwhelmingly positive in simplifying our routines.
-                                </p>
-                                <p style="font-size:0.875rem;line-height:1.8;">
-                                    On the one hand, technology has undeniably added layers of complexity to our lives. The constant connectivity facilitated by smartphones and social media can lead to information overload, making it difficult for individuals to disconnect and relax. Furthermore, the rapid pace of technological change requires continuous learning and adaptation, which can be stressful for many people, particularly older generations who may struggle with new interfaces and systems.
-                                </p>
-                                <p style="font-size:0.875rem;line-height:1.8;">
-                                    On the other hand, the benefits of technology in simplifying daily tasks are immeasurable. From online banking and e-commerce to digital communication tools, technology has eliminated numerous manual processes that were once time-consuming and tedious...
-                                </p>
-                                <small style="color:var(--admin-text-muted);">Tổng: 287 từ</small>
+                                <div id="studentAnswerContent" style="font-size:0.875rem;line-height:1.8;">
+                                    <!-- Rendered dynamically -->
+                                </div>
                             </div>
 
                             <!-- Score Inputs -->
@@ -202,24 +159,24 @@
                                 </h6>
                                 <div class="score-input-group">
                                     <label>Task Achievement</label>
-                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9">
+                                    <input type="number" class="form-control score-sub" min="0" max="9" step="0.5" placeholder="0-9" id="scoreTask">
                                 </div>
                                 <div class="score-input-group">
                                     <label>Coherence & Cohesion</label>
-                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9">
+                                    <input type="number" class="form-control score-sub" min="0" max="9" step="0.5" placeholder="0-9" id="scoreCoherence">
                                 </div>
                                 <div class="score-input-group">
                                     <label>Lexical Resource</label>
-                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9">
+                                    <input type="number" class="form-control score-sub" min="0" max="9" step="0.5" placeholder="0-9" id="scoreLexical">
                                 </div>
                                 <div class="score-input-group">
                                     <label>Grammar Range</label>
-                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9">
+                                    <input type="number" class="form-control score-sub" min="0" max="9" step="0.5" placeholder="0-9" id="scoreGrammar">
                                 </div>
                                 <hr>
                                 <div class="score-input-group">
                                     <label><strong>Overall Band</strong></label>
-                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9" style="font-size:1.2rem;width:90px;" id="overallBand" readonly>
+                                    <input type="number" class="form-control" min="0" max="9" step="0.5" placeholder="0-9" style="font-size:1.2rem;width:90px;" id="overallBand">
                                 </div>
                             </div>
 
@@ -228,9 +185,16 @@
                                 <h6 style="font-weight:700;font-size:0.9rem;margin-bottom:12px;">
                                     <i class="bi bi-chat-dots me-1"></i>Nhận xét & Feedback
                                 </h6>
-                                <textarea class="form-control" rows="5" placeholder="Nhập nhận xét chi tiết cho học viên..." style="font-size:0.875rem;"></textarea>
+                                <textarea class="form-control" rows="8" placeholder="Nhập nhận xét chi tiết cho học viên..." style="font-size:0.875rem;" id="teacherFeedback"></textarea>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Placeholder when no submission is selected -->
+                    <div class="grading-panel text-center text-muted py-5 grading-panel-placeholder" id="gradingPanelPlaceholder">
+                        <i class="bi bi-folder2-open mb-3" style="font-size: 3.5rem; color: #C9A227;"></i>
+                        <h4 class="fw-bold" style="color: #4a3800;">Bảng điều khiển chấm bài</h4>
+                        <p class="px-4" style="max-width: 400px;">Vui lòng chọn một bài làm của học viên từ danh sách bên trái để bắt đầu nghe ghi âm, đọc bài viết và chấm điểm chi tiết.</p>
                     </div>
                 </div>
             </main>
@@ -238,44 +202,213 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
     <script>
-        // Auto-calculate overall band
-        const scoreInputs = document.querySelectorAll('.score-input-group input:not(#overallBand)');
-        scoreInputs.forEach(input => {
-            input.addEventListener('input', calculateOverall);
-        });
+        document.addEventListener('DOMContentLoaded', async function() {
+            let activeAttempt = null;
+            let submissionsList = [];
 
-        function calculateOverall() {
-            const scores = [];
-            scoreInputs.forEach(input => {
-                const val = parseFloat(input.value);
-                if (!isNaN(val)) scores.push(val);
-            });
-            if (scores.length === 4) {
-                const avg = scores.reduce((a, b) => a + b, 0) / 4;
-                document.getElementById('overallBand').value = (Math.round(avg * 2) / 2).toFixed(1);
-            } else {
-                document.getElementById('overallBand').value = '';
+            // DOM elements
+            const dynamicList = document.getElementById('dynamicSubmissionList');
+            const skillFilter = document.getElementById('skillFilterSelect');
+            const panelContainer = document.getElementById('gradingPanelContainer');
+            const panelPlaceholder = document.getElementById('gradingPanelPlaceholder');
+            
+            const activeHeader = document.getElementById('activeSubmissionHeader');
+            const activeSubHeader = document.getElementById('activeSubmissionSubHeader');
+            const answerContent = document.getElementById('studentAnswerContent');
+            const overallBandInput = document.getElementById('overallBand');
+            const feedbackTextarea = document.getElementById('teacherFeedback');
+            const btnSubmit = document.getElementById('btnSubmitGrade');
+            
+            // Sub-scores inputs
+            const subInputs = document.querySelectorAll('.score-sub');
+
+            // 1. Tải danh sách bài thi tự luận
+            async function loadSubmissions() {
+                try {
+                    dynamicList.innerHTML = '<div class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm text-warning" role="status"></div> Đang tải...</div>';
+                    
+                    const filter = skillFilter.value;
+                    const res = await adminGetUngradedSubmissions({ skill: filter });
+                    submissionsList = res?.data?.content || res?.content || [];
+
+                    if (submissionsList.length === 0) {
+                        dynamicList.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-check-circle-fill text-success mb-2" style="font-size: 1.5rem;"></i><br>Không có bài nộp nào cần chấm.</div>';
+                        return;
+                    }
+
+                    dynamicList.innerHTML = '';
+                    submissionsList.forEach(item => {
+                        const date = new Date(item.submittedAt || item.startedAt);
+                        const timeStr = date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                        const isGraded = item.status === 'GRADED';
+                        
+                        const itemEl = document.createElement('div');
+                        itemEl.className = `submission-item ${activeAttempt && activeAttempt.attemptId === item.attemptId ? 'active' : ''}`;
+                        itemEl.innerHTML = `
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="student-name">${eh(item.studentName)}</span>
+                                <span class="status-badge ${isGraded ? 'graded' : 'pending'}" style="font-size:0.65rem;">
+                                    ${isGraded ? 'Đã chấm' : 'Chờ chấm'}
+                                </span>
+                            </div>
+                            <div class="submission-meta">${eh(item.examTitle)} (${eh(item.skill)}) — ${timeStr}</div>
+                        `;
+
+                        itemEl.addEventListener('click', () => {
+                            document.querySelectorAll('.submission-item').forEach(el => el.classList.remove('active'));
+                            itemEl.classList.add('active');
+                            selectSubmission(item);
+                        });
+
+                        dynamicList.appendChild(itemEl);
+                    });
+
+                } catch (e) {
+                    console.error('Lỗi tải danh sách bài nộp:', e);
+                    dynamicList.innerHTML = '<div class="text-center text-danger py-4">Lỗi kết nối máy chủ.</div>';
+                }
             }
-        }
 
-        // Submit grade
-        document.getElementById('btnSubmitGrade').addEventListener('click', () => {
-            const overall = document.getElementById('overallBand').value;
-            if (!overall) {
-                alert('Vui lòng chấm đủ 4 tiêu chí.');
-                return;
+            // 2. Chọn một bài thi cụ thể
+            function selectSubmission(item) {
+                activeAttempt = item;
+                panelPlaceholder.style.display = 'none';
+                panelContainer.style.display = 'block';
+
+                activeHeader.textContent = `${item.studentName} — ${item.examTitle} (${item.skill})`;
+                
+                const date = new Date(item.submittedAt || item.startedAt);
+                const timeStr = date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                activeSubHeader.textContent = `Nộp lúc: ${timeStr} • Kỹ năng: ${item.skill} • Trạng thái: ${item.status}`;
+
+                // Render câu trả lời học viên
+                renderStudentAnswers(item);
+
+                // Điền điểm số cũ nếu có
+                overallBandInput.value = item.bandScore != null ? item.bandScore : '';
+                feedbackTextarea.value = item.feedback ? item.feedback : '';
+
+                // Reset các điểm tiêu chí phụ
+                subInputs.forEach(input => input.value = '');
             }
-            alert('Đã gửi điểm thành công! Overall Band: ' + overall);
-        });
 
-        // Submission list click
-        document.querySelectorAll('.submission-item').forEach(item => {
-            item.addEventListener('click', function () {
-                document.querySelectorAll('.submission-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
+            // Render câu trả lời (Writing/Speaking)
+            function renderStudentAnswers(item) {
+                answerContent.innerHTML = '';
+                if (!item.answers || item.answers.length === 0) {
+                    answerContent.innerHTML = '<p class="text-muted">Không tìm thấy câu trả lời của học viên.</p>';
+                    return;
+                }
+
+                if (item.skill.toUpperCase() === 'SPEAKING') {
+                    item.answers.forEach(ans => {
+                        if (ans.questionNumber === 999) return; // Bỏ qua nháp Note
+                        const audioUrl = ans.answerText;
+                        answerContent.innerHTML += `
+                            <div class="mb-3 p-3 rounded" style="background: rgba(201, 162, 39, 0.05); border: 1px dashed #C9A227;">
+                                <strong class="d-block mb-2 text-dark">Câu hỏi Speaking Part:</strong>
+                                <p class="text-muted">${eh(ans.questionText || 'Đề bài Speaking')}</p>
+                                <hr>
+                                <strong class="d-block mb-2 text-danger"><i class="bi bi-play-circle me-1"></i>File ghi âm của học sinh:</strong>
+                                <audio src="${audioUrl}" controls class="w-100 rounded-pill shadow-sm" style="border: 2px solid var(--record-color);"></audio>
+                            </div>
+                        `;
+                    });
+                } else {
+                    // Writing
+                    item.answers.forEach(ans => {
+                        let text = ans.answerText || '';
+                        // Format lại định dạng block
+                        text = text
+                            .replace(/\[Introduction\]/gi, '<h6 class="fw-bold text-warning mb-1">Introduction</h6>')
+                            .replace(/\[Overview.*?\]/gi, '<h6 class="fw-bold text-warning mb-1">Overview / Body 1</h6>')
+                            .replace(/\[Body 1.*?\]/gi, '<h6 class="fw-bold text-warning mb-1">Body 1 / Body 2</h6>')
+                            .replace(/\[Body 2.*?\]/gi, '<h6 class="fw-bold text-warning mb-1">Body 2 / Conclusion</h6>')
+                            .replace(/\n/g, '<br>');
+
+                        answerContent.innerHTML += `
+                            <div class="mb-4 p-3 rounded border bg-white">
+                                <strong class="d-block mb-2 text-dark">Câu hỏi Writing Task ${ans.questionNumber}:</strong>
+                                <p class="text-muted" style="font-size:0.85rem;line-height:1.6;">${eh(ans.questionText || 'Đề bài tự luận')}</p>
+                                <hr>
+                                <div class="candidate-essay mt-3 text-dark" style="font-family:\'Be Vietnam Pro\', sans-serif;line-height:1.8;">
+                                    ${text}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // 3. Tự động tính Overall Band
+            subInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    const scores = [];
+                    subInputs.forEach(i => {
+                        const val = parseFloat(i.value);
+                        if (!isNaN(val)) scores.push(val);
+                    });
+                    if (scores.length === 4) {
+                        const avg = scores.reduce((a, b) => a + b, 0) / 4;
+                        overallBandInput.value = (Math.round(avg * 2) / 2).toFixed(1);
+                    }
+                });
             });
+
+            // 4. Gửi điểm số
+            btnSubmit.addEventListener('click', async function() {
+                if (!activeAttempt) return;
+                const score = parseFloat(overallBandInput.value);
+                const feedback = feedbackTextarea.value;
+
+                if (isNaN(score) || score < 0 || score > 9) {
+                    showToast('Vui lòng nhập điểm Overall Band hợp lệ (0.0 - 9.0).', 'error');
+                    return;
+                }
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Đang gửi...';
+
+                try {
+                    await adminGradeSubmission(activeAttempt.attemptId, {
+                        bandScore: score,
+                        feedback: feedback
+                    });
+
+                    showToast('Cập nhật điểm và phản hồi thành công!', 'success');
+                    
+                    // Reload submissions list
+                    await loadSubmissions();
+
+                    // Khôi phục view panel
+                    panelContainer.style.display = 'none';
+                    panelPlaceholder.style.display = 'flex';
+                    activeAttempt = null;
+
+                } catch (e) {
+                    console.error('Lỗi khi lưu điểm:', e);
+                    showToast('Lỗi khi chấm điểm bài thi.', 'error');
+                } finally {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = '<i class="bi bi-check-lg"></i> Gửi điểm';
+                }
+            });
+
+            // Lắng nghe sự kiện lọc
+            skillFilter.addEventListener('change', loadSubmissions);
+
+            // Tải danh sách lần đầu
+            await loadSubmissions();
+
+            // Helper escape HTML
+            function eh(str) {
+                if (!str) return '';
+                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
         });
     </script>
 </body>

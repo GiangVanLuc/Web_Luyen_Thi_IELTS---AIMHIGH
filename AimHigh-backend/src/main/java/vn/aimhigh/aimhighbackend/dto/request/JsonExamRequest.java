@@ -3,6 +3,7 @@ package vn.aimhigh.aimhighbackend.dto.request;
 import lombok.*;
 import vn.aimhigh.aimhighbackend.enums.*;
 import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @Data
@@ -27,7 +28,10 @@ public class JsonExamRequest {
     
     private Long sourceId;
     
+    @Valid
     private List<PassageRequest> passages;
+    
+    @Valid
     private List<PartRequest> parts;
 
     @Data
@@ -36,6 +40,7 @@ public class JsonExamRequest {
         private String content;
         private Integer passageOrder;
         private String imageUrl;
+        @Valid
         private List<QuestionRequest> questions;
     }
 
@@ -46,6 +51,7 @@ public class JsonExamRequest {
         private String audioUrl;
         private Integer audioDuration;
         private String transcript;
+        @Valid
         private List<QuestionRequest> questions;
     }
 
@@ -58,6 +64,7 @@ public class JsonExamRequest {
         private String explanation;
         private Integer audioStart;
         private Integer audioEnd;
+        @Valid
         private List<ChoiceRequest> choices;
     }
 

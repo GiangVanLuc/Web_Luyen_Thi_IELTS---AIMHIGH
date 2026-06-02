@@ -59,6 +59,9 @@ public class Attempt {
     @Column(name = "band_score")
     private Double bandScore;
     
+    @Column(columnDefinition = "LONGTEXT")
+    private String feedback;
+    
     @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL)
     private List<Answer> answers;
 

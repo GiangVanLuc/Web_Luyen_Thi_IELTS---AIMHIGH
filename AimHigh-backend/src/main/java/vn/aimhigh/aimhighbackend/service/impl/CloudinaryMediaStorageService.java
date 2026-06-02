@@ -22,7 +22,7 @@ import java.util.UUID;
 public class CloudinaryMediaStorageService implements MediaStorageService {
 
     private static final Set<String> AUDIO_EXTENSIONS = Set.of(
-            "mp3", "wav", "ogg", "m4a", "aac", "flac"
+            "mp3", "wav", "ogg", "m4a", "aac", "flac", "webm"
     );
 
     private static final Set<String> IMAGE_EXTENSIONS = Set.of(

@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import vn.aimhigh.aimhighbackend.enums.ExamLevel;
 import vn.aimhigh.aimhighbackend.enums.ExamType;
 import vn.aimhigh.aimhighbackend.enums.Skill;
+import vn.aimhigh.aimhighbackend.enums.ExamStatus;
 import vn.aimhigh.aimhighbackend.model.Exam;
 import vn.aimhigh.aimhighbackend.model.ListeningPart;
 import vn.aimhigh.aimhighbackend.model.ReadingPassage;
@@ -33,7 +34,7 @@ class SeedTest {
                 .title("Listening Practice Test 1")
                 .skill(Skill.LISTENING)
                 .duration(40)
-                .isActive(true)
+                .status(ExamStatus.PUBLISHED)
                 .level(ExamLevel.MEDIUM)
                 .type(ExamType.ACADEMIC)
                 .description("Mock DB Seed")
@@ -51,7 +52,7 @@ class SeedTest {
                 .title("Reading Practice Test 1")
                 .skill(Skill.READING)
                 .duration(60)
-                .isActive(true)
+                .status(ExamStatus.PUBLISHED)
                 .level(ExamLevel.MEDIUM)
                 .type(ExamType.ACADEMIC)
                 .description("Mock DB Seed")

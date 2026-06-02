@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -6,11 +6,12 @@
     <title>Đăng ký - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         :root {
-            --primary-blue: #c89a17;
-            --primary-blue-dark: #a97f0f;
+            --primary-brand: #c89a17;
+            --primary-brand-dark: #a97f0f;
             --text-primary: #4a3800;
             --text-secondary: #7a6a3a;
             --input-border: #e4d7b2;
@@ -140,7 +141,7 @@
             font-size: 0.92rem;
         }
 
-        .feature-list li i {
+        .feature-list li .bi {
             color: var(--logo-gold);
         }
 
@@ -153,7 +154,7 @@
             position: relative;
         }
 
-        .input-icon-wrap .fa-solid {
+        .input-icon-wrap .bi {
             position: absolute;
             top: 50%;
             left: 14px;
@@ -172,12 +173,12 @@
         }
 
         .input-icon-wrap .form-control:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 0.2rem rgba(200,154,23,0.25);
+            border-color: var(--primary-brand);
+            box-shadow: 0 0 0 0.2rem rgba(200, 154, 23, 0.25);
         }
 
         .btn-primary-auth {
-            background: var(--primary-blue);
+            background: var(--primary-brand);
             border: none;
             color: #fff;
             font-weight: 700;
@@ -186,7 +187,7 @@
         }
 
         .btn-primary-auth:hover {
-            background: var(--primary-blue-dark);
+            background: var(--primary-brand-dark);
             color: #fff;
         }
 
@@ -226,7 +227,7 @@
         }
 
         .switch-auth a {
-            color: var(--primary-blue);
+            color: var(--primary-brand);
             font-weight: 700;
             text-decoration: none;
         }
@@ -298,30 +299,30 @@
                     <p class="brand-desc">Nền tảng học IELTS theo lộ trình cá nhân hóa với AI hỗ trợ toàn diện và chấm điểm tức thì.</p>
 
                     <ul class="feature-list">
-                        <li><i class="fa-solid fa-circle-check"></i> Luyện Listening, Reading theo cấp độ chuẩn IELTS</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Luyện đề thi thử sát cấu trúc đề IELTS thật</li>
-                        <li><i class="fa-solid fa-circle-check"></i> AI chấm điểm và sửa bài Writing chi tiết</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Theo dõi tiến bộ và dự đoán band score</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Luyện Listening, Reading theo cấp độ chuẩn IELTS</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Luyện đề thi thử sát cấu trúc đề IELTS thật</li>
+                        <li><i class="bi bi-check-circle-fill"></i> AI chấm điểm và sửa bài Writing chi tiết</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Theo dõi tiến bộ và dự đoán band score</li>
                     </ul>
 
                     <div class="stats-grid">
                         <article class="stat-card rounded-4 text-center">
-                            <i class="fa-solid fa-headphones"></i>
+                            <i class="bi bi-headphones"></i>
                             <h4>8000+</h4>
                             <p>Bài nghe</p>
                         </article>
                         <article class="stat-card rounded-4 text-center">
-                            <i class="fa-solid fa-circle-question"></i>
+                            <i class="bi bi-question-circle-fill"></i>
                             <h4>1500+</h4>
                             <p>Câu hỏi</p>
                         </article>
                         <article class="stat-card rounded-4 text-center">
-                            <i class="fa-solid fa-file-lines"></i>
+                            <i class="bi bi-file-earmark-text-fill"></i>
                             <h4>50+</h4>
                             <p>Đề thi</p>
                         </article>
                         <article class="stat-card rounded-4 text-center">
-                            <i class="fa-solid fa-user-graduate"></i>
+                            <i class="bi bi-mortarboard-fill"></i>
                             <h4>10000+</h4>
                             <p>Lượt luyện tập</p>
                         </article>
@@ -340,7 +341,7 @@
                         <div class="mb-2">
                             <label for="registerName" class="form-label">Họ và tên</label>
                             <div class="input-icon-wrap">
-                                <i class="fa-solid fa-user"></i>
+                                <i class="bi bi-person-fill"></i>
                                 <input type="text" class="form-control rounded-3" id="registerName" placeholder="Nguyễn Văn A" required>
                             </div>
                         </div>
@@ -348,7 +349,7 @@
                         <div class="mb-2">
                             <label for="registerEmail" class="form-label">Email</label>
                             <div class="input-icon-wrap">
-                                <i class="fa-solid fa-envelope"></i>
+                                <i class="bi bi-envelope-fill"></i>
                                 <input type="email" class="form-control rounded-3" id="registerEmail" placeholder="you@example.com" required>
                             </div>
                         </div>
@@ -356,7 +357,7 @@
                         <div class="mb-2">
                             <label for="registerPassword" class="form-label">Mật khẩu</label>
                             <div class="input-icon-wrap">
-                                <i class="fa-solid fa-lock"></i>
+                                <i class="bi bi-lock-fill"></i>
                                 <input type="password" class="form-control rounded-3" id="registerPassword" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
                             </div>
                         </div>
@@ -364,7 +365,7 @@
                         <div class="mb-2">
                             <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
                             <div class="input-icon-wrap">
-                                <i class="fa-solid fa-lock"></i>
+                                <i class="bi bi-lock-fill"></i>
                                 <input type="password" class="form-control rounded-3" id="confirmPassword" placeholder="Nhập lại mật khẩu" minlength="6" required>
                             </div>
                         </div>
@@ -374,8 +375,8 @@
 
                     <div class="auth-divider my-2"><span>Hoặc tiếp tục với</span></div>
 
-                    <button type="button" onclick="window.location.href='http://localhost:8080/oauth2/authorization/google'" class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2">
-                        <i class="fa-brands fa-google"></i>
+                    <button type="button" onclick="window.location.href='http://localhost:8080/oauth2/authorization/google'" class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2" aria-label="Đăng nhập bằng Google">
+                        <i class="bi bi-google"></i>
                         <span>Google Login</span>
                     </button>
 

@@ -2474,6 +2474,13 @@ function submitTest(){
     new bootstrap.Modal(document.getElementById('subModal')).show();
 }
 
+function getSubmitTimeSpentSeconds() {
+    if (isRealMode()) {
+        return Math.max(0, Number(cfg.time || 0) - Number(timeLeft || 0));
+    }
+    return Math.max(0, Number(timeLeft || 0));
+}
+
 async function confirmSub(){
     if (isReviewMode) return;
     clearInterval(timerInt);
@@ -2515,7 +2522,7 @@ async function confirmSub(){
     }
 
     try {
-        const res = await submitAttemptAnswers(attemptId, answersPayload);
+        const res = await submitAttemptAnswers(attemptId, answersPayload, getSubmitTimeSpentSeconds());
         const submitResult = res.data || res;
         const result = await resolveDetailedResult(attemptId, submitResult, 5);
         

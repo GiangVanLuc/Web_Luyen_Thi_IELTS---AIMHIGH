@@ -1908,6 +1908,22 @@ function syncVocabularyMenuActive(view) {
     vaultLink.classList.toggle('active', view !== 'custom');
 }
 
+async function syncHeatmapFromBackend() {
+    const token = localStorage.getItem('aimhigh_token');
+    if (!token) return;
+    try {
+        const res = await apiFetch('/study-logs/heatmap');
+        const heatmapData = res?.data || res || {};
+        if (heatmapData && typeof heatmapData === 'object' && !Array.isArray(heatmapData)) {
+            const localActivity = getActivity();
+            const merged = { ...localActivity, ...heatmapData };
+            localStorage.setItem(ACTIVITY_KEY, JSON.stringify(merged));
+        }
+    } catch (err) {
+        console.warn('Không thể đồng bộ heatmap từ backend:', err.message || err);
+    }
+}
+
 // ===== INITIATE =====
 document.addEventListener('DOMContentLoaded', async () => {
     if (redirectLegacyVocabularyRoutes()) return;
@@ -1916,6 +1932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initVocabularyHeaderAuth();
     initData();
     await syncUserVocabularyFromBackend();
+    await syncHeatmapFromBackend();
     initWordTableControls();
 
     if (currentVocabularyPage === 'notebook') {

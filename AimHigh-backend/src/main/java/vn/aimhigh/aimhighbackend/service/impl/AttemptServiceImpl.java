@@ -16,10 +16,12 @@ import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 import vn.aimhigh.aimhighbackend.exception.ForbiddenException;
 import vn.aimhigh.aimhighbackend.model.Attempt;
 import vn.aimhigh.aimhighbackend.model.Exam;
+import vn.aimhigh.aimhighbackend.model.StudyLog;
 import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.repository.AttemptRepository;
 import vn.aimhigh.aimhighbackend.repository.ExamRepository;
 import vn.aimhigh.aimhighbackend.repository.UserRepository;
+import vn.aimhigh.aimhighbackend.repository.StudyLogRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +40,11 @@ public class AttemptServiceImpl implements AttemptService {
     private final ScoringService scoringService;
     private final RedisService redisService;
     private final ObjectMapper objectMapper;
+    private final StudyLogRepository studyLogRepository;
 
     @Transactional
     public AttemptResponse startAttempt(StartAttemptRequest request, Long userId) {
-        log.info("Báº¯t Ä‘áº§u bÃ i thi: examId={}, userId={}", request.getExamId(), userId);
+        log.info("Bắt đầu bài thi: examId={}, userId={}", request.getExamId(), userId);
 
         Attempt existingAttempt = attemptRepository
             .findByUserIdAndExamIdAndStatus(userId, request.getExamId(), AttemptStatus.IN_PROGRESS)
@@ -59,9 +62,9 @@ public class AttemptServiceImpl implements AttemptService {
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException("User khÃ´ng tá»“n táº¡i"));
+                .orElseThrow(() -> new BadRequestException("User không tồn tại"));
         Exam exam = examRepository.findById(request.getExamId())
-                .orElseThrow(() -> new BadRequestException("Exam khÃ´ng tá»“n táº¡i"));
+                .orElseThrow(() -> new BadRequestException("Exam không tồn tại"));
 
         Attempt attempt = Attempt.builder()
                 .user(user)
@@ -72,7 +75,7 @@ public class AttemptServiceImpl implements AttemptService {
         
         attemptRepository.save(attempt);
 
-        // LÆ°u Redis timer
+        // Lưu Redis timer
         redisService.startExamTimer(userId, exam.getId(), exam.getDuration());
         
         return AttemptResponse.builder()
@@ -87,12 +90,12 @@ public class AttemptServiceImpl implements AttemptService {
     }
 
     public void saveProgress(Long attemptId, SaveProgressRequest request, Long userId) {
-        log.info("LÆ°u tiáº¿n Ä‘á»™. attemptId: {}", attemptId);
+        log.info("Lưu tiến độ. attemptId: {}", attemptId);
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new BadRequestException("Attempt khÃ´ng tá»“n táº¡i"));
+                .orElseThrow(() -> new BadRequestException("Attempt không tồn tại"));
                 
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n lÆ°u tiáº¿n Ä‘á»™");
+            throw new ForbiddenException("Không có quyền lưu tiến độ");
         }
         
         Long examId = attempt.getExam().getId();
@@ -108,12 +111,12 @@ public class AttemptServiceImpl implements AttemptService {
     }
 
     public List<ProgressResponse> getProgress(Long attemptId, Long userId) {
-        log.info("Láº¥y tiáº¿n Ä‘á»™. attemptId: {}", attemptId);
+        log.info("Lấy tiến độ. attemptId: {}", attemptId);
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new BadRequestException("Attempt khÃ´ng tá»“n táº¡i"));
+                .orElseThrow(() -> new BadRequestException("Attempt không tồn tại"));
                 
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n láº¥y tiáº¿n Ä‘á»™");
+            throw new ForbiddenException("Không có quyền lấy tiến độ");
         }
 
         Object rawData = redisService.getExamProgress(userId, attempt.getExam().getId());
@@ -131,28 +134,59 @@ public class AttemptServiceImpl implements AttemptService {
 
     @Transactional
     public ResultResponse submitAttempt(Long attemptId, SubmitAttemptRequest request, Long userId) {
-        log.info("Ná»™p bÃ i thi. attemptId: {}", attemptId);
+        log.info("Nộp bài thi. attemptId: {}", attemptId);
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new BadRequestException("Attempt khÃ´ng tá»“n táº¡i"));
+                .orElseThrow(() -> new BadRequestException("Attempt không tồn tại"));
 
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n ná»™p bÃ i");
+            throw new ForbiddenException("Không có quyền nộp bài");
         }
 
-        if (attempt.getStatus() == AttemptStatus.SUBMITTED) {
-            throw new BadRequestException("BÃ i lÃ m Ä‘Ã£ Ä‘Æ°á»£c ná»™p!");
+        if (attempt.getStatus() != AttemptStatus.IN_PROGRESS) {
+            throw new BadRequestException("Bài làm đã được nộp!");
+        }
+
+        // Chống gian lận: Kiểm tra thời gian làm bài (Cộng thêm 5 phút bù trừ độ trễ mạng)
+        long allowedMinutes = attempt.getExam().getDuration() + 5L;
+        if (java.time.LocalDateTime.now().isAfter(attempt.getStartedAt().plusMinutes(allowedMinutes))) {
+            throw new BadRequestException("Đã quá thời gian làm bài, không thể nộp bài!");
         }
 
         Long examId = attempt.getExam().getId();
         redisService.clearExamProgress(userId, examId);
         redisService.delete("exam_timer:" + userId + ":" + examId);
 
+        if (request.getTimeSpent() != null && request.getTimeSpent() >= 0) {
+            attempt.setTimeSpent(request.getTimeSpent());
+        } else {
+            long elapsedSeconds = java.time.Duration.between(attempt.getStartedAt(), java.time.LocalDateTime.now()).getSeconds();
+            attempt.setTimeSpent((int) Math.max(0, Math.min(elapsedSeconds, Integer.MAX_VALUE)));
+        }
+
         scoringService.scoreAttempt(attempt, request.getAnswers());
+
+        // Ghi nhật ký học tập nộp bài thi
+        studyLogRepository.save(StudyLog.builder()
+                .user(attempt.getUser())
+                .activity("PRACTICE_SUBMIT")
+                .detail(attempt.getExam().getTitle() + " (" + attempt.getExam().getSkill().name() + ")")
+                .duration(attempt.getExam().getDuration())
+                .createdAt(java.time.LocalDateTime.now())
+                .build());
 
         return ResultResponse.builder()
                 .attemptId(attempt.getId())
+                .examId(attempt.getExam().getId())
+                .examTitle(attempt.getExam().getTitle())
+                .skill(attempt.getExam().getSkill())
+                .mode(attempt.getMode())
+                .totalQuestions(request.getAnswers() == null ? 0 : request.getAnswers().size())
+                .totalCorrect(attempt.getTotalCorrect() == null ? 0 : attempt.getTotalCorrect())
+                .totalWrong(attempt.getTotalWrong() == null ? 0 : attempt.getTotalWrong())
                 .score(attempt.getScore())
                 .bandScore(attempt.getBandScore())
+                .timeSpent(attempt.getTimeSpent())
+                .feedback(attempt.getFeedback())
                 .build();
     }
 }

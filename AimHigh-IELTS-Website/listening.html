@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -86,9 +86,16 @@
 <!-- SUBNAV -->
 <div class="subnav">
   <span class="sn-info" id="snInfo">Đang tải đề thi…</span>
-  <div class="sn-right">
-    <button class="sn-btn sn-btn-neutral" id="btnSubNote" onclick="toggleNote()">Hiện note</button>
-    <button class="sn-btn sn-btn-red" onclick="clearAllNotes()">Xoá tất cả note</button>
+  <div class="sn-right d-flex align-items-center gap-2">
+    <button class="sn-btn tool" id="tHL" onclick="setTool('hl')" title="Highlight (H)">
+      <i class="bi bi-highlighter"></i> Highlight
+    </button>
+    <button class="sn-btn tool" id="tNT" onclick="setTool('nt')" title="Notes (N)">
+      <i class="bi bi-sticky-fill"></i> Ghi chú
+    </button>
+    <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+    <button class="sn-btn sn-btn-neutral" id="btnSubNote" onclick="toggleNote()">Hiện list note</button>
+    <button class="sn-btn sn-btn-red" onclick="clearAllNotes()">Xoá list note</button>
   </div>
 </div>
 
@@ -118,15 +125,7 @@
 <!-- MAIN -->
 <div class="main">
 
-  <!-- TOOL SIDEBAR -->
-  <div class="tools">
-    <button class="tool" id="tHL" onclick="setTool('hl')" title="Highlight (H)">
-      <i class="bi bi-highlighter"></i>Highlight<br>Phím (H)
-    </button>
-    <button class="tool" id="tNT" onclick="setTool('nt')" title="Notes (N)">
-      <i class="bi bi-sticky-fill"></i>Notes<br>Phím (N)
-    </button>
-  </div>
+
 
   <!-- QUESTIONS PANEL — nội dung sẽ được JS inject vào -->
   <div class="qpanel" id="questionPanel">

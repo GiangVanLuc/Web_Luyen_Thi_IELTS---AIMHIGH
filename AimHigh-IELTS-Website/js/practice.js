@@ -358,9 +358,39 @@ function startActualTest() {
         window.location.href = `listening.html?${params.toString()}`;
 
     } else if (subject === 'writing') {
-        window.location.href = 'writing.html';
+        const selectedType = selectedCardType
+            || document.querySelector('input[name="writingType"]:checked')?.value
+            || 'single';
+        const selectedPart = selectedCardPart
+            || document.querySelector('input[name="writingPart"]:checked')?.value
+            || '1';
+        const section = selectedType === 'full' ? 'full' : selectedPart;
+        localStorage.setItem('currentExamSection', section);
+
+        const params = new URLSearchParams({
+            examId: String(selectedExamId),
+            section,
+            mode: selectedMode,
+            title: selectedExerciseTitle
+        });
+        window.location.href = `writing.html?${params.toString()}`;
     } else {
-        window.location.href = 'speaking.html';
+        const selectedType = selectedCardType
+            || document.querySelector('input[name="speakingType"]:checked')?.value
+            || 'single';
+        const selectedPart = selectedCardPart
+            || document.querySelector('input[name="speakingPart"]:checked')?.value
+            || '1';
+        const section = selectedType === 'full' ? 'full' : selectedPart;
+        localStorage.setItem('currentExamSection', section);
+
+        const params = new URLSearchParams({
+            examId: String(selectedExamId),
+            section,
+            mode: selectedMode,
+            title: selectedExerciseTitle
+        });
+        window.location.href = `speaking.html?${params.toString()}`;
     }
 }
 

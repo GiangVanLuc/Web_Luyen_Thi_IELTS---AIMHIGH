@@ -21,6 +21,7 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
+    // Đăng ký
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
             @RequestBody @Valid RegisterRequest request) {
@@ -29,12 +30,14 @@ public class AuthController {
                 .body(authenticationService.register(request));
     }
 
+    // Đăng nhập
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
+    // Refresh AccessToken
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(
             @RequestBody @Valid RefreshTokenRequest request) {
@@ -42,6 +45,7 @@ public class AuthController {
                 authenticationService.refreshToken(request.getRefreshToken()));
     }
 
+    // Logout
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @RequestBody @Valid RefreshTokenRequest request,

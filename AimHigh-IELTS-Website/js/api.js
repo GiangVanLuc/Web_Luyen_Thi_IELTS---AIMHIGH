@@ -21,7 +21,8 @@ async function apiFetch(endpoint, options = {}) {
         if (response.status === 401) {
             localStorage.removeItem('aimhigh_loggedIn');
             localStorage.removeItem('aimhigh_token');
-            window.location.href = 'login.html';
+            const isSubDir = window.location.pathname.includes('/admin/');
+            window.location.href = isSubDir ? '../login.html' : 'login.html';
             return null;
         }
 
@@ -117,7 +118,8 @@ async function apiLogout() {
         localStorage.removeItem('aimhigh_refreshToken');
         localStorage.removeItem('aimhigh_loggedIn');
         localStorage.removeItem('aimhigh_currentUser');
-        window.location.href = 'login.html';
+        const isSubDir = window.location.pathname.includes('/admin/');
+        window.location.href = isSubDir ? '../login.html' : 'login.html';
     }
 }
 
@@ -170,58 +172,7 @@ async function getTestHistory(page = 1) {
     return apiFetch(`/results/history?page=${page}&limit=10`);
 }
 
-// ===== FLASHCARDS =====
 
-/**
- * Lấy danh sách flashcard trong deck
- * @param {string} deckId
- */
-async function getFlashcards(deckId) {
-    return apiFetch(`/flashcards/decks/${deckId}/cards`);
-}
-
-/**
- * Tạo flashcard mới
- * @param {object} cardData - { word, meaning, example, phonetic, deckId }
- */
-async function createFlashcard(cardData) {
-    return apiFetch('/flashcards/cards', {
-        method: 'POST',
-        body: JSON.stringify(cardData)
-    });
-}
-
-/**
- * Cập nhật tiến trình review flashcard
- * @param {string} cardId
- * @param {number} level - 1-4
- */
-async function updateFlashcardReview(cardId, level) {
-    return apiFetch(`/flashcards/cards/${cardId}/review`, {
-        method: 'PUT',
-        body: JSON.stringify({ level, reviewedAt: new Date().toISOString() })
-    });
-}
-
-/**
- * Lấy danh sách decks của user
- */
-async function getDecks() {
-    return apiFetch('/flashcards/decks');
-}
-
-/**
- * Tạo deck mới
- * @param {string} name
- */
-async function createDeck(name) {
-    return apiFetch('/flashcards/decks', {
-        method: 'POST',
-        body: JSON.stringify({ name })
-    });
-}
-
-// ===== USER =====
 
 /**
  * Lấy thông tin profile
@@ -266,6 +217,13 @@ async function apiUploadAvatar(file) {
  */
 async function getDashboardStats() {
     return apiFetch('/users/dashboard');
+}
+
+/**
+ * Lấy thống kê admin dashboard
+ */
+async function adminGetDashboardStats() {
+    return apiFetch('/admin/dashboard/stats');
 }
 
 /**
@@ -420,7 +378,8 @@ async function adminImportExamExcel(file) {
     if (response.status === 401) {
         localStorage.removeItem('aimhigh_loggedIn');
         localStorage.removeItem('aimhigh_token');
-        window.location.href = 'login.html';
+        const isSubDir = window.location.pathname.includes('/admin/');
+        window.location.href = isSubDir ? '../login.html' : 'login.html';
         return null;
     }
     if (!response.ok) {
@@ -471,7 +430,8 @@ async function adminImportVocabularyExcel(file) {
     if (response.status === 401) {
         localStorage.removeItem('aimhigh_loggedIn');
         localStorage.removeItem('aimhigh_token');
-        window.location.href = 'login.html';
+        const isSubDir = window.location.pathname.includes('/admin/');
+        window.location.href = isSubDir ? '../login.html' : 'login.html';
         return null;
     }
     if (!response.ok) {
@@ -559,12 +519,6 @@ async function adminToggleUserLock(userId, locked) {
     });
 }
 
-/**
- * Lấy thống kê tổng quan cho admin dashboard
- */
-async function adminGetDashboardStats() {
-    return apiFetch('/admin/dashboard/stats');
-}
 
 // ===== EXAM SESSION API (Listening & Reading) =====
 
@@ -628,10 +582,14 @@ async function getAttemptProgress(attemptId) {
  * @param {number} attemptId
  * @param {Array} answers - [{ questionNumber, answerText, isSkipped }]
  */
-async function submitAttemptAnswers(attemptId, answers) {
+async function submitAttemptAnswers(attemptId, answers, timeSpent = null) {
+    const payload = { answers };
+    if (Number.isFinite(Number(timeSpent)) && Number(timeSpent) >= 0) {
+        payload.timeSpent = Math.floor(Number(timeSpent));
+    }
     return apiFetch(`/attempts/${attemptId}/submit`, {
         method: 'POST',
-        body: JSON.stringify({ answers })
+        body: JSON.stringify(payload)
     });
 }
 

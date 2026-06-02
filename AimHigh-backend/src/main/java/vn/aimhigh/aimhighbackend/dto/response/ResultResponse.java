@@ -20,6 +20,7 @@ public class ResultResponse {
     private Double score;
     private Double bandScore;
     private Integer timeSpent;
+    private String feedback;
     
     private List<ResultPartResponse> parts;
     private List<ResultPassageResponse> passages;

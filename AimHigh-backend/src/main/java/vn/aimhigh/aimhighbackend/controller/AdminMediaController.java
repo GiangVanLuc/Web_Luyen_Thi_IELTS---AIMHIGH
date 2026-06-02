@@ -25,6 +25,6 @@ public class AdminMediaController {
             @RequestParam(value = "type", defaultValue = "audio") String type
     ) {
         MediaUploadResponse response = mediaStorageService.upload(file, type);
-        return ResponseEntity.ok(ApiResponse.success(response, "Tải file lên Cloudflare R2 thành công"));
+        return ResponseEntity.ok(ApiResponse.success(response, "Tải file lên Cloudinary thành công"));
     }
 }

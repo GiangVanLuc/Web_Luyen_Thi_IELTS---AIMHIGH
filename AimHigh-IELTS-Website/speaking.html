@@ -1,995 +1,466 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking - AimHigh IELTS</title>
+    <title>Luyện tập Speaking - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/test.css">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="assets/logo.png" alt="AimHigh Logo" style="height: 65px;">
-                <span class="brand-name">AIM HIGH</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Luyện thi</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="listening.html"><i class="bi bi-headphones"></i> Listening</a></li>
-                            <li><a class="dropdown-item" href="reading.html"><i class="bi bi-book"></i> Reading</a></li>
-                            <li><a class="dropdown-item" href="writing.html"><i class="bi bi-pencil"></i> Writing</a></li>
-                            <li><a class="dropdown-item active" href="speaking.html"><i class="bi bi-mic"></i> Speaking</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html#my-study-overview">My Study</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Từ vựng</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="Vocabulary-notebook.html"><i class="bi bi-card-text"></i> Sổ từ vựng</a></li>
-                            <li><a class="dropdown-item" href="Vocabulary.html"><i class="bi bi-book-half"></i> Kho từ vựng AimHigh Pick</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <div class="nav-buttons">
-                    <a href="login.html" class="btn btn-outline-primary me-2">Đăng nhập</a>
-                    <a href="register.html" class="btn btn-primary">Đăng ký</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Page Header -->
-    <div class="page-header-section" style="padding-top:100px;padding-bottom:48px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <span class="test-badge speaking" style="font-size:14px;padding:8px 16px;">
-                            <i class="bi bi-mic"></i> Speaking
-                        </span>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.7);">
-                                <li class="breadcrumb-item"><a href="index.html" style="color:rgba(255,255,255,0.7)">Trang chủ</a></li>
-                                <li class="breadcrumb-item active" style="color:white">Speaking</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <h1 style="color:white;font-size:2.5rem;font-weight:800;margin-bottom:12px;">Luyện thi IELTS Speaking</h1>
-                    <p style="color:rgba(255,255,255,0.8);font-size:1.125rem;">Ghi âm câu trả lời, AI đánh giá phát âm, ngữ pháp và từ vựng theo tiêu chí IELTS</p>
-                </div>
-                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                    <div class="d-flex gap-3 justify-content-lg-end">
-                        <div class="text-center" style="color:white;">
-                            <div style="font-size:2rem;font-weight:700;">80+</div>
-                            <div style="font-size:0.875rem;opacity:0.7;">Đề bài</div>
-                        </div>
-                        <div class="text-center" style="color:white;">
-                            <div style="font-size:2rem;font-weight:700;">3</div>
-                            <div style="font-size:0.875rem;opacity:0.7;">Parts</div>
-                        </div>
-                        <div class="text-center" style="color:white;">
-                            <div style="font-size:2rem;font-weight:700;">AI</div>
-                            <div style="font-size:0.875rem;opacity:0.7;">Chấm điểm</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div style="background:var(--bg-secondary);padding:48px 0;min-height:60vh;">
-        <div class="container">
-
-            <!-- View Toggle: List vs Test -->
-            <div id="listView">
-                <!-- Filter Bar -->
-                <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
-                    <div class="d-flex gap-2">
-                        <button class="filter-tab active" onclick="filterPart(this,'all')">Tất cả</button>
-                        <button class="filter-tab" onclick="filterPart(this,'part1')">Part 1</button>
-                        <button class="filter-tab" onclick="filterPart(this,'part2')">Part 2</button>
-                        <button class="filter-tab" onclick="filterPart(this,'part3')">Part 3</button>
-                    </div>
-                    <div class="ms-auto">
-                        <div class="input-group" style="width:280px;">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control" placeholder="Tìm kiếm chủ đề..." oninput="searchTopics(this.value)">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Speaking Topics Grid -->
-                <div class="row g-4" id="topicsGrid">
-                    <!-- Part 1 Topics -->
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part1">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part1">Part 1</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Work & Study</h3>
-                            <p>Câu hỏi về công việc, học tập, kế hoạch tương lai và sở thích nghề nghiệp.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 5-6 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.5</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('work-study', 1)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part1">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part1">Part 1</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Hometown & Travel</h3>
-                            <p>Mô tả về quê hương, du lịch, địa điểm yêu thích và kinh nghiệm đi lại.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 5-6 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.7</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('hometown', 1)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part1">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part1">Part 1</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Hobbies & Free Time</h3>
-                            <p>Sở thích, hoạt động giải trí, thể thao và cách sử dụng thời gian rảnh.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 5-6 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.6</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('hobbies', 1)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Part 2 Topics -->
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part2">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part2">Part 2</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 3-4 phút</span>
-                            </div>
-                            <h3>Describe a Person</h3>
-                            <p>Mô tả một người bạn ngưỡng mộ, người thân hoặc người nổi tiếng có ảnh hưởng.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> Cue card</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('describe-person', 2)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part2">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part2">Part 2</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 3-4 phút</span>
-                            </div>
-                            <h3>Describe a Place</h3>
-                            <p>Mô tả một địa điểm đặc biệt, thành phố, công trình hoặc cảnh quan thiên nhiên.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> Cue card</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.5</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('describe-place', 2)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part2">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part2">Part 2</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 3-4 phút</span>
-                            </div>
-                            <h3>Describe an Event</h3>
-                            <p>Mô tả một sự kiện đáng nhớ, lễ hội, buổi hòa nhạc hoặc trải nghiệm đặc biệt.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> Cue card</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.6</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('describe-event', 2)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Part 3 Topics -->
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part3">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part3">Part 3</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Technology & Society</h3>
-                            <p>Thảo luận về tác động của công nghệ, mạng xã hội và trí tuệ nhân tạo lên xã hội.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 4-5 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.9</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('technology', 3)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part3">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part3">Part 3</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Environment & Climate</h3>
-                            <p>Phân tích các vấn đề môi trường, biến đổi khí hậu và giải pháp phát triển bền vững.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 4-5 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.7</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('environment', 3)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 topic-card-wrapper" data-part="part3">
-                        <div class="speaking-topic-card">
-                            <div class="topic-header">
-                                <span class="part-badge part3">Part 3</span>
-                                <span class="topic-time"><i class="bi bi-clock"></i> 4-5 phút</span>
-                            </div>
-                            <h3>Education & Learning</h3>
-                            <p>Tranh luận về hệ thống giáo dục, phương pháp học tập và vai trò của tri thức.</p>
-                            <div class="topic-meta">
-                                <span><i class="bi bi-question-circle"></i> 4-5 câu hỏi</span>
-                                <span><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                            </div>
-                            <button class="btn btn-speaking w-100 mt-3" onclick="startSpeakingTest('education', 3)">
-                                <i class="bi bi-mic-fill"></i> Bắt đầu luyện
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Test View (hidden by default) -->
-            <div id="testView" style="display:none;">
-                <!-- Test Header Bar -->
-                <div class="d-flex align-items-center justify-content-between mb-4 p-3 bg-white rounded-3 shadow-sm">
-                    <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-outline-secondary btn-sm" onclick="exitTest()">
-                            <i class="bi bi-arrow-left"></i> Danh sách
-                        </button>
-                        <div>
-                            <span id="testTitle" class="fw-bold">Speaking Test</span>
-                            <span class="ms-2 test-badge speaking" style="font-size:11px;">Speaking</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <div id="testTimerDisplay" class="test-timer-badge">
-                            <i class="bi bi-clock"></i> <span id="testTimerText">00:00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4">
-                    <!-- Left: Question / Cue Card -->
-                    <div class="col-lg-5">
-                        <!-- Part Navigation -->
-                        <div class="part-nav mb-4">
-                            <button class="part-nav-btn active" id="partBtn1" onclick="selectPart(1)">Part 1</button>
-                            <button class="part-nav-btn" id="partBtn2" onclick="selectPart(2)">Part 2</button>
-                            <button class="part-nav-btn" id="partBtn3" onclick="selectPart(3)">Part 3</button>
-                        </div>
-
-                        <!-- Cue Card / Question Card -->
-                        <div class="cue-card" id="cueCard">
-                            <div class="cue-card-header">
-                                <span id="partIndicator" class="part-badge part1">Part 1</span>
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-clock text-muted"></i>
-                                    <span id="partTime" class="text-muted small">Prep: 0s | Speak: 4 phút</span>
-                                </div>
-                            </div>
-                            <div class="cue-card-body" id="cueCardContent">
-                                <p class="cue-topic mb-3" id="cueMainQuestion">Do you work or are you a student?</p>
-                                <ul class="cue-points" id="cueSubPoints">
-                                    <li>What do you do for work / what do you study?</li>
-                                    <li>Why did you choose that job / subject?</li>
-                                    <li>What do you enjoy most about it?</li>
-                                    <li>What are your plans for the future?</li>
-                                </ul>
-                            </div>
-                            <div class="cue-card-tips">
-                                <div class="tip-header"><i class="bi bi-lightbulb-fill"></i> Tips</div>
-                                <p id="cueTips">Trả lời đầy đủ, sử dụng ví dụ cụ thể và mở rộng câu trả lời của bạn.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Recording Area -->
-                    <div class="col-lg-7">
-                        <div class="recording-area">
-                            <div class="recording-header">
-                                <h3>Khu vực ghi âm</h3>
-                                <div id="recordingStatus" class="recording-status idle">
-                                    <i class="bi bi-circle-fill"></i> Sẵn sàng
-                                </div>
-                            </div>
-
-                            <!-- Mic Visualization -->
-                            <div class="mic-container">
-                                <div class="mic-rings">
-                                    <div class="mic-ring ring-3"></div>
-                                    <div class="mic-ring ring-2"></div>
-                                    <div class="mic-ring ring-1"></div>
-                                </div>
-                                <div class="mic-icon" id="micIcon">
-                                    <i class="bi bi-mic-fill"></i>
-                                </div>
-                            </div>
-
-                            <!-- Timer Display -->
-                            <div class="recording-timer">
-                                <div class="timer-circle" id="timerCircle">
-                                    <svg viewBox="0 0 120 120">
-                                        <circle class="timer-bg" cx="60" cy="60" r="54"/>
-                                        <circle class="timer-progress" id="timerProgress" cx="60" cy="60" r="54"
-                                                stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
-                                    </svg>
-                                    <div class="timer-text">
-                                        <span id="recordTimer">00:00</span>
-                                        <small id="recordTimerLabel">ghi âm</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Waveform -->
-                            <div class="waveform-container" id="waveform">
-                                <div class="waveform-bar" style="height:20%"></div>
-                                <div class="waveform-bar" style="height:50%"></div>
-                                <div class="waveform-bar" style="height:80%"></div>
-                                <div class="waveform-bar" style="height:40%"></div>
-                                <div class="waveform-bar" style="height:90%"></div>
-                                <div class="waveform-bar" style="height:60%"></div>
-                                <div class="waveform-bar" style="height:30%"></div>
-                                <div class="waveform-bar" style="height:70%"></div>
-                                <div class="waveform-bar" style="height:50%"></div>
-                                <div class="waveform-bar" style="height:40%"></div>
-                                <div class="waveform-bar" style="height:85%"></div>
-                                <div class="waveform-bar" style="height:55%"></div>
-                                <div class="waveform-bar" style="height:35%"></div>
-                                <div class="waveform-bar" style="height:65%"></div>
-                                <div class="waveform-bar" style="height:75%"></div>
-                            </div>
-
-                            <!-- Controls -->
-                            <div class="recording-controls">
-                                <button class="btn btn-record" id="startBtn" onclick="startRecording()">
-                                    <i class="bi bi-mic-fill"></i> Bắt đầu ghi âm
-                                </button>
-                                <button class="btn btn-stop" id="stopBtn" onclick="stopRecording()" style="display:none">
-                                    <i class="bi bi-stop-fill"></i> Dừng ghi âm
-                                </button>
-                                <button class="btn btn-rerecord" id="rerecordBtn" onclick="reRecord()" style="display:none">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Ghi lại
-                                </button>
-                            </div>
-
-                            <!-- Recorded Audio Playback -->
-                            <div id="playbackArea" style="display:none;" class="playback-area">
-                                <p class="text-muted small mb-2"><i class="bi bi-check-circle-fill text-success"></i> Đã ghi âm thành công</p>
-                                <audio id="audioPlayback" controls class="w-100"></audio>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="text-center mt-4">
-                                <button class="btn btn-primary btn-lg" id="submitPartBtn" onclick="submitSpeaking()" style="display:none;">
-                                    <i class="bi bi-send-fill"></i> Nộp bài & Nhận điểm AI
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- AI Feedback (shown after submit) -->
-                        <div class="ai-feedback-card mt-4" id="aiFeedback" style="display:none;">
-                            <div class="ai-feedback-header">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-robot" style="color:var(--primary-color);font-size:1.5rem;"></i>
-                                    <h4>AI Feedback</h4>
-                                </div>
-                                <span class="badge bg-primary">Đang phân tích...</span>
-                            </div>
-                            <div class="scores-row">
-                                <div class="score-item">
-                                    <div class="score-val" id="flScore">--</div>
-                                    <div class="score-lbl">Fluency</div>
-                                </div>
-                                <div class="score-item">
-                                    <div class="score-val" id="lrScore">--</div>
-                                    <div class="score-lbl">Lexical</div>
-                                </div>
-                                <div class="score-item">
-                                    <div class="score-val" id="grScore">--</div>
-                                    <div class="score-lbl">Grammar</div>
-                                </div>
-                                <div class="score-item">
-                                    <div class="score-val" id="prScore">--</div>
-                                    <div class="score-lbl">Pronunciation</div>
-                                </div>
-                            </div>
-                            <div class="feedback-text" id="feedbackText">
-                                <p>AI đang phân tích câu trả lời của bạn...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2025 AimHigh. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <style>
-        .filter-tab {
-            padding: 8px 20px;
-            border: 2px solid var(--border-color);
-            background: white;
-            border-radius: 50px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-secondary);
+        :root {
+            --bg-body: #FFFDF5;
+            --card-bg: #ffffff;
+            --border-color: #F0E8C8;
+            --shadow: 0 1px 6px rgba(180, 140, 30, .08);
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --primary: #C9A227;
+            --primary-hover: #A07D18;
+            --primary-text: #92700A;
+            --primary-bg-light: #F5EDD5;
+            --record-color: #F26A36;
         }
-        .filter-tab.active, .filter-tab:hover {
-            background: var(--speaking-color);
-            border-color: var(--speaking-color);
-            color: white;
-        }
-        .speaking-topic-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            border: 1px solid var(--border-color);
-            height: 100%;
-            transition: var(--transition);
-        }
-        .speaking-topic-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-        .topic-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .part-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-        }
-        .part-badge.part1 { background: var(--listening-color); }
-        .part-badge.part2 { background: var(--primary-color); }
-        .part-badge.part3 { background: var(--speaking-color); }
-        .topic-time {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .speaking-topic-card h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .speaking-topic-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 16px;
-        }
-        .topic-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        .topic-meta span { display: flex; align-items: center; gap: 4px; }
-        .btn-speaking {
-            background: var(--speaking-color);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 10px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: var(--transition);
-        }
-        .btn-speaking:hover { background: #c2185b; color: white; transform: translateY(-1px); }
 
-        /* Test View Styles */
-        .part-nav { display: flex; gap: 8px; }
-        .part-nav-btn {
-            padding: 10px 24px;
-            border: 2px solid var(--border-color);
-            background: white;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-secondary);
-        }
-        .part-nav-btn.active {
-            background: var(--speaking-color);
-            border-color: var(--speaking-color);
-            color: white;
-        }
-        .cue-card {
-            background: white;
-            border-radius: var(--radius-lg);
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
         }
-        .cue-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .cue-card-body {
-            padding: 24px;
-        }
-        .cue-topic {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
-        .cue-points {
-            padding-left: 20px;
-            color: var(--text-secondary);
-        }
-        .cue-points li { margin-bottom: 8px; font-size: 0.9375rem; }
-        .cue-card-tips {
-            padding: 16px 20px;
-            background: rgba(37, 99, 235, 0.05);
-            border-top: 1px solid var(--border-color);
-        }
-        .tip-header {
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .cue-card-tips p { font-size: 0.875rem; color: var(--text-secondary); margin: 0; }
 
-        /* Recording Area */
-        .recording-area {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-        }
-        .recording-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            text-align: left;
-        }
-        .recording-header h3 { font-size: 1.125rem; font-weight: 700; margin: 0; }
-        .recording-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .recording-status.idle { background: var(--bg-secondary); color: var(--text-secondary); }
-        .recording-status.recording { background: rgba(239,68,68,0.1); color: var(--error-color); }
-        .recording-status.done { background: rgba(16,185,129,0.1); color: var(--success-color); }
+        /* --- Navbar AimHigh --- */
+        .navbar { background: #ffffff !important; border-bottom: 1px solid #eee; }
+        .brand-name { font-size: 1.5rem; font-weight: 800; color: #4a3800; letter-spacing: -.3px; }
+        .btn-outline-primary-nav { border: 1px solid var(--primary); color: var(--primary-text); }
+        .btn-outline-primary-nav:hover { background: var(--primary); color: #fff; }
 
-        .mic-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 24px;
-        }
-        .mic-rings { position: absolute; inset: 0; }
-        .mic-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 2px solid var(--speaking-color);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .mic-ring.ring-1 { inset: 10px; }
-        .mic-ring.ring-2 { inset: 0; }
-        .mic-ring.ring-3 { inset: -10px; }
-        .recording-active .mic-ring { opacity: 0.3; animation: ripple 1.5s ease-in-out infinite; }
-        .recording-active .mic-ring.ring-2 { animation-delay: 0.3s; }
-        .recording-active .mic-ring.ring-3 { animation-delay: 0.6s; }
-        @keyframes ripple { 0%,100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.1; } }
-
-        .mic-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--speaking-color);
-            border-radius: 50%;
+        /* --- Workspace 3 Cột --- */
+        .speaking-workspace {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: var(--transition);
-            z-index: 2;
+            width: 100%;
+            padding: 20px;
+            margin-top: 76px;
+            height: calc(100vh - 76px);
+            gap: 0;
         }
-        .recording-active .mic-icon { background: var(--error-color); animation: pulse 1s ease-in-out infinite; }
-        @keyframes pulse { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.1); } }
 
-        .recording-timer { margin: 0 auto 24px; width: 140px; }
-        .timer-circle { position: relative; }
-        .timer-circle svg { width: 100%; transform: rotate(-90deg); }
-        .timer-bg { fill: none; stroke: var(--border-color); stroke-width: 4; }
-        .timer-progress { fill: none; stroke: var(--speaking-color); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
-        .timer-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-        .timer-text span { display: block; font-size: 1.25rem; font-weight: 700; }
-        .timer-text small { font-size: 0.75rem; color: var(--text-secondary); }
-
-        .waveform-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            height: 60px;
-            margin-bottom: 24px;
-        }
-        .waveform-bar {
-            width: 4px;
-            background: var(--speaking-color);
-            border-radius: 4px;
-            opacity: 0.3;
-            transition: height 0.1s;
-        }
-        .recording-active .waveform-bar { opacity: 1; animation: waveform 0.5s ease-in-out infinite alternate; }
-        .waveform-bar:nth-child(odd) { animation-delay: 0.1s; }
-        @keyframes waveform { from { transform: scaleY(0.5); } to { transform: scaleY(1.5); } }
-
-        .recording-controls { display: flex; gap: 12px; justify-content: center; }
-        .btn-record {
-            background: var(--speaking-color);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 14px 32px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-        }
-        .btn-record:hover { background: #c2185b; transform: translateY(-2px); }
-        .btn-stop {
-            background: var(--error-color);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 14px 32px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-        }
-        .btn-rerecord {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+        .aim-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
-            border-radius: 50px;
-            padding: 14px 24px;
-            font-weight: 500;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .playback-area { text-align: left; padding-top: 16px; border-top: 1px solid var(--border-color); }
 
-        /* AI Feedback */
-        .ai-feedback-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-        }
-        .ai-feedback-header {
+        /* --- Resizer (Thanh kéo thả) --- */
+        .resizer {
+            width: 16px;
+            cursor: col-resize;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            z-index: 10;
+            position: relative;
         }
-        .ai-feedback-header h4 { margin: 0; font-size: 1.125rem; font-weight: 700; }
-        .scores-row {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
+        .resizer::after {
+            content: '';
+            width: 4px;
+            height: 40px;
+            background-color: #EFE8C8;
+            border-radius: 4px;
+            transition: background-color 0.2s;
         }
-        .score-item {
-            flex: 1;
-            text-align: center;
-            padding: 16px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-md);
-        }
-        .score-val { font-size: 1.75rem; font-weight: 700; color: var(--primary-color); }
-        .score-lbl { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
-        .feedback-text { color: var(--text-secondary); line-height: 1.7; font-size: 0.9375rem; }
+        .resizer:hover::after, .resizer.dragging::after { background-color: var(--primary); }
 
-        .test-timer-badge {
+        .col-nav { width: 28%; min-width: 250px; }
+        .col-notes { width: 28%; min-width: 250px; }
+
+        /* CỘT GIỮA: Sử dụng Flexbox hoàn toàn để chống đè nội dung */
+        .col-main {
+            flex-grow: 1;
+            min-width: 400px;
+            background-color: #FFFDF5;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(239,68,68,0.1);
-            color: var(--error-color);
-            border-radius: var(--radius-md);
-            font-weight: 600;
+            flex-direction: column;
         }
+
+        /* --- Cột Left: Navigation --- */
+        .part-tabs {
+            display: flex; gap: 8px; padding: 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+        }
+        .part-tab {
+            flex: 1; padding: 8px 0; text-align: center; font-size: 0.9rem; font-weight: 700;
+            border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s; background: white;
+        }
+        .part-tab.active {
+            background: var(--primary-bg-light); border-color: var(--primary); color: var(--primary-text);
+        }
+        .search-box {
+            padding: 12px 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+        }
+        .search-box input {
+            width: 100%; padding: 8px 12px 8px 36px; border: 1px solid #ddd; border-radius: 20px;
+            font-size: 0.9rem; outline: none; transition: 0.2s;
+        }
+        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15); }
+        .search-box .bi-search { position: absolute; left: 28px; top: 22px; color: #999; }
+
+        .topic-list { overflow-y: auto; flex-grow: 1; }
+        .topic-header {
+            padding: 12px 16px; background: #FAFAFA; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+        .topic-header:hover { background: var(--primary-bg-light); }
+        .topic-title { font-weight: 700; color: var(--text-main); font-size: 0.95rem; }
+        .topic-count { font-size: 0.75rem; color: var(--text-muted); }
+
+        .question-item {
+            padding: 12px 16px 12px 24px; font-size: 0.9rem; color: var(--text-muted);
+            border-bottom: 1px solid #f5f5f5; border-left: 4px solid transparent; cursor: pointer;
+        }
+        .question-item:hover { background: #fafafa; }
+        .question-item.active {
+            border-left-color: var(--primary); background: var(--primary-bg-light);
+            color: var(--primary-text); font-weight: 600;
+        }
+
+        /* Ẩn các phần nội dung không active */
+        .nav-content-block, .main-content-block { display: none; }
+        .nav-content-block.active { display: block; }
+        .main-content-block.active { display: flex; }
+
+        /* --- Cột Middle: Main Speaking Area --- */
+        .main-content-block {
+            flex-grow: 1; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; text-align: center; overflow-y: auto;
+        }
+
+        .btn-audio {
+            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--primary);
+            color: var(--primary-text); background: white; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer; transition: 0.2s; margin-bottom: 20px;
+        }
+        .btn-audio:hover { background: var(--primary-bg-light); }
+
+        .question-text-large {
+            font-size: 1.75rem; font-weight: 800; color: #4a3800; line-height: 1.4; max-width: 80%; margin: 0 auto;
+        }
+
+        /* Style đặc biệt cho Part 2 Cue Card */
+        .cue-card {
+            background: white; border: 1px solid var(--primary); border-radius: 12px;
+            padding: 24px 32px; text-align: left; max-width: 600px; width: 100%;
+            box-shadow: 0 4px 12px rgba(201, 162, 39, 0.1); margin-top: 20px; margin-bottom: 20px;
+        }
+        .cue-card ul { margin-bottom: 0; padding-left: 20px; color: var(--text-main); line-height: 1.8; }
+        .cue-card li { margin-bottom: 8px; }
+
+        .bottom-controls {
+            padding: 20px; background: #ffffff; border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0; /* Giữ thanh này luôn ở đáy */
+            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+        }
+        .btn-nav-circle {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd;
+            background: white; color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-nav-circle:hover { background: #f5f5f5; color: var(--text-main); }
+
+        .btn-record {
+            background-color: var(--record-color); color: white; border: none;
+            padding: 12px 32px; border-radius: 50px; font-weight: 700; font-size: 1.05rem;
+            display: flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 12px rgba(242, 106, 54, 0.3);
+        }
+        .btn-record:hover { background-color: #d85928; transform: translateY(-1px); }
+
+        /* --- Cột Right: Notes --- */
+        .notes-header {
+            padding: 16px; background: var(--primary-bg-light); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+        }
+        .notes-title { font-weight: 800; color: var(--primary-text); display: flex; align-items: center; gap: 8px; }
+        .notes-count { font-size: 0.8rem; font-weight: 600; color: var(--primary-text); opacity: 0.8; }
+        .notes-area {
+            flex-grow: 1; border: none; padding: 20px; font-size: 0.95rem; resize: none; outline: none;
+            background: white; color: var(--text-main);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #EFE8C8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
     </style>
+</head>
+<body>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const speakingData = {
-            'work-study': {
-                title: 'Work & Study',
-                parts: {
-                    1: {
-                        question: 'Do you work or are you a student?',
-                        points: ['What do you do for work / what do you study?', 'Why did you choose that job / subject?', 'What do you enjoy most about it?', 'What are your plans for the future?'],
-                        tips: 'Trả lời đầy đủ và mở rộng câu trả lời với ví dụ cụ thể. Tránh chỉ trả lời Yes/No.',
-                        time: 'Prep: 0s | Speak: 4 phút'
-                    },
-                    2: {
-                        question: 'Describe a job you would like to do in the future.',
-                        points: ['What the job is', 'What you would need to do', 'What skills you would need', 'Explain why you would like to do this job'],
-                        tips: 'Cue card Part 2: Nói liên tục 1-2 phút. Chuẩn bị 1 phút trước khi nói.',
-                        time: 'Prep: 1 phút | Speak: 2 phút'
-                    },
-                    3: {
-                        question: 'How has technology changed the way people work?',
-                        points: ['What kinds of work have changed most?', 'Are there jobs that technology cannot replace?', 'What are the pros and cons of working from home?', 'How might work change in the next 20 years?'],
-                        tips: 'Part 3 yêu cầu tư duy phân tích sâu. Đưa ra quan điểm rõ ràng và giải thích lý do.',
-                        time: 'Prep: 0s | Speak: 4-5 phút'
-                    }
-                }
-            },
-            'describe-person': {
-                title: 'Describe a Person',
-                parts: {
-                    1: { question: 'Do you have many friends?', points: ['Are your friends from school or work?', 'What do you usually do with your friends?', 'How important is friendship to you?'], tips: 'Chia sẻ tự nhiên về mối quan hệ bạn bè của bạn.', time: 'Prep: 0s | Speak: 4 phút' },
-                    2: { question: 'Describe a person you admire.', points: ['Who this person is', 'How you know this person', 'What this person does', 'Explain why you admire them'], tips: 'Mô tả chi tiết và cụ thể về người bạn chọn. Dùng các từ mô tả phong phú.', time: 'Prep: 1 phút | Speak: 2 phút' },
-                    3: { question: 'What qualities make a good role model for young people?', points: ['Why do young people need role models?', 'What kind of people are often seen as role models?', 'Has the idea of a role model changed over time?'], tips: 'Đưa ra nhiều góc nhìn khác nhau và lập luận thuyết phục.', time: 'Prep: 0s | Speak: 4-5 phút' }
-                }
-            }
-        };
+<nav class="navbar navbar-expand-lg fixed-top px-3">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+            <img src="assets/logo.png" alt="AimHigh Logo" style="height: 48px;" onerror="this.src='https://via.placeholder.com/150x48/FFFDF5/C9A227?text=AimHigh+Logo'">
+            <span class="brand-name">AimHigh</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-primary-nav btn-sm rounded-pill px-3 fw-bold d-none d-md-flex align-items-center gap-2">
+                <i class="bi bi-mic"></i> Micro check
+            </button>
+            <span class="text-muted fw-bold d-none d-md-block border-start ps-3" style="font-size: 0.9rem;">
+                <i class="bi bi-chat-quote"></i> IELTS Speaking
+            </span>
+            <a href="#" class="btn btn-outline-primary-nav btn-sm rounded-pill px-3 fw-bold">
+                <i class="bi bi-x-lg"></i> Thoát
+            </a>
+        </div>
+    </div>
+</nav>
 
-        let currentTopic = 'work-study';
-        let currentPart = 1;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordingTimer = null;
-        let recordSeconds = 0;
-        let maxRecordTime = 120;
+<div class="speaking-workspace" id="workspaceContainer">
 
-        function filterPart(btn, part) {
-            document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.topic-card-wrapper').forEach(card => {
-                if (part === 'all' || card.dataset.part === part) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
+    <div class="aim-card col-nav" id="colNav">
+        <div class="part-tabs">
+            <div class="part-tab active" data-target="part1">Part 1</div>
+            <div class="part-tab" data-target="part2">Part 2</div>
+            <div class="part-tab" data-target="part3">Part 3</div>
+        </div>
+        <div class="search-box position-relative">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Tìm theo chủ đề/ câu hỏi">
+        </div>
+
+        <div class="topic-list">
+
+            <div id="nav-part1" class="nav-content-block active">
+                <div>
+                    <div class="topic-header" data-bs-toggle="collapse" data-bs-target="#topic1">
+                        <div>
+                            <div class="topic-title">[T01-04/26] Life Stages</div>
+                            <div class="topic-count">1/6 câu</div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse show" id="topic1">
+                        <div class="question-item active">What did you often do with your friends in your childhood?</div>
+                        <div class="question-item">What do you think is the most important at the moment?</div>
+                        <div class="question-item">Do you have any plans for the next five years?</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="topic-header collapsed" data-bs-toggle="collapse" data-bs-target="#topic2">
+                        <div>
+                            <div class="topic-title">[T01-04/26] Views</div>
+                            <div class="topic-count">0/4 câu</div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse" id="topic2">
+                        <div class="question-item">How do people remember each stage of their lives?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nav-part2" class="nav-content-block">
+                <div>
+                    <div class="topic-header" data-bs-toggle="collapse" data-bs-target="#topicP2_1">
+                        <div>
+                            <div class="topic-title">Describe a person</div>
+                            <div class="topic-count">1/5 câu</div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse show" id="topicP2_1">
+                        <div class="question-item active">Describe a famous person you would like to meet</div>
+                        <div class="question-item">Describe a person who makes plans a lot</div>
+                        <div class="question-item">Describe a friend of yours who loves drawing/painting</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="topic-header collapsed" data-bs-toggle="collapse" data-bs-target="#topicP2_2">
+                        <div>
+                            <div class="topic-title">Describe an occasion</div>
+                            <div class="topic-count">0/3 câu</div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse" id="topicP2_2">
+                        <div class="question-item">Describe an occasion when you were not allowed to use your mobile phone</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nav-part3" class="nav-content-block">
+                <div>
+                    <div class="topic-header" data-bs-toggle="collapse" data-bs-target="#topicP3_1">
+                        <div>
+                            <div class="topic-title">Famous People & Society</div>
+                            <div class="topic-count">1/4 câu</div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse show" id="topicP3_1">
+                        <div class="question-item active">What kind of people become famous these days?</div>
+                        <div class="question-item">Is it easy for a famous person to have a normal life?</div>
+                        <div class="question-item">How does media impact the life of a celebrity?</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="resizer" id="resizer1"></div>
+
+    <div class="aim-card col-main" id="colMain">
+
+        <div id="main-part1" class="main-content-block active">
+            <button class="btn-audio" title="Nghe câu hỏi"><i class="bi bi-volume-up-fill"></i></button>
+            <h2 class="question-text-large">What did you often do with your friends in your childhood?</h2>
+        </div>
+
+        <div id="main-part2" class="main-content-block">
+            <button class="btn-audio" title="Nghe câu hỏi"><i class="bi bi-volume-up-fill"></i></button>
+            <h2 class="question-text-large fs-3">Describe a famous person you would like to meet</h2>
+
+            <div class="cue-card">
+                <p class="mb-3 fw-bold text-muted">You should say:</p>
+                <ul>
+                    <li>who this person is</li>
+                    <li>why they are famous</li>
+                    <li>what you would do if you met them</li>
+                    <li>and explain why you would like to meet them.</li>
+                </ul>
+            </div>
+
+            <div class="px-4 py-2 bg-white rounded-pill border border-warning text-warning fw-bold d-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-stopwatch"></i> Preparation Time: 01:00
+            </div>
+        </div>
+
+        <div id="main-part3" class="main-content-block">
+            <div class="mb-4 text-muted fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Follow-up Discussion</div>
+            <button class="btn-audio" title="Nghe câu hỏi"><i class="bi bi-volume-up-fill"></i></button>
+            <h2 class="question-text-large">What kind of people become famous these days compared to the past?</h2>
+        </div>
+
+        <div class="bottom-controls">
+            <button class="btn-nav-circle" title="Câu trước"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn-record">
+                <i class="bi bi-mic-fill fs-5"></i> Bắt đầu ghi âm
+            </button>
+            <button class="btn-nav-circle" title="Câu tiếp theo"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="resizer" id="resizer2"></div>
+
+    <div class="aim-card col-notes" id="colNotes">
+        <div class="notes-header">
+            <div class="notes-title"><i class="bi bi-journal-text"></i> Note</div>
+            <div class="notes-count" id="charCount">0/1000</div>
+        </div>
+        <textarea class="notes-area" id="noteArea" placeholder="Ghi chú các ý chính (keywords) của bạn tại đây..."></textarea>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/speaking.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // --- 1. LOGIC CHUYỂN TAB PART 1, 2, 3 ---
+        const partTabs = document.querySelectorAll('.part-tab');
+
+        partTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                partTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const targetPart = this.getAttribute('data-target');
+
+                document.querySelectorAll('.nav-content-block').forEach(el => {
+                    el.classList.remove('active');
+                });
+                document.getElementById('nav-' + targetPart).classList.add('active');
+
+                document.querySelectorAll('.main-content-block').forEach(el => {
+                    el.classList.remove('active');
+                });
+                document.getElementById('main-' + targetPart).classList.add('active');
             });
-        }
+        });
 
-        function searchTopics(query) {
-            const q = query.toLowerCase();
-            document.querySelectorAll('.topic-card-wrapper').forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(q) ? '' : 'none';
-            });
-        }
+        // --- 2. LOGIC ĐẾM KÝ TỰ CHO PHẦN NOTE ---
+        const noteArea = document.getElementById('noteArea');
+        const charCount = document.getElementById('charCount');
+        const MAX_CHARS = 1000;
 
-        function startSpeakingTest(topic, part) {
-            currentTopic = speakingData[topic] ? topic : 'work-study';
-            document.getElementById('listView').style.display = 'none';
-            document.getElementById('testView').style.display = 'block';
-            document.getElementById('testTitle').textContent = speakingData[currentTopic]?.title || 'Speaking Test';
-            selectPart(part || 1);
-        }
-
-        function selectPart(part) {
-            currentPart = part;
-            [1,2,3].forEach(p => {
-                document.getElementById('partBtn' + p).classList.toggle('active', p === part);
-            });
-            const data = speakingData[currentTopic]?.parts?.[part] || speakingData['work-study'].parts[1];
-            document.getElementById('partIndicator').textContent = 'Part ' + part;
-            document.getElementById('partIndicator').className = 'part-badge part' + part;
-            document.getElementById('cueMainQuestion').textContent = data.question;
-            document.getElementById('partTime').textContent = data.time;
-            document.getElementById('cueTips').textContent = data.tips;
-            const ul = document.getElementById('cueSubPoints');
-            ul.innerHTML = data.points.map(p => `<li>${p}</li>`).join('');
-            maxRecordTime = part === 2 ? 120 : 300;
-            resetRecording();
-        }
-
-        function exitTest() {
-            stopRecording();
-            document.getElementById('testView').style.display = 'none';
-            document.getElementById('listView').style.display = 'block';
-        }
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
-                    document.getElementById('audioPlayback').src = URL.createObjectURL(blob);
-                    document.getElementById('playbackArea').style.display = 'block';
-                    document.getElementById('submitPartBtn').style.display = 'inline-flex';
-                };
-                mediaRecorder.start();
-                document.getElementById('startBtn').style.display = 'none';
-                document.getElementById('stopBtn').style.display = 'flex';
-                document.getElementById('recordingStatus').className = 'recording-status recording';
-                document.getElementById('recordingStatus').innerHTML = '<i class="bi bi-record-circle-fill"></i> Đang ghi âm...';
-                document.querySelector('.mic-container').classList.add('recording-active');
-                document.querySelector('.waveform-container').classList.add('recording-active');
-                startRecordTimer();
-            } catch (e) {
-                alert('Không thể truy cập microphone. Vui lòng cho phép quyền truy cập micro.');
+        noteArea.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            if (currentLength > MAX_CHARS) {
+                this.value = this.value.substring(0, MAX_CHARS);
             }
+            charCount.textContent = `${this.value.length}/${MAX_CHARS}`;
+        });
+
+        // --- 3. LOGIC KÉO THẢ RESIZER ---
+        function createResizableColumn(resizer, leftElement, rightElement) {
+            let x = 0; let leftWidth = 0; let rightWidth = 0;
+
+            const mouseDownHandler = function (e) {
+                x = e.clientX;
+                leftWidth = leftElement.getBoundingClientRect().width;
+                rightWidth = rightElement.getBoundingClientRect().width;
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+                resizer.classList.add('dragging');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+            };
+
+            const mouseMoveHandler = function (e) {
+                const dx = e.clientX - x;
+                const newLeftWidth = leftWidth + dx;
+                const newRightWidth = rightWidth - dx;
+
+                if (newLeftWidth > 200 && newRightWidth > 200) {
+                    const parentWidth = leftElement.parentElement.getBoundingClientRect().width;
+                    leftElement.style.width = ((newLeftWidth / parentWidth) * 100) + '%';
+                    rightElement.style.width = ((newRightWidth / parentWidth) * 100) + '%';
+                    leftElement.style.flex = 'none';
+                    rightElement.style.flex = 'none';
+                }
+            };
+
+            const mouseUpHandler = function () {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+                resizer.classList.remove('dragging');
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = '';
+            };
+
+            resizer.addEventListener('mousedown', mouseDownHandler);
         }
 
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(t => t.stop());
-            }
-            clearInterval(recordingTimer);
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('rerecordBtn').style.display = 'flex';
-            document.getElementById('recordingStatus').className = 'recording-status done';
-            document.getElementById('recordingStatus').innerHTML = '<i class="bi bi-check-circle-fill"></i> Hoàn thành';
-            document.querySelector('.mic-container').classList.remove('recording-active');
-            document.querySelector('.waveform-container').classList.remove('recording-active');
-        }
+        const colNav = document.getElementById('colNav');
+        const colMain = document.getElementById('colMain');
+        const colNotes = document.getElementById('colNotes');
 
-        function reRecord() {
-            resetRecording();
-            document.getElementById('startBtn').style.display = 'flex';
-        }
-
-        function resetRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream?.getTracks().forEach(t => t.stop());
-            }
-            clearInterval(recordingTimer);
-            recordSeconds = 0;
-            updateTimerDisplay(0);
-            document.getElementById('startBtn').style.display = 'flex';
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('rerecordBtn').style.display = 'none';
-            document.getElementById('playbackArea').style.display = 'none';
-            document.getElementById('submitPartBtn').style.display = 'none';
-            document.getElementById('aiFeedback').style.display = 'none';
-            document.getElementById('recordingStatus').className = 'recording-status idle';
-            document.getElementById('recordingStatus').innerHTML = '<i class="bi bi-circle-fill"></i> Sẵn sàng';
-            document.querySelector('.mic-container').classList.remove('recording-active');
-            document.querySelector('.waveform-container').classList.remove('recording-active');
-        }
-
-        function startRecordTimer() {
-            recordSeconds = 0;
-            recordingTimer = setInterval(() => {
-                recordSeconds++;
-                updateTimerDisplay(recordSeconds);
-                if (recordSeconds >= maxRecordTime) stopRecording();
-            }, 1000);
-        }
-
-        function updateTimerDisplay(seconds) {
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            document.getElementById('recordTimer').textContent = `${m}:${s}`;
-            const circumference = 339.3;
-            const offset = circumference - (seconds / maxRecordTime) * circumference;
-            document.getElementById('timerProgress').style.strokeDashoffset = offset;
-        }
-
-        function submitSpeaking() {
-            document.getElementById('aiFeedback').style.display = 'block';
-            document.getElementById('submitPartBtn').style.display = 'none';
-            setTimeout(() => {
-                const scores = [6.0, 6.5, 7.0, 5.5, 7.5, 6.0, 6.5];
-                const score = scores[Math.floor(Math.random() * scores.length)];
-                document.getElementById('flScore').textContent = (score + 0.5).toFixed(1);
-                document.getElementById('lrScore').textContent = score.toFixed(1);
-                document.getElementById('grScore').textContent = (score - 0.5 < 4 ? 4 : score - 0.5).toFixed(1);
-                document.getElementById('prScore').textContent = score.toFixed(1);
-                document.getElementById('feedbackText').innerHTML = `
-                    <p><strong>Nhận xét:</strong> Câu trả lời của bạn có cấu trúc tốt và rõ ràng.
-                    Bạn sử dụng một số từ vựng IELTS phù hợp như từ học thuật.</p>
-                    <p><strong>Điểm mạnh:</strong> Trả lời đầy đủ các ý được yêu cầu, giọng nói tự nhiên.</p>
-                    <p><strong>Cần cải thiện:</strong> Cố gắng sử dụng nhiều cấu trúc ngữ pháp phức tạp hơn
-                    (relative clauses, conditionals). Tránh lặp từ quá nhiều lần.</p>
-                `;
-                document.querySelector('.ai-feedback-header .badge').textContent = `Band ${score.toFixed(1)}`;
-                document.querySelector('.ai-feedback-header .badge').className = 'badge bg-success';
-            }, 2000);
-        }
-    </script>
+        createResizableColumn(document.getElementById('resizer1'), colNav, colMain);
+        createResizableColumn(document.getElementById('resizer2'), colMain, colNotes);
+    });
+</script>
 </body>
 </html>
-

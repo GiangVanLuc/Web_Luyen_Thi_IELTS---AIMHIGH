@@ -11,6 +11,7 @@ import vn.aimhigh.aimhighbackend.model.Attempt;
 import vn.aimhigh.aimhighbackend.model.Question;
 import vn.aimhigh.aimhighbackend.repository.AttemptRepository;
 import vn.aimhigh.aimhighbackend.repository.QuestionRepository;
+import vn.aimhigh.aimhighbackend.service.AiGradingService;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -24,16 +25,28 @@ public class ScoringServiceImpl implements ScoringService {
 
     private final QuestionRepository questionRepository;
     private final AttemptRepository attemptRepository;
+    private final AiGradingService aiGradingService;
 
     @org.springframework.transaction.annotation.Transactional
     public void scoreAttempt(Attempt attempt, List<AnswerRequest> answers) {
-        log.info("Cháº¥m Ä‘iá»ƒm attempt: {}", attempt.getId());
+        log.info("Chấm điểm attempt: {}", attempt.getId());
         int totalCorrect = 0, totalWrong = 0;
+        Skill skill = attempt.getExam().getSkill();
 
         Map<Long, vn.aimhigh.aimhighbackend.model.Answer> answerByQuestionId = new LinkedHashMap<>();
 
         for (AnswerRequest answerReq : answers) {
             Question q = questionRepository.findByExamIdAndQuestionNumber(attempt.getExam().getId(), answerReq.getQuestionNumber()).orElse(null);
+            if (q == null && (skill == Skill.WRITING || skill == Skill.SPEAKING)) {
+                q = Question.builder()
+                        .exam(attempt.getExam())
+                        .questionNumber(answerReq.getQuestionNumber())
+                        .questionOrder(answerReq.getQuestionNumber())
+                        .questionText("Question " + answerReq.getQuestionNumber())
+                        .points(1.0)
+                        .build();
+                q = questionRepository.save(q);
+            }
             if (q != null) {
                 boolean isCorrect = scoreAnswer(q, answerReq.getAnswerText());
 
@@ -63,7 +76,14 @@ public class ScoringServiceImpl implements ScoringService {
         attempt.setTotalWrong(totalWrong);
         attempt.setStatus(AttemptStatus.SUBMITTED);
         attempt.setSubmittedAt(LocalDateTime.now());
-        attempt.setBandScore(calculateBandScore(totalCorrect, attempt.getExam().getSkill()));
+        
+        if (skill == Skill.WRITING || skill == Skill.SPEAKING) {
+            aiGradingService.grade(attempt, answers);
+            attempt.setStatus(vn.aimhigh.aimhighbackend.enums.AttemptStatus.valueOf("GRADED"));
+        } else {
+            attempt.setBandScore(calculateBandScore(totalCorrect, skill));
+        }
+        
         attemptRepository.save(attempt);
     }
 
@@ -103,11 +123,15 @@ public class ScoringServiceImpl implements ScoringService {
 
     private String sanitize(String input) {
         if (input == null) return "";
-        return input.trim().toLowerCase()
-                .replaceAll("\\b(a|an|the)\\b", "")
-                .replaceAll("[.,;!?]", "")
-                .replaceAll("\\s+", " ")
-                .trim();
+        String sanitized = input.trim().toLowerCase();
+        // Remove commas used as thousands separators in numbers (e.g. 10,000 -> 10000)
+        sanitized = sanitized.replaceAll("(?<=\\d),(?=\\d)", "");
+        // Remove articles
+        sanitized = sanitized.replaceAll("\\b(a|an|the)\\b", "");
+        // Remove punctuation except decimal points
+        sanitized = sanitized.replaceAll("(?<!\\d)[.,;!?](?!\\d)", "");
+        sanitized = sanitized.replaceAll("[.,;!?]$", "");
+        return sanitized.replaceAll("\\s+", " ").trim();
     }
 
     private boolean isTrueFalseShortcut(String actual, String expected) {

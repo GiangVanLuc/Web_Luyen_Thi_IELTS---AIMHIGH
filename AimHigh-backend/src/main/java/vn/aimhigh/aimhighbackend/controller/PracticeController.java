@@ -16,6 +16,12 @@ import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
 import vn.aimhigh.aimhighbackend.service.HighlightService;
 import vn.aimhigh.aimhighbackend.service.NoteService;
 import vn.aimhigh.aimhighbackend.service.UserService;
+import vn.aimhigh.aimhighbackend.repository.QuestionRepository;
+import vn.aimhigh.aimhighbackend.repository.AttemptRepository;
+import vn.aimhigh.aimhighbackend.model.Question;
+import vn.aimhigh.aimhighbackend.model.Attempt;
+import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
+import vn.aimhigh.aimhighbackend.exception.ForbiddenException;
 
 import java.util.List;
 
@@ -27,10 +33,26 @@ public class PracticeController {
     private final NoteService noteService;
     private final HighlightService highlightService;
     private final UserService userService;
+    private final QuestionRepository questionRepository;
+    private final AttemptRepository attemptRepository;
 
     @GetMapping("/attempts/{id}/questions/{qId}/answer")
-    public ResponseEntity<ApiResponse<String>> getAnswer(@PathVariable Long id, @PathVariable Long qId) {
-        return ResponseEntity.ok(ApiResponse.success("Correct Answer Placeholder"));
+    public ResponseEntity<ApiResponse<String>> getAnswer(@PathVariable Long id, @PathVariable Long qId, Authentication authentication) {
+        Long userId = userService.requireUser(authentication).getId();
+        Attempt attempt = attemptRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy attempt"));
+        if (!attempt.getUser().getId().equals(userId)) {
+            throw new ForbiddenException("Không có quyền truy cập bài làm này");
+        }
+        
+        Question question = questionRepository.findById(qId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy câu hỏi"));
+                
+        String answerAndExplanation = "Correct Answer: " + question.getCorrectAnswer();
+        if (question.getExplanation() != null && !question.getExplanation().isBlank()) {
+            answerAndExplanation += " | Explanation: " + question.getExplanation();
+        }
+        return ResponseEntity.ok(ApiResponse.success(answerAndExplanation));
     }
 
     @PostMapping("/attempts/{id}/notes")

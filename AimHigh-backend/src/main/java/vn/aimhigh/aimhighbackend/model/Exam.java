@@ -11,7 +11,7 @@ import java.util.List;
 @Table(
     name = "exams",
     indexes = {
-        @Index(name = "idx_exams_skill_level_active", columnList = "skill, level, is_active")
+        @Index(name = "idx_exams_skill_level_status", columnList = "skill, level, status")
     }
 )
 @Getter
@@ -49,8 +49,12 @@ public class Exam {
     private String examData;
     
     @Builder.Default
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = Boolean.TRUE;
+    @Enumerated(EnumType.STRING)
+    private ExamStatus status = ExamStatus.PUBLISHED;
+    
+    @Builder.Default
+    @Column(name = "is_active")
+    private Boolean isActive = true;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id")

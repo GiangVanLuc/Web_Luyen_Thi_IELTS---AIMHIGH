@@ -16,4 +16,5 @@ public class AttemptResponse {
     private AttemptStatus status;
     private LocalDateTime startedAt;
     private Integer duration;
+    private String feedback;
 }

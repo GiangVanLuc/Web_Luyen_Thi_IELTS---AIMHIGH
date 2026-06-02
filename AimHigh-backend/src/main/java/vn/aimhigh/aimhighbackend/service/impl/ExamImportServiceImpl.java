@@ -83,10 +83,6 @@ public class ExamImportServiceImpl implements ExamImportService {
             skill = Skill.READING;
         }
 
-        if (skill != Skill.READING && skill != Skill.LISTENING) {
-            throw new BadRequestException("Hiá»‡n táº¡i chá»‰ há»— trá»£ import Ä‘á» READING hoáº·c LISTENING");
-        }
-
         JsonNode sectionsNode = workingNode.path("sections");
         if (!sectionsNode.isArray() || sectionsNode.isEmpty()) {
             throw new BadRequestException("Thiáº¿u máº£ng 'sections' hoáº·c sections rá»—ng");
@@ -96,7 +92,7 @@ public class ExamImportServiceImpl implements ExamImportService {
                 .title(title)
                 .duration(duration)
                 .skill(skill)
-                .isActive(true)
+                .status(vn.aimhigh.aimhighbackend.enums.ExamStatus.PUBLISHED)
                 .level(ExamLevel.MEDIUM)
                 .type(ExamType.ACADEMIC)
                 .description(examNode.path("description").asText(null))
@@ -110,8 +106,10 @@ public class ExamImportServiceImpl implements ExamImportService {
 
         if (skill == Skill.LISTENING) {
             createdQuestionCount = persistListeningStructure(exam, sectionsNode, uniqueQuestionNumbers);
-        } else {
+        } else if (skill == Skill.READING) {
             createdQuestionCount = persistReadingStructure(exam, sectionsNode, uniqueQuestionNumbers);
+        } else {
+            createdQuestionCount = persistSubjectiveStructure(exam, sectionsNode, uniqueQuestionNumbers);
         }
 
         sanitizeExamDataForClient(workingNode);
@@ -204,6 +202,64 @@ public class ExamImportServiceImpl implements ExamImportService {
             validateSectionRange(sectionNode, questionNodes, sectionNumber);
 
             created += persistQuestionsForContainer(exam, primaryPassage, null, questionNodes, uniqueQuestionNumbers);
+        }
+
+        return created;
+    }
+
+    private int persistSubjectiveStructure(Exam exam, JsonNode sectionsNode, Set<Integer> uniqueQuestionNumbers) {
+        int created = 0;
+
+        for (JsonNode sectionNode : sectionsNode) {
+            int sectionNumber = sectionNode.path("sectionNumber").asInt(0);
+            if (sectionNumber <= 0) {
+                throw new BadRequestException("Subjective section thieu sectionNumber hop le");
+            }
+
+            List<JsonNode> questionNodes = collectQuestionNodesInSection(sectionNode);
+            ensureSectionHasQuestions(questionNodes, sectionNumber);
+            validateSectionRange(sectionNode, questionNodes, sectionNumber);
+
+            created += persistSubjectiveQuestions(exam, questionNodes, uniqueQuestionNumbers);
+        }
+
+        return created;
+    }
+
+    private int persistSubjectiveQuestions(
+            Exam exam,
+            List<JsonNode> questionNodes,
+            Set<Integer> uniqueQuestionNumbers
+    ) {
+        int created = 0;
+
+        questionNodes.sort(Comparator.comparingInt(node -> node.path("questionNumber").asInt()));
+        int order = 0;
+
+        for (JsonNode questionNode : questionNodes) {
+            int questionNumber = questionNode.path("questionNumber").asInt(0);
+            if (questionNumber <= 0) {
+                throw new BadRequestException("Cau hoi thieu questionNumber hop le");
+            }
+
+            if (!uniqueQuestionNumbers.add(questionNumber)) {
+                throw new BadRequestException("Trung questionNumber: " + questionNumber);
+            }
+
+            order++;
+            Question question = Question.builder()
+                    .exam(exam)
+                    .questionNumber(questionNumber)
+                    .questionOrder(order)
+                    .questionText(resolveQuestionText(questionNode))
+                    .correctAnswer(null)
+                    .explanation(questionNode.path("explanation").asText(null))
+                    .points(questionNode.path("points").asDouble(1.0))
+                    .build();
+
+            question = questionRepository.save(question);
+            created++;
+            ((ObjectNode) questionNode).put("id", question.getId());
         }
 
         return created;
@@ -327,26 +383,33 @@ public class ExamImportServiceImpl implements ExamImportService {
     }
 
     private void validateSectionRange(JsonNode sectionNode, List<JsonNode> questionNodes, int sectionNumber) {
-        int from = sectionNode.path("questionFrom").asInt(0);
-        int to = sectionNode.path("questionTo").asInt(0);
-        if (from <= 0 || to <= 0 || from > to) {
-            throw new BadRequestException("Section " + sectionNumber + " thiáº¿u questionFrom/questionTo há»£p lá»‡");
-        }
-
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
+        int minInQuestions = Integer.MAX_VALUE;
+        int maxInQuestions = Integer.MIN_VALUE;
         for (JsonNode questionNode : questionNodes) {
             int number = questionNode.path("questionNumber").asInt(0);
-            if (number <= 0) {
-                continue;
-            }
-            min = Math.min(min, number);
-            max = Math.max(max, number);
+            if (number <= 0) continue;
+            minInQuestions = Math.min(minInQuestions, number);
+            maxInQuestions = Math.max(maxInQuestions, number);
         }
 
-        if (min < from || max > to) {
+        int from = sectionNode.path("questionFrom").asInt(0);
+        int to = sectionNode.path("questionTo").asInt(0);
+
+        // Auto-infer if missing or invalid
+        if (from <= 0 || to <= 0 || from > to) {
+            if (minInQuestions == Integer.MAX_VALUE) {
+                throw new BadRequestException("Section " + sectionNumber + " không có câu hỏi hợp lệ");
+            }
+            from = minInQuestions;
+            to = maxInQuestions;
+            // Update node so it gets saved correctly in clientData
+            ((ObjectNode) sectionNode).put("questionFrom", from);
+            ((ObjectNode) sectionNode).put("questionTo", to);
+        }
+
+        if (minInQuestions < from || maxInQuestions > to) {
             throw new BadRequestException(
-                    "Question range cá»§a section " + sectionNumber + " khÃ´ng khá»›p: expected " + from + "-" + to + ", found " + min + "-" + max
+                    "Question range của section " + sectionNumber + " không khớp: expected " + from + "-" + to + ", found " + minInQuestions + "-" + maxInQuestions
             );
         }
     }
@@ -398,6 +461,15 @@ public class ExamImportServiceImpl implements ExamImportService {
     private String resolveQuestionText(JsonNode questionNode) {
         if (questionNode.hasNonNull("questionText") && !questionNode.path("questionText").asText().isBlank()) {
             return questionNode.path("questionText").asText();
+        }
+        if (questionNode.hasNonNull("prompt") && !questionNode.path("prompt").asText().isBlank()) {
+            return questionNode.path("prompt").asText();
+        }
+        if (questionNode.hasNonNull("topic") && !questionNode.path("topic").asText().isBlank()) {
+            return questionNode.path("topic").asText();
+        }
+        if (questionNode.hasNonNull("cueCard") && !questionNode.path("cueCard").asText().isBlank()) {
+            return questionNode.path("cueCard").asText();
         }
         if (questionNode.hasNonNull("lineTemplate") && !questionNode.path("lineTemplate").asText().isBlank()) {
             return questionNode.path("lineTemplate").asText();
@@ -683,11 +755,13 @@ public class ExamImportServiceImpl implements ExamImportService {
                     if (!globalQuestions.add(qn)) {
                         throw new BadRequestException("TrÃ¹ng questionNumber trong Excel: " + qn);
                     }
-                    if (correctAnswer.isBlank()) {
+                    if ((skill == Skill.READING || skill == Skill.LISTENING) && correctAnswer.isBlank()) {
                         throw new BadRequestException("CÃ¢u " + qn + " thiáº¿u correctAnswer");
                     }
 
-                    validateChoiceIntegrity(question, qn, correctAnswer);
+                    if (skill == Skill.READING || skill == Skill.LISTENING) {
+                        validateChoiceIntegrity(question, qn, correctAnswer);
+                    }
                     questionCountInSection++;
                     totalQuestions++;
                 }
@@ -700,7 +774,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         }
 
         String mode = examMeta.getOrDefault("mode", "PARTIAL").trim().toUpperCase(Locale.ROOT);
-        if ("FULL".equals(mode)) {
+        if ("FULL".equals(mode) && (skill == Skill.READING || skill == Skill.LISTENING)) {
             if (totalQuestions != 40) {
                 throw new BadRequestException("FULL exam báº¯t buá»™c cÃ³ 40 cÃ¢u, hiá»‡n táº¡i: " + totalQuestions);
             }
@@ -858,9 +932,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         }
         try {
             Skill skill = Skill.valueOf(raw.trim().toUpperCase(Locale.ROOT));
-            if (skill == Skill.READING || skill == Skill.LISTENING) {
-                return skill;
-            }
+            return skill;
         } catch (IllegalArgumentException ignored) {
         }
         return Skill.READING;
@@ -1064,6 +1136,3 @@ public class ExamImportServiceImpl implements ExamImportService {
         row.createCell(6).setCellValue(transcript);
     }
 }
-
-
-
