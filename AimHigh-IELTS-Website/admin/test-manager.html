@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qu?n l� d? thi - AimHigh IELTS</title>
+    <title>Quản lý đề thi - AimHigh IELTS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -19,62 +19,58 @@
                 <span class="sidebar-brand-text">AIM HIGH</span>
             </a>
             <nav class="sidebar-nav">
-                <div class="sidebar-nav-label">T?ng quan</div>
+                <div class="sidebar-nav-label">Tổng quan</div>
                 <a href="dashboard.html" class="sidebar-link">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <div class="sidebar-nav-label">Qu?n l� h?c t?p</div>
+                <div class="sidebar-nav-label">Quản lý học tập</div>
                 <a href="users.html" class="sidebar-link">
                     <i class="bi bi-people"></i>
-                    <span>Ngu?i d�ng</span>
+                    <span>Người dùng</span>
                 </a>
                 <a href="test-manager.html" class="sidebar-link active">
                     <i class="bi bi-collection"></i>
-                    <span>Danh s�ch d? thi</span>
+                    <span>Danh sách đề thi</span>
                 </a>
                 <a href="test-builder.html" class="sidebar-link">
                     <i class="bi bi-plus-square"></i>
-                    <span>T?o d? thi</span>
+                    <span>Tạo đề thi</span>
                 </a>
                 <a href="vocabulary-manager.html" class="sidebar-link">
                     <i class="bi bi-journal-richtext"></i>
-                    <span>Kho t? v?ng</span>
+                    <span>Kho từ vựng</span>
                 </a>
 
-                <div class="sidebar-nav-label">Ch?m di?m & B�o c�o</div>
+                <div class="sidebar-nav-label">Chấm điểm & Báo cáo</div>
                 <a href="grading.html" class="sidebar-link">
                     <i class="bi bi-pencil-square"></i>
-                    <span>Ch?m b�i</span>
+                    <span>Chấm bài</span>
                     <span class="sidebar-badge">12</span>
                 </a>
                 <a href="reports.html" class="sidebar-link">
                     <i class="bi bi-bar-chart-line"></i>
-                    <span>B�o c�o h?c t?p</span>
+                    <span>Báo cáo học tập</span>
                 </a>
 
-                <div class="sidebar-nav-label">V?n h�nh</div>
+                <div class="sidebar-nav-label">Vận hành</div>
                 <a href="notifications.html" class="sidebar-link">
                     <i class="bi bi-megaphone"></i>
-                    <span>Th�ng b�o</span>
-                </a>
-                <a href="roles.html" class="sidebar-link">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Ph�n quy?n</span>
+                    <span>Thông báo</span>
                 </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
-                    <span>Nh?t k� h? th?ng</span>
+                    <span>Nhật ký hệ thống</span>
                 </a>
 
-                <div class="sidebar-nav-label">H? th?ng</div>
+                <div class="sidebar-nav-label">Hệ thống</div>
                 <a href="settings.html" class="sidebar-link">
                     <i class="bi bi-gear"></i>
-                    <span>C�i d?t</span>
+                    <span>Cài đặt</span>
                 </a>
 
-                <div class="sidebar-nav-label">Kh�c</div>
+                <div class="sidebar-nav-label">Khác</div>
                 <a href="../index.html" class="sidebar-link">
                     <i class="bi bi-box-arrow-up-right"></i>
                     <span>Xem Website</span>
@@ -95,12 +91,12 @@
                     <button class="topbar-btn d-lg-none" onclick="toggleMobileSidebar()">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h1 class="topbar-title">Qu?n l� d? thi</h1>
+                    <h1 class="topbar-title">Quản lý đề thi</h1>
                 </div>
                 <div class="topbar-right">
                     <div class="topbar-search d-none d-md-block">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="T�m ki?m...">
+                        <input type="text" placeholder="Tìm kiếm...">
                     </div>
                     <button class="topbar-btn">
                         <i class="bi bi-bell"></i>
@@ -109,9 +105,9 @@
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>H? so</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>�ang xu?t</a></li>
+                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -123,22 +119,22 @@
                     <div class="admin-card-header">
                         <div class="filter-bar">
                             <select class="form-select" id="filterSkill">
-                                <option value="">T?t c? k? nang</option>
+                                <option value="">Tất cả kỹ năng</option>
                                 <option value="listening">Listening</option>
                                 <option value="reading">Reading</option>
                                 <option value="writing">Writing</option>
                                 <option value="speaking">Speaking</option>
                             </select>
                             <select class="form-select" id="filterStatus">
-                                <option value="">T?t c? tr?ng th�i</option>
+                                <option value="">Tất cả trạng thái</option>
                                 <option value="published">Published</option>
                                 <option value="draft">Draft</option>
                                 <option value="archived">Archived</option>
                             </select>
-                            <input type="text" class="form-control" placeholder="T�m theo t�n d? thi..." id="searchTest">
+                            <input type="text" class="form-control" placeholder="Tìm theo tên đề thi..." id="searchTest">
                         </div>
                         <a href="test-builder.html" class="btn-admin-primary">
-                            <i class="bi bi-plus-lg"></i> T?o d? m?i
+                            <i class="bi bi-plus-lg"></i> Tạo đề mới
                         </a>
                     </div>
 
@@ -147,13 +143,13 @@
                         <table class="admin-table" id="testTable">
                             <thead>
                                 <tr>
-                                    <th>T�n d? thi</th>
-                                    <th>K? nang</th>
-                                    <th>S? c�u</th>
-                                    <th>Th?i gian</th>
-                                    <th>Tr?ng th�i</th>
-                                    <th>Ng�y t?o</th>
-                                    <th>Lu?t thi</th>
+                                    <th>Tên đề thi</th>
+                                    <th>Kỹ năng</th>
+                                    <th>Số câu</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Lượt thi</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -163,7 +159,7 @@
 
                     <!-- Pagination -->
                     <div class="admin-pagination">
-                        <div class="admin-pagination-info" id="testTableInfo">�ang t?i d? li?u...</div>
+                        <div class="admin-pagination-info" id="testTableInfo">Đang tải dữ liệu...</div>
                         <div class="admin-pagination-btns">
                             <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
                             <button class="page-btn active">1</button>
@@ -203,33 +199,33 @@
             if (!body) return;
 
             if (!Array.isArray(exams) || exams.length === 0) {
-                body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Chua c� d? thi n�o</td></tr>';
-                if (info) info.textContent = 'Hi?n th? 0 d? thi';
+                body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Chưa có đề thi nào</td></tr>';
+                if (info) info.textContent = 'Hiển thị 0 đề thi';
                 return;
             }
 
             body.innerHTML = exams.map(exam => {
                 const status = String(exam.status || 'archived').toLowerCase();
                 const nextStatus = status === 'published' ? 'archived' : 'published';
-                const toggleLabel = status === 'published' ? '?n' : 'Xu?t b?n';
+                const toggleLabel = status === 'published' ? 'Ẩn' : 'Xuất bản';
                 return `
                     <tr>
-                        <td><strong>${exam.title || '(Kh�ng c� t�n)'}</strong></td>
+                        <td><strong>${exam.title || '(Không có tên)'}</strong></td>
                         <td>${exam.skill || '--'}</td>
                         <td>${exam.totalQuestions || '--'}</td>
-                        <td>${exam.duration || '--'} ph�t</td>
+                        <td>${exam.duration || '--'} phút</td>
                         <td><span class="status-badge ${statusClass(status)}">${status}</span></td>
                         <td>${formatDateTime(exam.createdAt)}</td>
                         <td>--</td>
                         <td>
-                            <button class="btn-icon-sm" title="S?a" data-action="edit" data-id="${exam.id}"><i class="bi bi-pencil"></i></button>
+                            <button class="btn-icon-sm" title="Sửa" data-action="edit" data-id="${exam.id}"><i class="bi bi-pencil"></i></button>
                             <button class="btn-icon-sm" title="${toggleLabel}" data-action="status" data-status="${nextStatus}" data-id="${exam.id}"><i class="bi bi-toggle2-off"></i></button>
-                            <button class="btn-icon-sm danger" title="X�a" data-action="delete" data-id="${exam.id}"><i class="bi bi-trash"></i></button>
+                            <button class="btn-icon-sm danger" title="Xóa" data-action="delete" data-id="${exam.id}"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>`;
             }).join('');
 
-            if (info) info.textContent = `Hi?n th? ${exams.length} d? thi`;
+            if (info) info.textContent = `Hiển thị ${exams.length} đề thi`;
         }
 
         async function loadAdminExams() {
@@ -243,7 +239,7 @@
                 renderExamRows(exams);
             } catch (error) {
                 renderExamRows([]);
-                showToast(`Kh�ng th? t?i danh s�ch d?: ${error.message || 'Unknown error'}`, 'danger');
+                showToast(`Không thể tải danh sách đề: ${error.message || 'Unknown error'}`, 'danger');
             }
         }
 
@@ -263,19 +259,19 @@
 
                 try {
                     if (action === 'delete') {
-                        if (!confirm('B?n ch?c ch?n mu?n x�a d? thi n�y?')) return;
+                        if (!confirm('Bạn chắc chắn muốn xóa đề thi này?')) return;
                         await adminDeleteTest(id);
-                        showToast('X�a d? thi th�nh c�ng');
+                        showToast('Xóa đề thi thành công');
                         await loadAdminExams();
                     } else if (action === 'status') {
                         await adminUpdateTestStatus(id, btn.dataset.status || 'published');
-                        showToast('C?p nh?t tr?ng th�i th�nh c�ng');
+                        showToast('Cập nhật trạng thái thành công');
                         await loadAdminExams();
                     } else if (action === 'edit') {
                         window.location.href = `test-builder.html?examId=${encodeURIComponent(id)}`;
                     }
                 } catch (error) {
-                    showToast(`Thao t�c th?t b?i: ${error.message || 'Unknown error'}`, 'danger');
+                    showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
                 }
             });
 

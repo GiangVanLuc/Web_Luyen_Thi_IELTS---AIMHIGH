@@ -60,10 +60,6 @@
                     <i class="bi bi-megaphone"></i>
                     <span>Thông báo</span>
                 </a>
-                <a href="roles.html" class="sidebar-link">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Phân quyền</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -178,7 +174,9 @@
                                     <option>3 tháng qua</option>
                                 </select>
                             </div>
-                            <canvas id="weeklyChart" height="260"></canvas>
+                            <div style="position: relative; height: 260px; width: 100%;">
+                                <canvas id="weeklyChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
@@ -188,7 +186,9 @@
                             <div class="admin-card-header">
                                 <h3 class="admin-card-title">Phân bổ kỹ năng</h3>
                             </div>
-                            <canvas id="skillChart" height="260"></canvas>
+                            <div style="position: relative; height: 260px; width: 100%;">
+                                <canvas id="skillChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -274,12 +274,6 @@
                         <a href="notifications.html" class="admin-card text-decoration-none h-100 d-block">
                             <h3 class="admin-card-title"><i class="bi bi-megaphone me-2"></i>Trung tâm thông báo</h3>
                             <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Gửi thông báo theo nhóm học viên, theo dõi trạng thái gửi và lịch sử chiến dịch.</p>
-                        </a>
-                    </div>
-                    <div class="col-md-6 col-xl-3">
-                        <a href="roles.html" class="admin-card text-decoration-none h-100 d-block">
-                            <h3 class="admin-card-title"><i class="bi bi-shield-check me-2"></i>Vai trò & quyền</h3>
-                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Thiết lập quyền theo module cho Super Admin, Content Admin, Reviewer, Support.</p>
                         </a>
                     </div>
                     <div class="col-md-6 col-xl-3">

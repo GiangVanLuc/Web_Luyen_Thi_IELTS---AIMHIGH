@@ -59,10 +59,6 @@
                     <i class="bi bi-megaphone"></i>
                     <span>Thông báo</span>
                 </a>
-                <a href="roles.html" class="sidebar-link">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Phân quyền</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -100,12 +96,12 @@
                 <div class="topbar-right">
                     <div class="topbar-search d-none d-md-block">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Tìm người dùng...">
+                        <input type="text" placeholder="Tìm người dùng..." id="searchUserTop">
                     </div>
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="../profile.html"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
@@ -116,39 +112,30 @@
             <main class="admin-content">
                 <!-- Stats -->
                 <div class="row g-3 mb-4">
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-icon blue"><i class="bi bi-people-fill"></i></div>
                             </div>
-                            <div class="stat-card-value">1,248</div>
+                            <div class="stat-card-value" id="statTotal">--</div>
                             <div class="stat-card-label">Tổng người dùng</div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-icon green"><i class="bi bi-person-check-fill"></i></div>
                             </div>
-                            <div class="stat-card-value">1,195</div>
+                            <div class="stat-card-value" id="statStudent">--</div>
                             <div class="stat-card-label">Học viên</div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <div class="stat-card-icon purple"><i class="bi bi-mortarboard-fill"></i></div>
-                            </div>
-                            <div class="stat-card-value">48</div>
-                            <div class="stat-card-label">Giáo viên</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-icon red"><i class="bi bi-shield-lock-fill"></i></div>
                             </div>
-                            <div class="stat-card-value">5</div>
+                            <div class="stat-card-value" id="statAdmin">--</div>
                             <div class="stat-card-label">Admin</div>
                         </div>
                     </div>
@@ -161,7 +148,6 @@
                             <select class="form-select" id="filterRole">
                                 <option value="">Tất cả vai trò</option>
                                 <option value="student">Học viên</option>
-                                <option value="teacher">Giáo viên</option>
                                 <option value="admin">Admin</option>
                             </select>
                             <input type="text" class="form-control" placeholder="Tìm theo tên, email..." id="searchUser">
@@ -178,127 +164,20 @@
                                     <th>Người dùng</th>
                                     <th>Vai trò</th>
                                     <th>Ngày đăng ký</th>
-                                    <th>Bài thi</th>
-                                    <th>Điểm TB</th>
+                                    <th>Đăng nhập</th>
                                     <th>Trạng thái</th>
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="user-avatar-cell">
-                                            <div class="user-avatar-sm">NT</div>
-                                            <div>
-                                                <div class="user-name-cell">Nguyễn Thảo</div>
-                                                <div class="user-email-cell">thao.nguyen@email.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge student">Học viên</span></td>
-                                    <td>01/01/2026</td>
-                                    <td>24</td>
-                                    <td>6.5</td>
-                                    <td><span class="status-badge published">Active</span></td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm danger" title="Khóa"><i class="bi bi-lock"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-avatar-cell">
-                                            <div class="user-avatar-sm">TM</div>
-                                            <div>
-                                                <div class="user-name-cell">Trần Minh</div>
-                                                <div class="user-email-cell">minh.tran@email.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge student">Học viên</span></td>
-                                    <td>15/01/2026</td>
-                                    <td>18</td>
-                                    <td>7.0</td>
-                                    <td><span class="status-badge published">Active</span></td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm danger" title="Khóa"><i class="bi bi-lock"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-avatar-cell">
-                                            <div class="user-avatar-sm" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">GV</div>
-                                            <div>
-                                                <div class="user-name-cell">Nguyễn Văn An</div>
-                                                <div class="user-email-cell">an.nguyen@aimhigh.edu</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge teacher">Giáo viên</span></td>
-                                    <td>01/12/2025</td>
-                                    <td>—</td>
-                                    <td>—</td>
-                                    <td><span class="status-badge published">Active</span></td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm danger" title="Khóa"><i class="bi bi-lock"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-avatar-cell">
-                                            <div class="user-avatar-sm" style="background:linear-gradient(135deg,#ef4444,#dc2626);">AD</div>
-                                            <div>
-                                                <div class="user-name-cell">Admin AimHigh</div>
-                                                <div class="user-email-cell">admin@aimhigh.edu</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge admin">Admin</span></td>
-                                    <td>01/10/2025</td>
-                                    <td>—</td>
-                                    <td>—</td>
-                                    <td><span class="status-badge published">Active</span></td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-avatar-cell">
-                                            <div class="user-avatar-sm">LH</div>
-                                            <div>
-                                                <div class="user-name-cell">Lê Hương</div>
-                                                <div class="user-email-cell">huong.le@email.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge student">Học viên</span></td>
-                                    <td>20/02/2026</td>
-                                    <td>8</td>
-                                    <td>5.5</td>
-                                    <td><span class="status-badge archived">Locked</span></td>
-                                    <td>
-                                        <button class="btn-icon-sm" title="Sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm" title="Mở khóa"><i class="bi bi-unlock"></i></button>
-                                    </td>
-                                </tr>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b;">Đang tải dữ liệu...</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="admin-pagination">
-                        <div class="admin-pagination-info">Hiển thị 1-5 / 1,248 người dùng</div>
-                        <div class="admin-pagination-btns">
-                            <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn">2</button>
-                            <button class="page-btn">3</button>
-                            <button class="page-btn">...</button>
-                            <button class="page-btn">250</button>
-                            <button class="page-btn"><i class="bi bi-chevron-right"></i></button>
-                        </div>
+                        <div class="admin-pagination-info" id="usersPaginationInfo">--</div>
+                        <div class="admin-pagination-btns" id="usersPaginationBtns"></div>
                     </div>
                 </div>
             </main>
@@ -309,41 +188,347 @@
     <div class="modal fade" id="addUserModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Thêm người dùng mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size:0.85rem;">Họ tên *</label>
-                        <input type="text" class="form-control" placeholder="Nhập họ tên...">
+                <form id="addUserForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Thêm người dùng mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size:0.85rem;">Email *</label>
-                        <input type="email" class="form-control" placeholder="Nhập email...">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Họ tên *</label>
+                            <input type="text" class="form-control" id="newUserName" placeholder="Nhập họ tên..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Email *</label>
+                            <input type="email" class="form-control" id="newUserEmail" placeholder="Nhập email..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Mật khẩu * (tối thiểu 8 ký tự)</label>
+                            <input type="password" class="form-control" id="newUserPassword" placeholder="Nhập mật khẩu..." minlength="8" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Vai trò *</label>
+                            <select class="form-select" id="newUserRole">
+                                <option value="student">Học viên</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size:0.85rem;">Mật khẩu *</label>
-                        <input type="password" class="form-control" placeholder="Nhập mật khẩu...">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn-admin-primary" id="addUserSubmitBtn">Tạo tài khoản</button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size:0.85rem;">Vai trò *</label>
-                        <select class="form-select">
-                            <option value="student">Học viên</option>
-                            <option value="teacher">Giáo viên</option>
-                            <option value="admin">Admin</option>
-                        </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Role Modal -->
+    <div class="modal fade" id="editRoleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editRoleForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Đổi vai trò</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn-admin-primary">Tạo tài khoản</button>
-                </div>
+                    <div class="modal-body">
+                        <p class="mb-3" style="font-size:0.9rem;color:#64748b;">
+                            Người dùng: <strong id="editRoleUserName">--</strong>
+                        </p>
+                        <input type="hidden" id="editRoleUserId">
+                        <div class="mb-1">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Vai trò mới *</label>
+                            <select class="form-select" id="editRoleSelect">
+                                <option value="student">Học viên</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn-admin-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script>
+        const PAGE_SIZE = 10;
+        let usersState = { page: 1, role: '', search: '', totalPages: 1, totalElements: 0 };
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
+        }
+
+        function getInitials(name, email) {
+            const base = (name && name.trim()) ? name.trim() : (email || '?');
+            const parts = base.split(/\s+/).filter(Boolean);
+            if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            return base.slice(0, 2).toUpperCase();
+        }
+
+        function formatDate(input) {
+            if (!input) return '--';
+            const dt = new Date(input);
+            if (Number.isNaN(dt.getTime())) return '--';
+            return dt.toLocaleDateString('vi-VN');
+        }
+
+        function roleBadge(role) {
+            const r = String(role || '').toUpperCase();
+            if (r === 'ADMIN') return '<span class="role-badge admin">Admin</span>';
+            return '<span class="role-badge student">Học viên</span>';
+        }
+
+        function providerLabel(provider) {
+            return String(provider || '').toUpperCase() === 'GOOGLE' ? 'Google' : 'Email';
+        }
+
+        function currentAdminEmail() {
+            try {
+                const u = getAdminCurrentUser ? getAdminCurrentUser() : {};
+                return String(u.email || '').toLowerCase();
+            } catch (_) { return ''; }
+        }
+
+        function renderUserRows(users) {
+            const body = document.getElementById('usersTableBody');
+            if (!body) return;
+
+            if (!Array.isArray(users) || users.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b;">Không có người dùng nào</td></tr>';
+                return;
+            }
+
+            const selfEmail = currentAdminEmail();
+
+            body.innerHTML = users.map(u => {
+                const locked = u.isLocked === true;
+                const isSelf = String(u.email || '').toLowerCase() === selfEmail && selfEmail !== '';
+                const avatar = u.avatarUrl
+                    ? `<img src="${escapeHtml(u.avatarUrl)}" alt="" class="user-avatar-sm" style="object-fit:cover;">`
+                    : `<div class="user-avatar-sm">${escapeHtml(getInitials(u.name, u.email))}</div>`;
+
+                const lockBtn = isSelf
+                    ? ''
+                    : (locked
+                        ? `<button class="btn-icon-sm" title="Mở khóa" data-action="unlock" data-id="${u.id}"><i class="bi bi-unlock"></i></button>`
+                        : `<button class="btn-icon-sm danger" title="Khóa" data-action="lock" data-id="${u.id}"><i class="bi bi-lock"></i></button>`);
+
+                const statusBadge = locked
+                    ? '<span class="status-badge archived">Locked</span>'
+                    : '<span class="status-badge published">Active</span>';
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="user-avatar-cell">
+                                ${avatar}
+                                <div>
+                                    <div class="user-name-cell">${escapeHtml(u.name || '(Chưa đặt tên)')}</div>
+                                    <div class="user-email-cell">${escapeHtml(u.email || '')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${roleBadge(u.role)}</td>
+                        <td>${formatDate(u.createdAt)}</td>
+                        <td>${providerLabel(u.authProvider)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn-icon-sm" title="Đổi vai trò" data-action="edit" data-id="${u.id}" data-name="${escapeHtml(u.name || u.email || '')}" data-role="${escapeHtml(String(u.role || '').toLowerCase())}"><i class="bi bi-pencil"></i></button>
+                            ${lockBtn}
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function renderPagination() {
+            const info = document.getElementById('usersPaginationInfo');
+            const btns = document.getElementById('usersPaginationBtns');
+            const { page, totalPages, totalElements } = usersState;
+
+            if (info) {
+                if (totalElements === 0) {
+                    info.textContent = 'Hiển thị 0 người dùng';
+                } else {
+                    const from = (page - 1) * PAGE_SIZE + 1;
+                    const to = Math.min(page * PAGE_SIZE, totalElements);
+                    info.textContent = `Hiển thị ${from}-${to} / ${totalElements} người dùng`;
+                }
+            }
+            if (!btns) return;
+
+            const pages = Math.max(1, totalPages);
+            let html = `<button class="page-btn" ${page <= 1 ? 'disabled' : ''} data-page="${page - 1}"><i class="bi bi-chevron-left"></i></button>`;
+            const maxShown = 5;
+            let start = Math.max(1, page - 2);
+            let end = Math.min(pages, start + maxShown - 1);
+            start = Math.max(1, end - maxShown + 1);
+            for (let i = start; i <= end; i++) {
+                html += `<button class="page-btn ${i === page ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+            if (end < pages) {
+                html += `<button class="page-btn" disabled>...</button>`;
+                html += `<button class="page-btn ${pages === page ? 'active' : ''}" data-page="${pages}">${pages}</button>`;
+            }
+            html += `<button class="page-btn" ${page >= pages ? 'disabled' : ''} data-page="${page + 1}"><i class="bi bi-chevron-right"></i></button>`;
+            btns.innerHTML = html;
+
+            btns.querySelectorAll('.page-btn:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const p = parseInt(btn.dataset.page, 10);
+                    if (p && p !== usersState.page) {
+                        usersState.page = p;
+                        loadUsers();
+                    }
+                });
+            });
+        }
+
+        async function loadUsers() {
+            const body = document.getElementById('usersTableBody');
+            if (body) body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b;">Đang tải dữ liệu...</td></tr>';
+
+            try {
+                const res = await adminGetUsers({
+                    page: usersState.page,
+                    limit: PAGE_SIZE,
+                    role: usersState.role,
+                    search: usersState.search
+                });
+                const pageData = res?.data || {};
+                const content = pageData.content || [];
+                usersState.totalPages = pageData.totalPages ?? 1;
+                usersState.totalElements = pageData.totalElements ?? content.length;
+                renderUserRows(content);
+                renderPagination();
+            } catch (error) {
+                renderUserRows([]);
+                showToast(`Không thể tải danh sách người dùng: ${error.message || 'Lỗi không xác định'}`, 'danger');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const [all, students, admins] = await Promise.all([
+                    adminGetUsers({ page: 1, limit: 1 }),
+                    adminGetUsers({ page: 1, limit: 1, role: 'student' }),
+                    adminGetUsers({ page: 1, limit: 1, role: 'admin' })
+                ]);
+                document.getElementById('statTotal').textContent = (all?.data?.totalElements ?? 0).toLocaleString('vi-VN');
+                document.getElementById('statStudent').textContent = (students?.data?.totalElements ?? 0).toLocaleString('vi-VN');
+                document.getElementById('statAdmin').textContent = (admins?.data?.totalElements ?? 0).toLocaleString('vi-VN');
+            } catch (_) {
+                // Bỏ qua lỗi thống kê, không chặn bảng chính
+            }
+        }
+
+        let searchTimer = null;
+        function onSearchInput(value) {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                usersState.search = value.trim();
+                usersState.page = 1;
+                loadUsers();
+            }, 350);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadUsers();
+
+            document.getElementById('filterRole')?.addEventListener('change', (e) => {
+                usersState.role = e.target.value;
+                usersState.page = 1;
+                loadUsers();
+            });
+            document.getElementById('searchUser')?.addEventListener('input', (e) => onSearchInput(e.target.value));
+            document.getElementById('searchUserTop')?.addEventListener('input', (e) => {
+                const main = document.getElementById('searchUser');
+                if (main) main.value = e.target.value;
+                onSearchInput(e.target.value);
+            });
+
+            // Hành động trên từng dòng
+            document.getElementById('usersTableBody')?.addEventListener('click', async (e) => {
+                const btn = e.target.closest('button[data-action]');
+                if (!btn) return;
+                const id = btn.dataset.id;
+                const action = btn.dataset.action;
+                if (!id) return;
+
+                try {
+                    if (action === 'lock' || action === 'unlock') {
+                        const lock = action === 'lock';
+                        if (lock && !confirm('Khóa tài khoản này? Người dùng sẽ không thể đăng nhập.')) return;
+                        await adminToggleUserLock(id, lock);
+                        showToast(lock ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản');
+                        await loadUsers();
+                        await loadStats();
+                    } else if (action === 'edit') {
+                        document.getElementById('editRoleUserId').value = id;
+                        document.getElementById('editRoleUserName').textContent = btn.dataset.name || '--';
+                        document.getElementById('editRoleSelect').value = btn.dataset.role === 'admin' ? 'admin' : 'student';
+                        bootstrap.Modal.getOrCreateInstance(document.getElementById('editRoleModal')).show();
+                    }
+                } catch (error) {
+                    showToast(`Thao tác thất bại: ${error.message || 'Lỗi không xác định'}`, 'danger');
+                }
+            });
+
+            // Đổi vai trò
+            document.getElementById('editRoleForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('editRoleUserId').value;
+                const role = document.getElementById('editRoleSelect').value;
+                try {
+                    await adminUpdateUserRole(id, role);
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('editRoleModal')).hide();
+                    showToast('Cập nhật vai trò thành công');
+                    await loadUsers();
+                    await loadStats();
+                } catch (error) {
+                    showToast(`Cập nhật thất bại: ${error.message || 'Lỗi không xác định'}`, 'danger');
+                }
+            });
+
+            // Thêm người dùng
+            document.getElementById('addUserForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('addUserSubmitBtn');
+                const payload = {
+                    name: document.getElementById('newUserName').value.trim(),
+                    email: document.getElementById('newUserEmail').value.trim(),
+                    password: document.getElementById('newUserPassword').value,
+                    role: document.getElementById('newUserRole').value
+                };
+                if (!payload.name || !payload.email || payload.password.length < 8) {
+                    showToast('Vui lòng nhập đủ thông tin, mật khẩu tối thiểu 8 ký tự', 'danger');
+                    return;
+                }
+                submitBtn.disabled = true;
+                try {
+                    await adminCreateUser(payload);
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('addUserModal')).hide();
+                    document.getElementById('addUserForm').reset();
+                    showToast('Tạo tài khoản thành công');
+                    usersState.page = 1;
+                    await loadUsers();
+                    await loadStats();
+                } catch (error) {
+                    showToast(`Tạo tài khoản thất bại: ${error.message || 'Lỗi không xác định'}`, 'danger');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

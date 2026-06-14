@@ -369,9 +369,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('aimhigh_token') && localStorage.getItem('aimhigh_loggedIn') === 'true') {
-                window.location.href = 'dashboard.html';
+                window.location.href = getPostLoginRedirect();
             }
         });
+
+        function getCurrentRole() {
+            try {
+                const user = JSON.parse(localStorage.getItem('aimhigh_currentUser') || '{}') || {};
+                return String(user.role || '').toUpperCase();
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function getPostLoginRedirect() {
+            const role = getCurrentRole();
+            const adminRoles = ['ADMIN'];
+            return adminRoles.includes(role) ? 'admin/dashboard.html' : 'dashboard.html';
+        }
 
         async function handleLogin(event) {
             event.preventDefault();
@@ -382,7 +397,7 @@
             try {
                 await apiLogin(email, password);
                 if (localStorage.getItem('aimhigh_loggedIn') === 'true') {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = getPostLoginRedirect();
                 } else {
                     alert('Đăng nhập thất bại. Vui lòng thử lại.');
                 }

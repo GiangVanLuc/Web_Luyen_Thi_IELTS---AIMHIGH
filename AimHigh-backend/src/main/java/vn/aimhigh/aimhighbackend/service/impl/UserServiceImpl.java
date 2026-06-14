@@ -136,6 +136,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public UserProfileResponse createUserByAdmin(String name, String email, String rawPassword, Role role) {
+        String normalizedName = name == null ? "" : name.trim();
+        if (normalizedName.isBlank()) {
+            throw new BadRequestException("Tên không được để trống");
+        }
+
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+        if (normalizedEmail.isBlank()) {
+            throw new BadRequestException("Email không được để trống");
+        }
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(normalizedEmail))) {
+            throw new BadRequestException("Email đã được sử dụng bởi tài khoản khác");
+        }
+
+        if (rawPassword == null || rawPassword.length() < 8) {
+            throw new BadRequestException("Mật khẩu phải có ít nhất 8 ký tự");
+        }
+
+        User user = User.builder()
+                .name(normalizedName)
+                .email(normalizedEmail)
+                .password(passwordEncoder.encode(rawPassword))
+                .role(role == null ? Role.STUDENT : role)
+                .authProvider(AuthProvider.LOCAL)
+                .isLocked(false)
+                .build();
+
+        User savedUser = userRepository.save(user);
+        return toProfileResponse(savedUser, null);
+    }
+
+    @Override
+    @Transactional
     public void updateUserRole(Long userId, Role role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException("Không tìm thấy người dùng"));

@@ -40,7 +40,8 @@ async function apiFetch(endpoint, options = {}) {
             const role = String(currentUser?.role || '').toUpperCase();
             const errorData = await response.json().catch(() => ({}));
 
-            if (isAdminEndpoint && role !== 'ADMIN') {
+            const adminRoles = ['ADMIN'];
+            if (isAdminEndpoint && !adminRoles.includes(role)) {
                 throw new Error('Bạn chưa có quyền ADMIN. Vui lòng đăng nhập bằng tài khoản ADMIN để dùng chức năng này.');
             }
 
@@ -536,6 +537,17 @@ async function adminGradeSubmission(submissionId, gradeData) {
 async function adminGetUsers(params = {}) {
     const query = new URLSearchParams({ page: 1, limit: 10, ...params });
     return apiFetch(`/admin/users?${query}`);
+}
+
+/**
+ * Tạo tài khoản mới (admin)
+ * @param {object} payload - { name, email, password, role }
+ */
+async function adminCreateUser(payload) {
+    return apiFetch('/admin/users', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
 }
 
 /**

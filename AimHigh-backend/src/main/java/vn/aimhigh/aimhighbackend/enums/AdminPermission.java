@@ -34,16 +34,7 @@ public enum AdminPermission {
             return Set.of();
         }
         return switch (role) {
-            case ADMIN, SUPER_ADMIN -> EnumSet.allOf(AdminPermission.class);
-            case CONTENT_ADMIN -> EnumSet.of(
-                    DASHBOARD_VIEW,
-                    VOCAB_VIEW, VOCAB_CREATE, VOCAB_UPDATE, VOCAB_DELETE, VOCAB_IMPORT,
-                    EXAM_VIEW, EXAM_CREATE, EXAM_UPDATE, EXAM_DELETE, EXAM_IMPORT, EXAM_PUBLISH,
-                    NOTIFICATION_MANAGE,
-                    REPORT_VIEW
-            );
-            case REVIEWER -> EnumSet.of(DASHBOARD_VIEW, SUBMISSION_VIEW, SUBMISSION_GRADE, REPORT_VIEW);
-            case SUPPORT -> EnumSet.of(DASHBOARD_VIEW, USER_VIEW, USER_LOCK);
+            case ADMIN -> EnumSet.allOf(AdminPermission.class);
             case STUDENT -> Set.of();
         };
     }

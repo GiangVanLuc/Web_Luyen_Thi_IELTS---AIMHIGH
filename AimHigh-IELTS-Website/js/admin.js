@@ -1,6 +1,6 @@
 // ===== ADMIN.JS - Admin CMS Logic =====
 
-const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN', 'REVIEWER', 'SUPPORT'];
+const ADMIN_ROLES = ['ADMIN'];
 
 function getAdminCurrentUser() {
     try {

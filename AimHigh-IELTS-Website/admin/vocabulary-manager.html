@@ -58,10 +58,6 @@
                     <i class="bi bi-megaphone"></i>
                     <span>Thông báo</span>
                 </a>
-                <a href="roles.html" class="sidebar-link">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Phân quyền</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -219,19 +215,7 @@
         let vocabPage = 0;
         const vocabSize = 50;
 
-        function requireAdminSession() {
-            const token = localStorage.getItem('aimhigh_token');
-            const currentUser = JSON.parse(localStorage.getItem('aimhigh_currentUser') || '{}');
-            const role = String(currentUser?.role || '').toUpperCase();
-            if (!token || role !== 'ADMIN') {
-                showToast('Bạn cần đăng nhập ADMIN để sử dụng trang này.', 'danger');
-                setTimeout(() => {
-                    window.location.href = '../login.html';
-                }, 900);
-                return false;
-            }
-            return true;
-        }
+
 
         function normalizeList(response) {
             const data = response?.data ?? response;
@@ -288,7 +272,7 @@
         }
 
         async function loadVocabulary() {
-            if (!requireAdminSession()) return;
+            if (!requireAdminPage()) return;
 
             const q = document.getElementById('vocabSearchInput')?.value?.trim() || '';
             const partOfSpeech = document.getElementById('vocabPartFilter')?.value || '';
@@ -384,7 +368,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!requireAdminSession()) return;
+            if (!requireAdminPage()) return;
 
             document.getElementById('importJsonTextBtn')?.addEventListener('click', importJsonText);
             document.getElementById('importJsonFileBtn')?.addEventListener('click', importJsonFile);

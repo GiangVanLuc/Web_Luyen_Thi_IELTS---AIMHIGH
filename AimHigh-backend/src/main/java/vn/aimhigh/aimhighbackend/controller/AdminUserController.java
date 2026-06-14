@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +43,22 @@ public class AdminUserController {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), limit);
         Role userRole = parseRoleOrNull(role);
         return ResponseEntity.ok(ApiResponse.success(userService.getUsersWithPagination(userRole, search, pageable)));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<UserProfileResponse>> createUser(
+            @RequestBody Map<String, String> body,
+            Authentication authentication) {
+        adminAuthorizationService.requirePermission(authentication, AdminPermission.USER_CREATE);
+        String name = body.get("name");
+        String email = body.get("email");
+        String password = body.get("password");
+        String roleStr = body.get("role");
+        Role role = (roleStr == null || roleStr.isBlank())
+                ? Role.STUDENT
+                : Role.valueOf(roleStr.toUpperCase());
+        UserProfileResponse created = userService.createUserByAdmin(name, email, password, role);
+        return ResponseEntity.ok(ApiResponse.success(created, "Tạo tài khoản thành công"));
     }
 
     @PatchMapping("/{id}/role")

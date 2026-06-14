@@ -21,6 +21,7 @@ public interface UserService {
     void changePassword(ChangePasswordRequest request, Authentication authentication);
     
     Page<UserProfileResponse> getUsersWithPagination(Role role, String search, Pageable pageable);
+    UserProfileResponse createUserByAdmin(String name, String email, String rawPassword, Role role);
     void updateUserRole(Long userId, Role role);
     void toggleUserLock(Long userId, boolean isLocked);
 }

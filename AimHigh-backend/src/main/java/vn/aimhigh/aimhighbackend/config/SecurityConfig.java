@@ -73,13 +73,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers("/api/admin/**").hasAnyRole(
-                                "ADMIN",
-                                "SUPER_ADMIN",
-                                "CONTENT_ADMIN",
-                                "REVIEWER",
-                                "SUPPORT"
-                        )
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 // ① OAuth2 CLIENT — xử lý Google Login
