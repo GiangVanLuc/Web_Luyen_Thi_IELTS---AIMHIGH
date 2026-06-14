@@ -17,6 +17,8 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
     List<User> findUsersNeedingReview(@Param("threshold") LocalDateTime threshold);
     Optional<UserVocabulary> findByUserIdAndVocabularyId(Long userId, Long vocabId);
 
+    Optional<UserVocabulary> findByUserIdAndCustomNormalizedWord(Long userId, String customNormalizedWord);
+
     Optional<UserVocabulary> findByUserIdAndId(Long userId, Long id);
 
     List<UserVocabulary> findByUserId(Long userId);
@@ -29,20 +31,20 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
 
     @Query("""
         select uv from UserVocabulary uv
-        join uv.vocabulary v
+        left join uv.vocabulary v
         left join uv.group g
         where uv.user.id = :userId
           and (:learned is null or uv.learned = :learned)
           and (:learnLevel is null or uv.learnLevel = :learnLevel)
           and (:groupId is null or g.id = :groupId)
-          and (:partOfSpeech is null or lower(coalesce(v.partOfSpeech, '')) = lower(:partOfSpeech))
+          and (:partOfSpeech is null or lower(coalesce(v.partOfSpeech, uv.customPartOfSpeech, '')) = lower(:partOfSpeech))
           and (:fromDate is null or uv.savedAt >= :fromDate)
           and (:toDate is null or uv.savedAt <= :toDate)
           and (
                 :keyword is null
-                or lower(v.word) like lower(concat('%', :keyword, '%'))
-                or lower(coalesce(v.meaning, '')) like lower(concat('%', :keyword, '%'))
-                or lower(coalesce(v.viMeaning, '')) like lower(concat('%', :keyword, '%'))
+                or lower(coalesce(v.word, uv.customWord, '')) like lower(concat('%', :keyword, '%'))
+                or lower(coalesce(v.meaning, uv.customMeaning, '')) like lower(concat('%', :keyword, '%'))
+                or lower(coalesce(v.viMeaning, uv.customViMeaning, '')) like lower(concat('%', :keyword, '%'))
           )
     """)
     List<UserVocabulary> searchUserVocabulary(

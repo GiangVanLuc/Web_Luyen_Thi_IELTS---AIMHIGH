@@ -703,6 +703,16 @@ async function apiLookupVocab(word) {
     return apiFetch(`/vocabulary/lookup?word=${encodeURIComponent(word)}`);
 }
 
+async function apiGetGlobalVocab(filters = {}) {
+    const query = new URLSearchParams();
+    Object.entries(filters || {}).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') return;
+        query.set(key, String(value));
+    });
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return apiFetch(`/vocabulary${suffix}`);
+}
+
 async function apiSaveUserVocab(vocabId, options = {}) {
     const payload = {
         vocabId
@@ -723,6 +733,13 @@ async function apiSaveUserVocab(vocabId, options = {}) {
     }
 
     return apiFetch(`/user-vocabulary`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function apiSaveCustomUserVocab(payload = {}) {
+    return apiFetch('/user-vocabulary/custom', {
         method: 'POST',
         body: JSON.stringify(payload)
     });

@@ -3,6 +3,8 @@ package vn.aimhigh.aimhighbackend.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Locale;
+import vn.aimhigh.aimhighbackend.enums.VocabularySourceType;
 
 @Entity
 @Table(
@@ -29,8 +31,31 @@ public class UserVocabulary {
     private User user;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vocab_id", nullable = false)
+    @JoinColumn(name = "vocab_id")
     private Vocabulary vocabulary;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source_type")
+    private VocabularySourceType sourceType = VocabularySourceType.GLOBAL;
+
+    @Column(name = "custom_word")
+    private String customWord;
+
+    @Column(name = "custom_normalized_word")
+    private String customNormalizedWord;
+
+    @Column(name = "custom_ipa")
+    private String customIpa;
+
+    @Column(name = "custom_part_of_speech")
+    private String customPartOfSpeech;
+
+    @Column(name = "custom_meaning", columnDefinition = "TEXT")
+    private String customMeaning;
+
+    @Column(name = "custom_vi_meaning", columnDefinition = "TEXT")
+    private String customViMeaning;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -62,6 +87,7 @@ public class UserVocabulary {
 
     @PrePersist
     protected void onCreate() {
+        syncSourceType();
         syncLearnState();
         if (learned == null) {
             learned = Boolean.FALSE;
@@ -78,6 +104,7 @@ public class UserVocabulary {
 
     @PreUpdate
     protected void onUpdate() {
+        syncSourceType();
         syncLearnState();
         if (reviewCount == null) {
             reviewCount = 0;
@@ -96,5 +123,15 @@ public class UserVocabulary {
             learnLevel = 2;
         }
         learned = learnLevel >= 2;
+    }
+
+    private void syncSourceType() {
+        if (sourceType == null) {
+            sourceType = vocabulary == null ? VocabularySourceType.CUSTOM : VocabularySourceType.GLOBAL;
+        }
+        if (sourceType == VocabularySourceType.CUSTOM && customWord != null) {
+            customWord = customWord.trim();
+            customNormalizedWord = customWord.toLowerCase(Locale.ROOT);
+        }
     }
 }

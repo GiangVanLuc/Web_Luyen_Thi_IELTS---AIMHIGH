@@ -21,9 +21,6 @@ public class ApiResponse<T> {
     private Object errors;
     private LocalDateTime timestamp;
 
-    /**
-     * Trả về response thành công với dữ liệu mặc định.
-     */
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -34,9 +31,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    /**
-     * Trả về response thành công với dữ liệu và thông báo tùy chỉnh.
-     */
     public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -47,9 +41,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    /**
-     * Trả về response thành công với dữ liệu, thông báo và status code tùy chỉnh.
-     */
     public static <T> ApiResponse<T> success(T data, String message, int status) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -60,9 +51,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    /**
-     * Trả về response thành công không có dữ liệu (có thể dùng cho DELETE hoặc cập nhật).
-     */
     public static <T> ApiResponse<T> success(String message) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -72,9 +60,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    /**
-     * Trả về response lỗi với thông báo và status code.
-     */
     public static <T> ApiResponse<T> error(String message, int status) {
         return ApiResponse.<T>builder()
                 .success(false)
@@ -84,9 +69,6 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    /**
-     * Trả về response lỗi kèm chi tiết lỗi (ví dụ: validation errors).
-     */
     public static <T> ApiResponse<T> error(String message, int status, Object errors) {
         return ApiResponse.<T>builder()
                 .success(false)

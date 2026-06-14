@@ -376,6 +376,74 @@ async function saveWordToBackend(item, groupName) {
     };
 }
 
+async function saveWordToBackendV2(item, groupName) {
+    if (!hasBackendAuthToken() || typeof apiSaveUserVocab !== 'function') return null;
+
+    const targetGroupName = String(groupName || item.group || 'Sổ từ vựng').trim() || 'Sổ từ vựng';
+    const groupMeta = getGroupMetaByName(targetGroupName);
+    let vocabId = Number(item?.backendVocabId);
+
+    if ((!Number.isFinite(vocabId) || vocabId <= 0) && typeof apiLookupVocab === 'function') {
+        try {
+            const lookupRes = await apiLookupVocab(item.word);
+            const vocabData = lookupRes?.data || lookupRes;
+            vocabId = Number(vocabData?.id);
+        } catch (_) {
+            vocabId = NaN;
+        }
+    }
+
+    if (!Number.isFinite(vocabId) || vocabId <= 0) {
+        if (typeof apiSaveCustomUserVocab !== 'function') return null;
+        const customRes = await apiSaveCustomUserVocab({
+            word: item.word,
+            ipa: item.pronunciation,
+            pronunciation: item.pronunciation,
+            partOfSpeech: item.type,
+            meaning: item.meaning,
+            viMeaning: item.meaning,
+            groupId: Number.isFinite(Number(groupMeta?.id)) ? Number(groupMeta.id) : undefined,
+            groupName: targetGroupName,
+            note: item?.note || null
+        });
+        const customData = customRes?.data || customRes || {};
+        const customUserVocabularyId = Number(customData?.userVocabularyId);
+        const customGroupId = Number(customData?.groupId);
+        if (Number.isFinite(customGroupId) && customGroupId > 0) {
+            setGroupMeta(targetGroupName, { id: customGroupId, name: customData?.groupName || targetGroupName });
+        }
+        return {
+            backendVocabId: null,
+            backendUserVocabularyId: Number.isFinite(customUserVocabularyId) && customUserVocabularyId > 0 ? customUserVocabularyId : null,
+            backendGroupId: Number.isFinite(customGroupId) && customGroupId > 0 ? customGroupId : null,
+            learnLevel: normalizeLearnLevel(customData?.learnLevel),
+            status: toStatusFromLearnLevel(customData?.learnLevel, customData?.learned === true)
+        };
+    }
+
+    const saveRes = await apiSaveUserVocab(vocabId, {
+        groupId: Number.isFinite(Number(groupMeta?.id)) ? Number(groupMeta.id) : undefined,
+        groupName: targetGroupName,
+        note: item?.note || null
+    });
+    const savedData = saveRes?.data || saveRes || {};
+    const backendUserVocabularyId = Number(savedData?.userVocabularyId);
+    const backendGroupId = Number(savedData?.groupId);
+    if (Number.isFinite(backendGroupId) && backendGroupId > 0) {
+        setGroupMeta(targetGroupName, { id: backendGroupId, name: savedData?.groupName || targetGroupName });
+    }
+
+    return {
+        backendVocabId: vocabId,
+        backendUserVocabularyId: Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0 ? backendUserVocabularyId : null,
+        backendGroupId: Number.isFinite(backendGroupId) && backendGroupId > 0 ? backendGroupId : null,
+        learnLevel: normalizeLearnLevel(savedData?.learnLevel),
+        status: toStatusFromLearnLevel(savedData?.learnLevel, savedData?.learned === true)
+    };
+}
+
+saveWordToBackend = saveWordToBackendV2;
+
 // ===== AUTO INIT VOCAB DATA =====
 function initData() {
     normalizeVocabularyStorage();

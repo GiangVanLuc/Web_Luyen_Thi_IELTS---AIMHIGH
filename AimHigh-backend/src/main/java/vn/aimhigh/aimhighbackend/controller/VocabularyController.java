@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.aimhigh.aimhighbackend.dto.request.CustomVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.SaveVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchDeleteRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchSaveRequest;
@@ -40,6 +41,17 @@ public class VocabularyController {
         return ResponseEntity.ok(ApiResponse.success(vocabularyService.lookup(word, userId)));
     }
 
+    @GetMapping("/vocabulary")
+    public ResponseEntity<ApiResponse<List<VocabularyResponse>>> getGlobalVocabulary(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String partOfSpeech,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            Authentication authentication) {
+        Long userId = userService.requireUser(authentication).getId();
+        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getGlobalVocabulary(q, partOfSpeech, page, size, userId)));
+    }
+
     @PostMapping("/user-vocabulary")
     public ResponseEntity<ApiResponse<VocabularyResponse>> saveToVocabulary(
             @Valid @RequestBody SaveVocabularyRequest request,
@@ -47,6 +59,15 @@ public class VocabularyController {
         Long userId = userService.requireUser(authentication).getId();
         VocabularyResponse response = vocabularyService.saveToUserVocabulary(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response, "Lưu từ vựng thành công"));
+    }
+
+    @PostMapping("/user-vocabulary/custom")
+    public ResponseEntity<ApiResponse<VocabularyResponse>> saveCustomVocabulary(
+            @Valid @RequestBody CustomVocabularyRequest request,
+            Authentication authentication) {
+        Long userId = userService.requireUser(authentication).getId();
+        VocabularyResponse response = vocabularyService.saveCustomVocabulary(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Lưu từ vựng cá nhân thành công"));
     }
 
     @GetMapping("/user-vocabulary")

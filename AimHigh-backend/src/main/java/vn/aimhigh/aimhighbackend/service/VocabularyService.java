@@ -1,5 +1,6 @@
 package vn.aimhigh.aimhighbackend.service;
 
+import vn.aimhigh.aimhighbackend.dto.request.CustomVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.SaveVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchDeleteRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchSaveRequest;
@@ -17,7 +18,11 @@ import java.util.List;
 public interface VocabularyService {
     VocabularyResponse lookup(String word, Long userId);
 
+    List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Integer page, Integer size, Long userId);
+
     VocabularyResponse saveToUserVocabulary(SaveVocabularyRequest request, Long userId);
+
+    VocabularyResponse saveCustomVocabulary(CustomVocabularyRequest request, Long userId);
 
     List<VocabularyResponse> getUserVocabulary(
             Long userId,

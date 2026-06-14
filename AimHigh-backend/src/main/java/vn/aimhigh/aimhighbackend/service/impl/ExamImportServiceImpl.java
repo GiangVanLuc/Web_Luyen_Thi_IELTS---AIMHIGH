@@ -946,7 +946,7 @@ public class ExamImportServiceImpl implements ExamImportService {
 
         writeKeyValueRow(sheet, 1, "title", (fullSample ? "Full Sample IELTS " : "Sample IELTS ") + skill.name() + " Test");
         writeKeyValueRow(sheet, 2, "skill", skill.name());
-        writeKeyValueRow(sheet, 3, "duration", skill == Skill.LISTENING ? "30" : "60");
+        writeKeyValueRow(sheet, 3, "duration", skill == Skill.LISTENING ? "30" : (skill == Skill.SPEAKING ? "15" : "60"));
         writeKeyValueRow(sheet, 4, "description", "Imported from Excel template");
         writeKeyValueRow(sheet, 5, "mode", fullSample ? "FULL" : "PARTIAL");
 
@@ -973,6 +973,13 @@ public class ExamImportServiceImpl implements ExamImportService {
         } else if (skill == Skill.LISTENING) {
             writeSectionRow(sheet, 1, 1, "Section 1", 1, 10, "https://cdn.example.com/listening-sec1.mp3", 420, "Transcript section 1");
             writeSectionRow(sheet, 2, 2, "Section 2", 11, 20, "https://cdn.example.com/listening-sec2.mp3", 450, "Transcript section 2");
+        } else if (skill == Skill.WRITING) {
+            writeSectionRow(sheet, 1, 1, "Writing Task 1", 1, 1, "", 0, "");
+            writeSectionRow(sheet, 2, 2, "Writing Task 2", 2, 2, "", 0, "");
+        } else if (skill == Skill.SPEAKING) {
+            writeSectionRow(sheet, 1, 1, "Speaking Part 1", 1, 4, "", 0, "");
+            writeSectionRow(sheet, 2, 2, "Speaking Part 2", 5, 5, "", 0, "");
+            writeSectionRow(sheet, 3, 3, "Speaking Part 3", 6, 9, "", 0, "");
         } else if (fullSample) {
             writeSectionRow(sheet, 1, 1, "Section 1", 1, 13, "", 0, "");
             writeSectionRow(sheet, 2, 2, "Section 2", 14, 26, "", 0, "");
@@ -1031,7 +1038,51 @@ public class ExamImportServiceImpl implements ExamImportService {
         header.createCell(6).setCellValue("audioStart");
         header.createCell(7).setCellValue("audioEnd");
 
-        if (fullSample) {
+        if (skill == Skill.WRITING) {
+            Row task1 = sheet.createRow(1);
+            task1.createCell(0).setCellValue(1);
+            task1.createCell(1).setCellValue(1);
+            task1.createCell(2).setCellValue("The chart below shows sample IELTS Writing Task 1 data. Summarise the information and make comparisons where relevant.");
+            task1.createCell(3).setCellValue("");
+            task1.createCell(4).setCellValue("Assess task achievement, coherence, lexical resource, grammar.");
+            task1.createCell(5).setCellValue(1);
+            task1.createCell(6).setCellValue(0);
+            task1.createCell(7).setCellValue(0);
+
+            Row task2 = sheet.createRow(2);
+            task2.createCell(0).setCellValue(2);
+            task2.createCell(1).setCellValue(2);
+            task2.createCell(2).setCellValue("Some people believe online learning is more effective than classroom learning. Discuss both views and give your opinion.");
+            task2.createCell(3).setCellValue("");
+            task2.createCell(4).setCellValue("Assess task response, coherence, lexical resource, grammar.");
+            task2.createCell(5).setCellValue(1);
+            task2.createCell(6).setCellValue(0);
+            task2.createCell(7).setCellValue(0);
+        } else if (skill == Skill.SPEAKING) {
+            String[] prompts = {
+                    "Part 1: What do you usually do in your free time?",
+                    "Part 1: Do you prefer studying alone or with others?",
+                    "Part 1: How often do you use public transport?",
+                    "Part 1: What kind of music do you enjoy?",
+                    "Part 2 cue card: Describe a goal you achieved. You should say what it was, how you achieved it, and why it was important.",
+                    "Part 3: Why do people set personal goals?",
+                    "Part 3: Are young people under more pressure today?",
+                    "Part 3: How can schools help students plan their future?",
+                    "Part 3: Is success always measurable?"
+            };
+            for (int i = 0; i < prompts.length; i++) {
+                Row row = sheet.createRow(i + 1);
+                int q = i + 1;
+                row.createCell(0).setCellValue(q <= 4 ? 1 : (q == 5 ? 2 : 3));
+                row.createCell(1).setCellValue(q);
+                row.createCell(2).setCellValue(prompts[i]);
+                row.createCell(3).setCellValue("");
+                row.createCell(4).setCellValue("Assess fluency, lexical resource, grammar, pronunciation.");
+                row.createCell(5).setCellValue(1);
+                row.createCell(6).setCellValue(0);
+                row.createCell(7).setCellValue(0);
+            }
+        } else if (fullSample) {
             int rowIndex = 1;
             int totalQuestions = 40;
             for (int q = 1; q <= totalQuestions; q++) {

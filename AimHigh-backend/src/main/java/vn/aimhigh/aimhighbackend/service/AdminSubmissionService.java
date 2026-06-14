@@ -7,5 +7,6 @@ import vn.aimhigh.aimhighbackend.dto.response.AdminSubmissionResponse;
 
 public interface AdminSubmissionService {
     Page<AdminSubmissionResponse> getSubmissions(String skillFilter, Pageable pageable);
+    Page<AdminSubmissionResponse> getUngradedSubmissions(String skillFilter, Pageable pageable);
     void gradeSubmission(Long attemptId, AdminGradeRequest request);
 }

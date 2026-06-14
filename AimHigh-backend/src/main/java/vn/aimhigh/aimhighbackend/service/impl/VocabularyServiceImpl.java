@@ -2,8 +2,11 @@ package vn.aimhigh.aimhighbackend.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.aimhigh.aimhighbackend.dto.request.CustomVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.SaveVocabularyRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchDeleteRequest;
 import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyBatchSaveRequest;
@@ -16,6 +19,7 @@ import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyGroupResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
+import vn.aimhigh.aimhighbackend.enums.VocabularySourceType;
 import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.model.UserVocabulary;
 import vn.aimhigh.aimhighbackend.model.UserVocabularyGroup;
@@ -60,15 +64,31 @@ public class VocabularyServiceImpl implements VocabularyService {
             throw new BadRequestException("Invalid vocabulary word");
         }
 
-        Vocabulary vocab = vocabularyRepository.findByNormalizedWord(normalizedWord).orElseGet(() -> {
-            Vocabulary newVocab = Vocabulary.builder()
-                    .word(word.trim())
-                    .build();
-            return vocabularyRepository.save(newVocab);
-        });
+        Vocabulary vocab = vocabularyRepository.findByNormalizedWord(normalizedWord)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy từ trong AimHigh Pick"));
 
         Optional<UserVocabulary> saved = userVocabularyRepository.findByUserIdAndVocabularyId(userId, vocab.getId());
         return toResponse(vocab, saved.orElse(null));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Integer page, Integer size, Long userId) {
+        int safePage = page == null || page < 0 ? 0 : page;
+        int safeSize = size == null ? 50 : Math.min(Math.max(size, 1), 200);
+        String normalizedPos = trimToNull(partOfSpeech);
+        if (normalizedPos != null) {
+            normalizedPos = normalizedPos.toLowerCase(Locale.ROOT);
+        }
+
+        return vocabularyRepository.searchVocabulary(
+                        trimToNull(keyword),
+                        normalizedPos,
+                        PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.ASC, "word"))
+                )
+                .stream()
+                .map(vocab -> toResponse(vocab, userVocabularyRepository.findByUserIdAndVocabularyId(userId, vocab.getId()).orElse(null)))
+                .toList();
     }
 
     @Override
@@ -112,6 +132,7 @@ public class VocabularyServiceImpl implements VocabularyService {
         UserVocabulary userVocab = UserVocabulary.builder()
                 .user(user)
                 .vocabulary(vocab)
+                .sourceType(VocabularySourceType.GLOBAL)
                 .group(targetGroup)
                 .learned(false)
                 .learnLevel(0)
@@ -129,6 +150,38 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .build());
 
         return toResponse(vocab, saved);
+    }
+
+    @Override
+    public VocabularyResponse saveCustomVocabulary(CustomVocabularyRequest request, Long userId) {
+        String cleanedWord = trimToNull(request.getWord());
+        if (cleanedWord == null) {
+            throw new BadRequestException("Từ vựng không được bỏ trống");
+        }
+
+        String normalizedWord = normalizeWord(cleanedWord);
+        UserVocabularyGroup targetGroup = resolveTargetGroup(userId, request.getGroupId(), request.getGroupName());
+        Optional<UserVocabulary> existing = userVocabularyRepository.findByUserIdAndCustomNormalizedWord(userId, normalizedWord);
+
+        UserVocabulary userVocabulary = existing.orElseGet(() -> UserVocabulary.builder()
+                .user(getUser(userId))
+                .sourceType(VocabularySourceType.CUSTOM)
+                .learned(false)
+                .learnLevel(0)
+                .build());
+
+        userVocabulary.setVocabulary(null);
+        userVocabulary.setSourceType(VocabularySourceType.CUSTOM);
+        userVocabulary.setCustomWord(cleanedWord);
+        userVocabulary.setCustomIpa(trimToNull(firstNonBlank(request.getIpa(), request.getPronunciation())));
+        userVocabulary.setCustomPartOfSpeech(trimToNull(request.getPartOfSpeech()));
+        userVocabulary.setCustomMeaning(trimToNull(request.getMeaning()));
+        userVocabulary.setCustomViMeaning(trimToNull(firstNonBlank(request.getViMeaning(), request.getMeaning())));
+        userVocabulary.setGroup(targetGroup);
+        userVocabulary.setNote(trimToNull(request.getNote()));
+
+        UserVocabulary saved = userVocabularyRepository.save(userVocabulary);
+        return toResponse(null, saved);
     }
 
     @Override
@@ -411,7 +464,7 @@ public class VocabularyServiceImpl implements VocabularyService {
         Comparator<UserVocabulary> bySavedAtAsc = Comparator.comparing(UserVocabulary::getSavedAt,
                 Comparator.nullsLast(LocalDateTime::compareTo));
         Comparator<UserVocabulary> byWordAsc = Comparator.comparing(
-                uv -> uv.getVocabulary() == null ? "" : String.valueOf(uv.getVocabulary().getWord()).toLowerCase(Locale.ROOT),
+                uv -> getWordForSort(uv).toLowerCase(Locale.ROOT),
                 Comparator.nullsLast(String::compareTo)
         );
 
@@ -538,6 +591,19 @@ public class VocabularyServiceImpl implements VocabularyService {
         return cleaned.isEmpty() ? null : cleaned;
     }
 
+    private String firstNonBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            String cleaned = trimToNull(value);
+            if (cleaned != null) {
+                return cleaned;
+            }
+        }
+        return null;
+    }
+
     private String normalizeWord(String word) {
         if (word == null) {
             return "";
@@ -546,7 +612,8 @@ public class VocabularyServiceImpl implements VocabularyService {
     }
 
     private VocabularyResponse toResponse(Vocabulary vocab, UserVocabulary userVocabulary) {
-        Long vocabId = vocab == null ? null : vocab.getId();
+        Vocabulary effectiveVocab = vocab != null ? vocab : (userVocabulary == null ? null : userVocabulary.getVocabulary());
+        Long vocabId = effectiveVocab == null ? null : effectiveVocab.getId();
         List<VocabularyResponse.ExampleDto> examples = vocabId == null
                 ? List.of()
                 : vocabularyExampleRepository.findByVocabularyId(vocabId).stream()
@@ -560,15 +627,15 @@ public class VocabularyServiceImpl implements VocabularyService {
         UserVocabularyGroup group = userVocabulary == null ? null : userVocabulary.getGroup();
 
         return VocabularyResponse.builder()
-                .id(vocab == null ? null : vocab.getId())
-                .word(vocab == null ? null : vocab.getWord())
-                .ipa(vocab == null ? null : vocab.getIpa())
-                .partOfSpeech(vocab == null ? null : vocab.getPartOfSpeech())
-                .meaning(vocab == null ? null : vocab.getMeaning())
-                .viMeaning(vocab == null ? null : vocab.getViMeaning())
-                .audioUrl(vocab == null ? null : vocab.getAudioUrl())
-                .imageUrl(vocab == null ? null : vocab.getImageUrl())
-                .related(vocab == null ? null : vocab.getRelated())
+                .id(effectiveVocab == null ? null : effectiveVocab.getId())
+                .word(resolveWord(effectiveVocab, userVocabulary))
+                .ipa(resolveIpa(effectiveVocab, userVocabulary))
+                .partOfSpeech(resolvePartOfSpeech(effectiveVocab, userVocabulary))
+                .meaning(resolveMeaning(effectiveVocab, userVocabulary))
+                .viMeaning(resolveViMeaning(effectiveVocab, userVocabulary))
+                .audioUrl(effectiveVocab == null ? null : effectiveVocab.getAudioUrl())
+                .imageUrl(effectiveVocab == null ? null : effectiveVocab.getImageUrl())
+                .related(effectiveVocab == null ? null : effectiveVocab.getRelated())
                 .examples(examples)
                 .isSaved(userVocabulary != null)
                 .userVocabularyId(userVocabulary == null ? null : userVocabulary.getId())
@@ -581,6 +648,36 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .reviewCount(userVocabulary == null ? null : userVocabulary.getReviewCount())
                 .savedAt(userVocabulary == null ? null : userVocabulary.getSavedAt())
                 .build();
+    }
+
+    private String getWordForSort(UserVocabulary userVocabulary) {
+        if (userVocabulary == null) {
+            return "";
+        }
+        if (userVocabulary.getVocabulary() != null && userVocabulary.getVocabulary().getWord() != null) {
+            return userVocabulary.getVocabulary().getWord();
+        }
+        return userVocabulary.getCustomWord() == null ? "" : userVocabulary.getCustomWord();
+    }
+
+    private String resolveWord(Vocabulary vocab, UserVocabulary userVocabulary) {
+        return vocab != null ? vocab.getWord() : userVocabulary == null ? null : userVocabulary.getCustomWord();
+    }
+
+    private String resolveIpa(Vocabulary vocab, UserVocabulary userVocabulary) {
+        return vocab != null ? vocab.getIpa() : userVocabulary == null ? null : userVocabulary.getCustomIpa();
+    }
+
+    private String resolvePartOfSpeech(Vocabulary vocab, UserVocabulary userVocabulary) {
+        return vocab != null ? vocab.getPartOfSpeech() : userVocabulary == null ? null : userVocabulary.getCustomPartOfSpeech();
+    }
+
+    private String resolveMeaning(Vocabulary vocab, UserVocabulary userVocabulary) {
+        return vocab != null ? vocab.getMeaning() : userVocabulary == null ? null : userVocabulary.getCustomMeaning();
+    }
+
+    private String resolveViMeaning(Vocabulary vocab, UserVocabulary userVocabulary) {
+        return vocab != null ? vocab.getViMeaning() : userVocabulary == null ? null : userVocabulary.getCustomViMeaning();
     }
 }
 

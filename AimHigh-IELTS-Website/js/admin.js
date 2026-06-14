@@ -1,5 +1,51 @@
 // ===== ADMIN.JS - Admin CMS Logic =====
 
+const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN', 'CONTENT_ADMIN', 'REVIEWER', 'SUPPORT'];
+
+function getAdminCurrentUser() {
+    try {
+        return JSON.parse(localStorage.getItem('aimhigh_currentUser') || localStorage.getItem('aimhigh_user') || '{}') || {};
+    } catch (_) {
+        return {};
+    }
+}
+
+function getAdminRole() {
+    const user = getAdminCurrentUser();
+    return String(user.role || localStorage.getItem('aimhigh_role') || '').toUpperCase();
+}
+
+function isAdminRole(role = getAdminRole()) {
+    return ADMIN_ROLES.includes(String(role || '').toUpperCase());
+}
+
+function requireAdminPage() {
+    const token = localStorage.getItem('aimhigh_token');
+    if (!token || !isAdminRole()) {
+        const loginPath = window.location.pathname.includes('/admin/') ? '../login.html' : 'login.html';
+        window.location.href = loginPath;
+        return false;
+    }
+    return true;
+}
+
+function adminApiFetch(endpoint, options = {}) {
+    if (typeof apiFetch !== 'function') {
+        return Promise.reject(new Error('apiFetch is not loaded'));
+    }
+    return apiFetch(endpoint, options);
+}
+
+function showAdminToast(message, type = 'success') {
+    showToast(message, type);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('/admin/')) {
+        requireAdminPage();
+    }
+});
+
 // ===== Sidebar Pin/Unpin =====
 function toggleSidebar() {
     const sidebar = document.getElementById('adminSidebar');
