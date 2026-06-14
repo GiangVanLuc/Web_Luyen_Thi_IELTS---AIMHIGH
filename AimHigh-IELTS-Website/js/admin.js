@@ -1,18 +1,18 @@
 // ===== ADMIN.JS - Admin CMS Logic =====
 
-// ===== Sidebar Toggle =====
+// ===== Sidebar Pin/Unpin =====
 function toggleSidebar() {
     const sidebar = document.getElementById('adminSidebar');
     const icon = document.getElementById('sidebarToggleIcon');
-    sidebar.classList.toggle('collapsed');
+    sidebar.classList.toggle('pinned');
 
-    if (sidebar.classList.contains('collapsed')) {
-        icon.className = 'bi bi-chevron-bar-right';
+    if (sidebar.classList.contains('pinned')) {
+        icon.className = 'bi bi-pin-fill';
     } else {
-        icon.className = 'bi bi-chevron-bar-left';
+        icon.className = 'bi bi-pin-angle';
     }
 
-    localStorage.setItem('admin_sidebar_collapsed', sidebar.classList.contains('collapsed'));
+    localStorage.setItem('admin_sidebar_pinned', sidebar.classList.contains('pinned'));
 }
 
 function toggleMobileSidebar() {
@@ -22,13 +22,15 @@ function toggleMobileSidebar() {
 
 // Restore sidebar state
 document.addEventListener('DOMContentLoaded', () => {
-    const collapsed = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+    const pinned = localStorage.getItem('admin_sidebar_pinned') === 'true';
     const sidebar = document.getElementById('adminSidebar');
     const icon = document.getElementById('sidebarToggleIcon');
 
-    if (sidebar && collapsed) {
-        sidebar.classList.add('collapsed');
-        if (icon) icon.className = 'bi bi-chevron-bar-right';
+    if (sidebar && pinned) {
+        sidebar.classList.add('pinned');
+        if (icon) icon.className = 'bi bi-pin-fill';
+    } else if (icon) {
+        icon.className = 'bi bi-pin-angle';
     }
 });
 

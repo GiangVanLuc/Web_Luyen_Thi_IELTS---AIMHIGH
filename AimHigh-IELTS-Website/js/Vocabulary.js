@@ -26,6 +26,27 @@ function safeParseJson(rawValue, fallbackValue) {
     }
 }
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeInlineJsString(value) {
+    return String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n');
+}
+
+function escapeInlineJsAttr(value) {
+    return escapeHtml(escapeInlineJsString(value));
+}
+
 function hasBackendAuthToken() {
     return !!localStorage.getItem('aimhigh_token');
 }
@@ -794,18 +815,20 @@ function renderGroups() {
         list.forEach(g => {
             if (isCustom && g === 'Tất cả') return;
             const count = data.filter(v => v.group === g).length;
+            const groupHtml = escapeHtml(g);
+            const groupJsAttr = escapeInlineJsAttr(g);
             
             let actionBtns = '';
             if (isCustom) {
                actionBtns = `<div class="ms-2 d-flex align-items-center">
-                   <button class="btn btn-sm text-primary p-0" onclick="startRenameGroup(event, '${g.replace(/'/g, "\\'")}')" title="Đổi tên"><i class="bi bi-pencil"></i></button>
-                   <button class="btn btn-sm text-danger p-0 ms-2" onclick="deleteGroup(event, '${g.replace(/'/g, "\\'")}')" title="Xóa nhóm"><i class="bi bi-trash"></i></button>
+                   <button class="btn btn-sm text-primary p-0" onclick="startRenameGroup(event, '${groupJsAttr}')" title="Đổi tên"><i class="bi bi-pencil"></i></button>
+                   <button class="btn btn-sm text-danger p-0 ms-2" onclick="deleteGroup(event, '${groupJsAttr}')" title="Xóa nhóm"><i class="bi bi-trash"></i></button>
                </div>`;
             }
 
-            secHtml += `<div class="group-card ${activeGroupFilter === g ? 'active' : ''}" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
+            secHtml += `<div class="group-card ${activeGroupFilter === g ? 'active' : ''}" onclick="selectGroup('${groupJsAttr}')">
                 <div class="group-card-header">
-                    <div class="d-flex align-items-center"><h4 class="mb-0" style="font-size: 1rem; font-weight: 700;">${g}</h4>${actionBtns}</div>
+                    <div class="d-flex align-items-center"><h4 class="mb-0" style="font-size: 1rem; font-weight: 700;">${groupHtml}</h4>${actionBtns}</div>
                     <span class="group-word-count">${count} từ</span>
                 </div>
                 <p>Nhóm từ vựng</p>
@@ -1130,7 +1153,7 @@ function renderWordTable() {
     let titleText = activeGroupFilter;
     if (activeGroupFilter === 'all_custom') titleText = 'Sổ từ vựng của bạn';
 
-    title.innerHTML = '<i class="bi bi-card-text"></i> ' + titleText;
+    title.innerHTML = '<i class="bi bi-card-text"></i> ' + escapeHtml(titleText);
     countEl.textContent = filtered.length === scopedWords.length
         ? filtered.length + ' từ'
         : (filtered.length + '/' + scopedWords.length + ' từ');
@@ -1196,10 +1219,11 @@ function renderWordTable() {
         const realIndex = v._realIndex;
         let statusTd = '';
         if (isCustom) {
-            const statusLabel = v.status || 'Chưa thuộc';
+            const statusLabelRaw = v.status || 'Chưa thuộc';
+            const statusLabel = escapeHtml(statusLabelRaw);
             let btnClass = 'status-chua';
-            if (statusLabel === 'Nhớ sơ sơ') btnClass = 'status-soso';
-            if (statusLabel === 'Đã thuộc') btnClass = 'status-da';
+            if (statusLabelRaw === 'Nhớ sơ sơ') btnClass = 'status-soso';
+            if (statusLabelRaw === 'Đã thuộc') btnClass = 'status-da';
             
             statusTd = `
             <td>
@@ -1220,19 +1244,19 @@ function renderWordTable() {
             <td><input type="checkbox" class="form-check-input word-checkbox" value="${realIndex}"></td>
             ${statusTd}
             <td>
-                <div class="fw-bold" style="font-size: 1.05rem;">${v.word}</div>
-                ${v.pronunciation ? `<div class="text-secondary small mt-1">${v.pronunciation}</div>` : ''}
+                <div class="fw-bold" style="font-size: 1.05rem;">${escapeHtml(v.word)}</div>
+                ${v.pronunciation ? `<div class="text-secondary small mt-1">${escapeHtml(v.pronunciation)}</div>` : ''}
             </td>
-            <td style="color: #64748b;">${v.type || '-'}</td>
-            <td>${v.meaning || '-'}</td>
+            <td style="color: #64748b;">${escapeHtml(v.type || '-')}</td>
+            <td>${escapeHtml(v.meaning || '-')}</td>
             <td>
                 <ul class="mb-0 ps-3 text-muted" style="font-size: 0.875rem;">
-                    ${Array.isArray(v.formula) ? v.formula.map(f => `<li>${f}</li>`).join('') : `<li>${v.formula || '-'}</li>`}
+                    ${Array.isArray(v.formula) ? v.formula.map(f => `<li>${escapeHtml(f)}</li>`).join('') : `<li>${escapeHtml(v.formula || '-')}</li>`}
                 </ul>
             </td>
             <td style="max-width: 280px;">
                 <ul class="mb-0 ps-3 text-muted" style="font-size: 0.875rem; line-height: 1.4;">
-                    ${Array.isArray(v.example) ? v.example.map(e => `<li>${e}</li>`).join('') : `<li>${v.example || '-'}</li>`}
+                    ${Array.isArray(v.example) ? v.example.map(e => `<li>${escapeHtml(e)}</li>`).join('') : `<li>${escapeHtml(v.example || '-')}</li>`}
                 </ul>
             </td>
             <td class="word-actions">
@@ -1382,11 +1406,11 @@ function populateSaveDropdown() {
             groups.push(fallbackGroup);
             saveGroups(groups);
         }
-        list.innerHTML = `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${fallbackGroup}')"><i class="bi bi-folder2 text-primary me-2"></i>${fallbackGroup}</a></li>`;
+        list.innerHTML = `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${escapeInlineJsAttr(fallbackGroup)}')"><i class="bi bi-folder2 text-primary me-2"></i>${escapeHtml(fallbackGroup)}</a></li>`;
         return;
     }
     
-    list.innerHTML = mergedGroups.map(g => `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${g}')"><i class="bi bi-folder2 text-primary me-2"></i>${g}</a></li>`).join('');
+    list.innerHTML = mergedGroups.map(g => `<li><a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); saveSelectedWords('${escapeInlineJsAttr(g)}')"><i class="bi bi-folder2 text-primary me-2"></i>${escapeHtml(g)}</a></li>`).join('');
 }
 
 async function saveSelectedWords(groupName) {
@@ -1878,7 +1902,7 @@ function showCurrentCard() {
             } else {
                 formStr = card.formula;
             }
-            elFormula.innerHTML = formStr.replace(/\n/g, '<br>');
+            elFormula.innerHTML = escapeHtml(formStr).replace(/\n/g, '<br>');
             elFormulaContainer.style.display = 'block';
         } else {
             elFormulaContainer.style.display = 'none';
@@ -1893,7 +1917,7 @@ function showCurrentCard() {
         } else {
             exStr = card.example || '';
         }
-        elExample.innerHTML = exStr.replace(/\n/g, '<br>');
+        elExample.innerHTML = escapeHtml(exStr).replace(/\n/g, '<br>');
     }
     
     document.getElementById('reviewCurrent').textContent = completedCardsCount;

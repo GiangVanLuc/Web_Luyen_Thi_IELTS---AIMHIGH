@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import vn.aimhigh.aimhighbackend.dto.response.AttemptResponse;
 import vn.aimhigh.aimhighbackend.dto.response.ResultResponse;
 import vn.aimhigh.aimhighbackend.dto.response.QuestionResponse;
+import vn.aimhigh.aimhighbackend.enums.AttemptStatus;
+import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
 import vn.aimhigh.aimhighbackend.exception.ForbiddenException;
 import vn.aimhigh.aimhighbackend.model.Attempt;
@@ -45,6 +47,10 @@ public class ResultServiceImpl implements ResultService {
         // Kiá»ƒm tra quyá»n (pháº£i lÃ  bÃ i cá»§a mÃ¬nh)
         if (!attempt.getUser().getId().equals(userId)) {
             throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n xem Ä‘iá»ƒm cá»§a ngÆ°á»i khÃ¡c");
+        }
+
+        if (attempt.getStatus() == AttemptStatus.IN_PROGRESS) {
+            throw new BadRequestException("Bài làm chưa được nộp, chưa thể xem kết quả");
         }
 
         List<Answer> attemptAnswers = attempt.getAnswers() == null ? List.of() : attempt.getAnswers();

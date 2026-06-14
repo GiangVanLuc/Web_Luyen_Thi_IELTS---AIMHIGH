@@ -1,6 +1,7 @@
 package vn.aimhigh.aimhighbackend;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import vn.aimhigh.aimhighbackend.enums.ExamLevel;
@@ -15,6 +16,7 @@ import vn.aimhigh.aimhighbackend.repository.ListeningPartRepository;
 import vn.aimhigh.aimhighbackend.repository.ReadingPassageRepository;
 
 @SpringBootTest
+@Disabled("Dev-only seed helper; do not run during automated tests.")
 class SeedTest {
 
     @Autowired

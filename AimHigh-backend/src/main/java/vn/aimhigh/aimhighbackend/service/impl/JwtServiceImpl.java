@@ -28,8 +28,11 @@ public class JwtServiceImpl implements JwtService {
     @Value("${app.jwt.secret-key}")
     private String secretKey;
 
-    private static final long ACCESS_TOKEN_MINUTES = 30;
-    private static final long REFRESH_TOKEN_DAYS = 30;
+    @Value("${app.jwt.expiration-ms:1800000}")
+    private long accessTokenExpirationMs;
+
+    @Value("${app.jwt.refresh-expiration-ms:2592000000}")
+    private long refreshTokenExpirationMs;
 
     public String generateAccessToken(User user) {
         try {
@@ -38,7 +41,7 @@ public class JwtServiceImpl implements JwtService {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(user.getEmail())
                     .issueTime(Date.from(now))
-                    .expirationTime(Date.from(now.plus(ACCESS_TOKEN_MINUTES, ChronoUnit.MINUTES)))
+                    .expirationTime(Date.from(now.plusMillis(accessTokenExpirationMs)))
                     .claim("role", user.getRole().name())
                     .claim("name", user.getName())
                     .build();
@@ -61,7 +64,7 @@ public class JwtServiceImpl implements JwtService {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(user.getEmail())
                     .issueTime(Date.from(now))
-                    .expirationTime(Date.from(now.plus(REFRESH_TOKEN_DAYS, ChronoUnit.DAYS)))
+                    .expirationTime(Date.from(now.plusMillis(refreshTokenExpirationMs)))
                     .claim("role", user.getRole().name())
                     .build();
 

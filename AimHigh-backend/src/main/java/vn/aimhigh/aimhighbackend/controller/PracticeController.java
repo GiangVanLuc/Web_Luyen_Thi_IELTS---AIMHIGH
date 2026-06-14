@@ -12,7 +12,7 @@ import vn.aimhigh.aimhighbackend.dto.request.NoteUpdateRequest;
 import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
 import vn.aimhigh.aimhighbackend.dto.response.HighlightResponse;
 import vn.aimhigh.aimhighbackend.dto.response.NoteResponse;
-import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
+import vn.aimhigh.aimhighbackend.enums.AttemptStatus;
 import vn.aimhigh.aimhighbackend.service.HighlightService;
 import vn.aimhigh.aimhighbackend.service.NoteService;
 import vn.aimhigh.aimhighbackend.service.UserService;
@@ -22,6 +22,7 @@ import vn.aimhigh.aimhighbackend.model.Question;
 import vn.aimhigh.aimhighbackend.model.Attempt;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
 import vn.aimhigh.aimhighbackend.exception.ForbiddenException;
+import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 
 import java.util.List;
 
@@ -44,10 +45,18 @@ public class PracticeController {
         if (!attempt.getUser().getId().equals(userId)) {
             throw new ForbiddenException("Không có quyền truy cập bài làm này");
         }
+
+        if (attempt.getStatus() == AttemptStatus.IN_PROGRESS) {
+            throw new BadRequestException("Chỉ được xem đáp án sau khi đã nộp bài");
+        }
         
         Question question = questionRepository.findById(qId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy câu hỏi"));
-                
+
+        if (question.getExam() == null || !question.getExam().getId().equals(attempt.getExam().getId())) {
+            throw new ForbiddenException("Câu hỏi không thuộc bài làm này");
+        }
+
         String answerAndExplanation = "Correct Answer: " + question.getCorrectAnswer();
         if (question.getExplanation() != null && !question.getExplanation().isBlank()) {
             answerAndExplanation += " | Explanation: " + question.getExplanation();

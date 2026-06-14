@@ -1,11 +1,12 @@
 // ===== API.JS - Giao tiếp với Backend =====
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'http://localhost:8085/api';
 
 /**
  * Helper: thực hiện fetch với headers mặc định
  */
 async function apiFetch(endpoint, options = {}) {
+    const { _retry = false, ...fetchOptions } = options;
     const token = localStorage.getItem('aimhigh_token');
     const defaultHeaders = {
         'Content-Type': 'application/json',
@@ -14,13 +15,20 @@ async function apiFetch(endpoint, options = {}) {
 
     try {
         const response = await fetch(`${API_BASE}${endpoint}`, {
-            ...options,
-            headers: { ...defaultHeaders, ...options.headers }
+            ...fetchOptions,
+            headers: { ...defaultHeaders, ...fetchOptions.headers }
         });
 
         if (response.status === 401) {
+            if (!_retry && !endpoint.startsWith('/auth/')) {
+                const refreshedToken = await apiRefreshAccessToken();
+                if (refreshedToken) {
+                    return apiFetch(endpoint, { ...fetchOptions, _retry: true });
+                }
+            }
             localStorage.removeItem('aimhigh_loggedIn');
             localStorage.removeItem('aimhigh_token');
+            localStorage.removeItem('aimhigh_refreshToken');
             const isSubDir = window.location.pathname.includes('/admin/');
             window.location.href = isSubDir ? '../login.html' : 'login.html';
             return null;
@@ -48,6 +56,38 @@ async function apiFetch(endpoint, options = {}) {
     } catch (err) {
         console.error(`API Error [${endpoint}]:`, err.message);
         throw err;
+    }
+}
+
+async function apiRefreshAccessToken() {
+    const refreshToken = localStorage.getItem('aimhigh_refreshToken');
+    if (!refreshToken) return null;
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken })
+        });
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (!data?.accessToken) return null;
+
+        localStorage.setItem('aimhigh_token', data.accessToken);
+        if (data?.refreshToken) {
+            localStorage.setItem('aimhigh_refreshToken', data.refreshToken);
+        }
+        localStorage.setItem('aimhigh_loggedIn', 'true');
+        localStorage.setItem('aimhigh_currentUser', JSON.stringify({
+            email: data.email,
+            name: data.name,
+            role: data.role
+        }));
+        return data.accessToken;
+    } catch (_) {
+        return null;
     }
 }
 
@@ -89,6 +129,9 @@ async function apiRegister(userData) {
     });
     if (data?.accessToken) {
         localStorage.setItem('aimhigh_token', data.accessToken);
+        if (data?.refreshToken) {
+            localStorage.setItem('aimhigh_refreshToken', data.refreshToken);
+        }
         localStorage.setItem('aimhigh_loggedIn', 'true');
         localStorage.setItem('aimhigh_currentUser', JSON.stringify({
             email: data.email,

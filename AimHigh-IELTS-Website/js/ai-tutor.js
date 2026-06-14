@@ -8,11 +8,10 @@
     const welcomeBoard = document.getElementById('welcomeBoard');
 
     const STORAGE_KEY = 'aimhigh_chat_history_v1';
-    let chatHistory = []; // Lưu trữ dạng: { role: 'user'|'model', text: '...' }
+    let chatHistory = [];
+    let isSending = false;
 
-    // Init Page
-    window.addEventListener('DOMContentLoaded', () => {
-        // Kiểm tra xem đã đăng nhập chưa
+    window.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('aimhigh_token');
         if (!token) {
             alert('Vui lòng đăng nhập để trò chuyện với AI Tutor!');
@@ -20,148 +19,168 @@
             return;
         }
 
-        loadHistory();
         initControls();
+        await loadHistory();
     });
 
-    // Load lịch sử từ localStorage
-    function loadHistory() {
+    async function loadHistory() {
+        if (typeof apiFetch === 'function') {
+            try {
+                const res = await apiFetch('/ai/chat/history');
+                const serverHistory = Array.isArray(res?.data) ? res.data : [];
+                chatHistory = serverHistory.map(normalizeMessage).filter(Boolean);
+                saveLocalHistory();
+                renderHistory();
+                return;
+            } catch (error) {
+                console.warn('Không thể tải lịch sử AI Tutor từ backend:', error?.message || error);
+            }
+        }
+
+        loadLocalHistory();
+        renderHistory();
+    }
+
+    function loadLocalHistory() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             chatHistory = raw ? JSON.parse(raw) : [];
-        } catch (e) {
+        } catch (_) {
             chatHistory = [];
-        }
-
-        if (chatHistory.length > 0) {
-            if (welcomeBoard) welcomeBoard.style.display = 'none';
-            chatHistory.forEach(msg => {
-                appendMessageUI(msg.role, msg.text);
-            });
-            scrollToBottom();
         }
     }
 
-    // Lưu lịch sử vào localStorage
-    function saveHistory() {
-        // Giới hạn lịch sử lưu trữ tối đa 20 tin nhắn gần nhất để tránh phình dung lượng
-        if (chatHistory.length > 20) {
-            chatHistory = chatHistory.slice(chatHistory.length - 20);
+    function saveLocalHistory() {
+        if (chatHistory.length > 30) {
+            chatHistory = chatHistory.slice(chatHistory.length - 30);
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
     }
 
-    // Khởi tạo các sự kiện
+    function renderHistory() {
+        const messages = [...chatHistory];
+        chatContainer.innerHTML = '';
+
+        if (messages.length === 0) {
+            if (welcomeBoard) {
+                chatContainer.appendChild(welcomeBoard);
+                welcomeBoard.style.display = 'block';
+            }
+            return;
+        }
+
+        if (welcomeBoard) welcomeBoard.style.display = 'none';
+        messages.forEach(msg => appendMessageUI(msg.role, msg.text));
+        scrollToBottom();
+    }
+
     function initControls() {
-        chatInput.addEventListener('input', () => {
-            sendBtn.disabled = chatInput.value.trim() === '';
-        });
+        chatInput.addEventListener('input', updateSendButtonState);
 
         chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !sendBtn.disabled) {
+            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) {
                 e.preventDefault();
                 sendMessage();
             }
         });
 
-        sendBtn.addEventListener('click', sendMessage);
+        sendBtn.addEventListener('click', () => sendMessage());
 
         if (clearChatBtn) {
-            clearChatBtn.addEventListener('click', () => {
-                if (confirm('Bạn có muốn xóa toàn bộ lịch sử trò chuyện với AI không?')) {
-                    chatHistory = [];
-                    localStorage.removeItem(STORAGE_KEY);
-                    chatContainer.innerHTML = '';
-                    if (welcomeBoard) {
-                        chatContainer.appendChild(welcomeBoard);
-                        welcomeBoard.style.display = 'block';
-                    }
-                    if (typeof showToast === 'function') {
-                        showToast('Đã xóa sạch lịch sử trò chuyện', 'success');
-                    }
-                }
-            });
+            clearChatBtn.addEventListener('click', clearHistory);
         }
     }
 
-    // Gửi tin nhắn
-    async function sendMessage(overrideText = '') {
-        const text = (overrideText || chatInput.value).trim();
-        if (!text) return;
-
-        // Reset input
-        if (!overrideText) {
-            chatInput.value = '';
-            sendBtn.disabled = true;
+    async function clearHistory() {
+        if (!confirm('Bạn có muốn xóa toàn bộ lịch sử trò chuyện với AI không?')) {
+            return;
         }
 
-        // Ẩn bảng chào mừng
+        try {
+            if (typeof apiFetch === 'function') {
+                await apiFetch('/ai/chat/history', { method: 'DELETE' });
+            }
+        } catch (error) {
+            console.warn('Không thể xóa lịch sử AI Tutor trên backend:', error?.message || error);
+        }
+
+        chatHistory = [];
+        localStorage.removeItem(STORAGE_KEY);
+        renderHistory();
+
+        if (typeof showToast === 'function') {
+            showToast('Đã xóa lịch sử trò chuyện', 'success');
+        }
+    }
+
+    async function sendMessage(overrideText = '') {
+        const text = String(overrideText || chatInput.value || '').trim();
+        if (!text || isSending) return;
+
+        if (!overrideText) {
+            chatInput.value = '';
+        }
+        setSendingState(true);
+
         if (welcomeBoard && welcomeBoard.style.display !== 'none') {
             welcomeBoard.style.display = 'none';
         }
 
-        // 1. Thêm tin nhắn user vào UI và History
-        appendMessageUI('user', text);
-        chatHistory.push({ role: 'user', text });
-        saveHistory();
+        appendAndStoreMessage('user', text);
         scrollToBottom();
 
-        // 2. Hiển thị "AI đang soạn tin..."
         const typingIndicator = showTypingIndicator();
         scrollToBottom();
 
         try {
-            // Lấy 10 tin nhắn gần nhất làm ngữ cảnh hội thoại cho Gemini
-            const contextHistory = chatHistory.slice(-10);
-
-            // 3. Gọi API Backend
             if (typeof apiFetch !== 'function') {
                 throw new Error('Hệ thống API chưa sẵn sàng. Vui lòng thử lại sau.');
             }
 
             const res = await apiFetch('/ai/chat', {
                 method: 'POST',
-                body: JSON.stringify({
-                    message: text,
-                    history: contextHistory
-                })
+                body: JSON.stringify({ message: text })
             });
 
-            // Ẩn typing indicator
             removeTypingIndicator(typingIndicator);
 
-            const aiText = res?.data?.response || res?.response || 'Không có phản hồi từ AI.';
-            
-            // 4. Thêm tin nhắn AI vào UI và History
-            appendMessageUI('model', aiText);
-            chatHistory.push({ role: 'model', text: aiText });
-            saveHistory();
-            scrollToBottom();
+            const data = res?.data || {};
+            const aiText = data.response || 'AI Tutor chưa có phản hồi.';
+            const assistantMessage = normalizeMessage(data.assistantMessage) || { role: 'model', text: aiText };
 
+            chatHistory = chatHistory.filter(msg => msg !== null);
+            chatHistory.push(assistantMessage);
+            saveLocalHistory();
+            appendMessageUI(assistantMessage.role, assistantMessage.text);
+            scrollToBottom();
         } catch (error) {
             removeTypingIndicator(typingIndicator);
-            appendMessageUI('model', `Lỗi: ${error.message || 'Không thể kết nối máy chủ.'}`);
+            appendAndStoreMessage('model', `Lỗi: ${error.message || 'Không thể kết nối máy chủ.'}`);
             scrollToBottom();
+        } finally {
+            setSendingState(false);
         }
     }
 
-    // Hiển thị bong bóng tin nhắn trên giao diện
+    function appendAndStoreMessage(role, text) {
+        const message = { role, text };
+        chatHistory.push(message);
+        saveLocalHistory();
+        appendMessageUI(role, text);
+    }
+
     function appendMessageUI(role, text) {
         const row = document.createElement('div');
         row.className = `message-row ${role === 'user' ? 'user' : 'bot'}`;
 
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        
-        // Convert \n sang <br> để xuống dòng hiển thị đẹp mắt
-        const formattedText = escapeHtml(text).replace(/\n/g, '<br>');
-        bubble.innerHTML = `<p>${formattedText}</p>`;
+        bubble.innerHTML = `<p>${escapeHtml(String(text || '')).replace(/\n/g, '<br>')}</p>`;
 
         row.appendChild(bubble);
         chatContainer.appendChild(row);
     }
 
-    // Show indicator
     function showTypingIndicator() {
         const row = document.createElement('div');
         row.className = 'message-row bot';
@@ -180,32 +199,52 @@
         return row;
     }
 
-    // Hide indicator
     function removeTypingIndicator(el) {
         if (el && el.parentNode) {
             el.parentNode.removeChild(el);
-        } else {
-            const fallback = document.getElementById('aiTypingIndicator');
-            if (fallback) fallback.parentNode.removeChild(fallback);
+            return;
         }
+
+        const fallback = document.getElementById('aiTypingIndicator');
+        if (fallback) fallback.parentNode.removeChild(fallback);
     }
 
-    // Cuộn xuống cuối
+    function setSendingState(value) {
+        isSending = value;
+        chatInput.disabled = value;
+        updateSendButtonState();
+    }
+
+    function updateSendButtonState() {
+        sendBtn.disabled = isSending || chatInput.value.trim() === '';
+    }
+
+    function normalizeMessage(message) {
+        if (!message) return null;
+        const role = message.role === 'assistant' ? 'model' : message.role;
+        const text = message.text || message.content || message.response || '';
+        if (!text) return null;
+        return {
+            id: message.id,
+            role: role === 'user' ? 'user' : 'model',
+            text,
+            createdAt: message.createdAt
+        };
+    }
+
     function scrollToBottom() {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Helper phòng vệ chống mã độc XSS
     function escapeHtml(unsafe) {
-        return unsafe
-             .replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
+        return String(unsafe)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
-    // Xuất hàm ra global để dùng cho các chip gợi ý nhanh
     window.sendSuggestion = function (text) {
         sendMessage(text);
     };

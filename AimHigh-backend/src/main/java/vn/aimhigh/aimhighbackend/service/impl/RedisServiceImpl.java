@@ -2,6 +2,7 @@ package vn.aimhigh.aimhighbackend.service.impl;
 
 import vn.aimhigh.aimhighbackend.service.RedisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    @Value("${app.jwt.refresh-expiration-ms:2592000000}")
+    private long refreshTokenExpirationMs;
 
     // ===== BASIC =====
 
@@ -34,7 +38,7 @@ public class RedisServiceImpl implements RedisService {
     // ===== REFRESH TOKEN =====
 
     public void saveRefreshToken(Long userId, String token) {
-        set("refresh_token:" + userId, token, 30, TimeUnit.DAYS);
+        set("refresh_token:" + userId, token, refreshTokenExpirationMs, TimeUnit.MILLISECONDS);
     }
 
     public String getRefreshToken(Long userId) {

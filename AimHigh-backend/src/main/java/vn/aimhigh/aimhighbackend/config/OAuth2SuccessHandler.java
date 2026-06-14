@@ -49,6 +49,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return userRepository.save(newUser);
         });
 
+        if (Boolean.TRUE.equals(user.getIsLocked())) {
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/login.html?error=account_locked");
+            return;
+        }
+
         String accessToken  = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 

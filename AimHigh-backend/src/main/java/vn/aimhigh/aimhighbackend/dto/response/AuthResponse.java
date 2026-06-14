@@ -12,6 +12,7 @@ import vn.aimhigh.aimhighbackend.enums.Role;
 @Builder
 public class AuthResponse {
     private String accessToken;
+    private String refreshToken;
     private String email;
     private String name;
     private Role role;

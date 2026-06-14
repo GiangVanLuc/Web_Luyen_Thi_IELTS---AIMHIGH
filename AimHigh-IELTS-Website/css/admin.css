@@ -22,7 +22,7 @@
 
 /* --- Sidebar --- */
 .admin-sidebar {
-    width: var(--admin-sidebar-width);
+    width: var(--admin-sidebar-collapsed);
     background: var(--admin-sidebar-bg);
     position: fixed;
     top: 0;
@@ -31,19 +31,22 @@
     z-index: 1050;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
 
-.admin-sidebar.collapsed {
-    width: var(--admin-sidebar-collapsed);
+.admin-sidebar:hover,
+.admin-sidebar.pinned {
+    width: var(--admin-sidebar-width);
 }
+
+/* collapsed class no longer needed — sidebar auto-collapses */
 
 .sidebar-brand {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 20px;
+    padding: 10px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     text-decoration: none;
     min-height: 60px;
@@ -62,14 +65,29 @@
     white-space: nowrap;
 }
 
-.admin-sidebar.collapsed .sidebar-brand-text {
-    display: none;
+.admin-sidebar .sidebar-brand-text {
+    opacity: 0;
+    transition: opacity 0.2s ease 0s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.admin-sidebar:hover .sidebar-brand-text,
+.admin-sidebar.pinned .sidebar-brand-text {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.1s;
 }
 
 .sidebar-nav {
     flex: 1;
     padding: 16px 0;
     overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .sidebar-nav-label {
@@ -80,19 +98,28 @@
     letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.35);
     white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.2s ease 0s, font-size 0.2s ease;
 }
 
-.admin-sidebar.collapsed .sidebar-nav-label {
+.admin-sidebar:hover .sidebar-nav-label,
+.admin-sidebar.pinned .sidebar-nav-label {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.1s;
+}
+
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-nav-label {
     text-align: center;
     padding: 8px 4px 4px;
     font-size: 0;
+    opacity: 0;
 }
 
 .sidebar-link {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 20px;
+    padding: 10px 25px;
     color: rgba(255, 255, 255, 0.65);
     text-decoration: none;
     font-size: 0.9rem;
@@ -121,13 +148,29 @@
     flex-shrink: 0;
 }
 
-.admin-sidebar.collapsed .sidebar-link span {
-    display: none;
+.admin-sidebar .sidebar-link span {
+    opacity: 0;
+    transition: opacity 0.2s ease 0s;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.admin-sidebar.collapsed .sidebar-link {
-    justify-content: center;
-    padding: 12px;
+.admin-sidebar:hover .sidebar-link span,
+.admin-sidebar.pinned .sidebar-link span {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.1s;
+}
+
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-link {
+    padding: 10px 25px;
+}
+
+/* Hide text labels, badges, brand text, and toggle button text when collapsed to avoid layout shifting */
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-link span,
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-badge,
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-brand-text,
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-toggle-btn span {
+    display: none !important;
 }
 
 .sidebar-badge {
@@ -142,8 +185,15 @@
     text-align: center;
 }
 
-.admin-sidebar.collapsed .sidebar-badge {
-    display: none;
+.admin-sidebar .sidebar-badge {
+    opacity: 0;
+    transition: opacity 0.2s ease 0s;
+}
+
+.admin-sidebar:hover .sidebar-badge,
+.admin-sidebar.pinned .sidebar-badge {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.1s;
 }
 
 .sidebar-footer {
@@ -169,22 +219,33 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-.admin-sidebar.collapsed .sidebar-toggle-btn {
+.admin-sidebar:not(:hover):not(.pinned) .sidebar-toggle-btn {
     text-align: center;
+}
+
+.admin-sidebar .sidebar-toggle-btn span {
+    opacity: 0;
+    transition: opacity 0.2s ease 0s;
+}
+
+.admin-sidebar:hover .sidebar-toggle-btn span,
+.admin-sidebar.pinned .sidebar-toggle-btn span {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.1s;
 }
 
 /* --- Main Content --- */
 .admin-main {
     flex: 1;
-    margin-left: var(--admin-sidebar-width);
-    transition: margin-left 0.3s ease;
+    margin-left: var(--admin-sidebar-collapsed);
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-.admin-sidebar.collapsed ~ .admin-main {
-    margin-left: var(--admin-sidebar-collapsed);
+.admin-sidebar.pinned ~ .admin-main {
+    margin-left: var(--admin-sidebar-width);
 }
 
 /* --- Topbar --- */

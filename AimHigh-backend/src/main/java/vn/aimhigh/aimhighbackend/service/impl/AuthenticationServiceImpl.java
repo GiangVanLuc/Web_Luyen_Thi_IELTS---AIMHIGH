@@ -4,6 +4,7 @@ import vn.aimhigh.aimhighbackend.service.JwtService;
 import vn.aimhigh.aimhighbackend.service.AuthenticationService;
 import vn.aimhigh.aimhighbackend.service.RedisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import vn.aimhigh.aimhighbackend.dto.response.AuthResponse;
 import vn.aimhigh.aimhighbackend.dto.response.LoginResponse;
 import vn.aimhigh.aimhighbackend.enums.AuthProvider;
 import vn.aimhigh.aimhighbackend.enums.Role;
+import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 
 import vn.aimhigh.aimhighbackend.model.User;
 
@@ -31,6 +33,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService; // âœ… ThÃªm - bá» RefreshTokenRepository
+
+    @Value("${app.jwt.expiration-ms:1800000}")
+    private long accessTokenExpirationMs;
 
     // ÄÄƒng kÃ½ báº±ng email
     public AuthResponse register(RegisterRequest request) {
@@ -49,9 +54,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        redisService.saveRefreshToken(user.getId(), refreshToken);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole())
@@ -91,6 +99,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User khÃ´ng tá»“n táº¡i!"));
 
+        if (Boolean.TRUE.equals(user.getIsLocked())) {
+            throw new BadRequestException("Tài khoản đã bị khóa");
+        }
+
         // âœ… Verify token tá»« Redis
         String storedToken = redisService.getRefreshToken(user.getId());
         if (storedToken == null || !storedToken.equals(refreshToken)) {
@@ -120,7 +132,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new RuntimeException("User khÃ´ng tá»“n táº¡i!"));
 
         // âœ… Blacklist AccessToken
-        redisService.blacklistToken(accessToken, 30 * 60 * 1000L);
+        redisService.blacklistToken(accessToken, accessTokenExpirationMs);
 
         // âœ… XÃ³a RefreshToken khá»i Redis
         redisService.deleteRefreshToken(user.getId());
