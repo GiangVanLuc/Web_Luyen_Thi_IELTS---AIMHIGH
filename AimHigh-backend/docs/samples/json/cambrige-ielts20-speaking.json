@@ -1,0 +1,74 @@
+{
+  "exam": {
+    "title": "Cambridge 20 IELTS - Test 1 Speaking",
+    "skill": "SPEAKING",
+    "duration": 15,
+    "totalQuestions": 11,
+    "description": "Đề Speaking Cambridge 20 Test 1 (Part 1: Walking; Part 2: a play or film; Part 3: theatre & acting)."
+  },
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Speaking Part 1",
+      "questionFrom": 1,
+      "questionTo": 4,
+      "groups": [
+        {
+          "groupTitle": "Part 1 - Walking",
+          "type": "SPEAKING_PART",
+          "questions": [
+            { "questionNumber": 1, "questionText": "How much walking do you do in your daily life?", "points": 1 },
+            { "questionNumber": 2, "questionText": "Did you walk more when you were at school than now?", "points": 1 },
+            { "questionNumber": 3, "questionText": "What places are there to go for a walk near where you live?", "points": 1 },
+            { "questionNumber": 4, "questionText": "Would you ever like to go on a walking holiday?", "points": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 2,
+      "label": "Speaking Part 2",
+      "questionFrom": 5,
+      "questionTo": 5,
+      "groups": [
+        {
+          "groupTitle": "Part 2 - Cue Card",
+          "type": "SPEAKING_PART",
+          "questions": [
+            {
+              "questionNumber": 5,
+              "prompt": "Describe a play or a film you have seen that you would like to see again with friends.",
+              "cuePoints": [
+                "what play or film you'd like to go to see again",
+                "who you would go with",
+                "what other people have said about this play or film",
+                "and explain why you would like to see this play or film again with friends."
+              ],
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 3,
+      "label": "Speaking Part 3",
+      "questionFrom": 6,
+      "questionTo": 11,
+      "groups": [
+        {
+          "groupTitle": "Part 3 - Plays, shows and acting",
+          "type": "SPEAKING_PART",
+          "questions": [
+            { "questionNumber": 6, "questionText": "What are the most popular kinds of plays or shows at theatres in your country?", "points": 1 },
+            { "questionNumber": 7, "questionText": "How easy is it to get tickets to the theatre?", "points": 1 },
+            { "questionNumber": 8, "questionText": "Do you think theatres need to do more to attract younger audiences?", "points": 1 },
+            { "questionNumber": 9, "questionText": "What do you think attracts people to working as an actor?", "points": 1 },
+            { "questionNumber": 10, "questionText": "What are some of the qualities that a person needs to have if they want to become an actor?", "points": 1 },
+            { "questionNumber": 11, "questionText": "Can you think of any disadvantages of working as an actor?", "points": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

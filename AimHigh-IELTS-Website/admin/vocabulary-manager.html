@@ -54,10 +54,6 @@
                 </a>
 
                 <div class="sidebar-nav-label">Vận hành</div>
-                <a href="notifications.html" class="sidebar-link">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Thông báo</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -67,12 +63,6 @@
                 <a href="settings.html" class="sidebar-link">
                     <i class="bi bi-gear"></i>
                     <span>Cài đặt</span>
-                </a>
-
-                <div class="sidebar-nav-label">Khác</div>
-                <a href="../index.html" class="sidebar-link">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                    <span>Xem Website</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -95,9 +85,11 @@
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="../profile.html"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-up-right me-2"></i>Xem Website</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="if(typeof adminLogout === 'function') { adminLogout(); } else { window.location.href='../login.html'; } return false;"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -114,7 +106,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">JSON thủ công</label>
-                                    <textarea id="jsonPayloadInput" class="form-control" rows="8" placeholder='Ví dụ: [{"word":"acquire","partOfSpeech":"verb","meaning":"to get"}]'></textarea>
+                                    <textarea id="jsonPayloadInput" class="form-control" rows="8" placeholder='[{"word":"luggage","partOfSpeech":"noun","viMeaning":"hành lý","folder":"Basic","topic":"Travel"}]'></textarea>
                                     <button id="importJsonTextBtn" class="btn-admin-primary mt-3">
                                         <i class="bi bi-filetype-json"></i> Import từ JSON text
                                     </button>
@@ -134,7 +126,8 @@
                                     </button>
 
                                     <p class="text-muted mt-3 mb-0" style="font-size: 0.875rem;">
-                                        Header Excel tối thiểu cần cột <strong>word</strong>. Các cột hỗ trợ: ipa, partOfSpeech, meaning, viMeaning, audioUrl, imageUrl, related, exampleEn, exampleVi.
+                                        Header Excel tối thiểu cần cột <strong>word</strong>. Các cột hỗ trợ: ipa, partOfSpeech, meaning, viMeaning, audioUrl, imageUrl, related, <strong>folder</strong>, <strong>topic</strong>, exampleEn, exampleVi.
+                                        <br>Có <strong>folder + topic</strong> → tự tạo và gán vào đó. Chỉ có <strong>topic</strong> → vào thư mục mặc định <em>"Khác"</em>. Chỉ có <strong>folder</strong> → tạo chủ đề <em>"Chung"</em>. Không có gì → chưa phân chủ đề.
                                     </p>
                                 </div>
                             </div>
@@ -154,10 +147,39 @@
                                 <input id="quickPartOfSpeech" class="form-control" placeholder="Part of speech (noun, verb...)">
                                 <input id="quickMeaning" class="form-control" placeholder="Meaning (EN)">
                                 <input id="quickViMeaning" class="form-control" placeholder="Nghĩa tiếng Việt" required>
+                                <select id="quickTopic" class="form-select">
+                                    <option value="">— Chưa phân chủ đề —</option>
+                                </select>
                                 <button class="btn-admin-primary" type="submit">
                                     <i class="bi bi-plus-circle"></i> Lưu từ mới
                                 </button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title mb-0"><i class="bi bi-folder2-open me-2"></i>Thư mục & Chủ đề (AimHigh Pick)</h3>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Tạo thư mục mới</label>
+                            <div class="d-flex gap-2 mb-3">
+                                <input id="newFolderName" class="form-control" placeholder="VD: Basic, Advanced...">
+                                <button id="addFolderBtn" class="btn-admin-primary" type="button" style="white-space:nowrap;"><i class="bi bi-plus"></i> Thư mục</button>
+                            </div>
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Tạo chủ đề trong thư mục</label>
+                            <div class="d-flex gap-2">
+                                <select id="topicFolderSelect" class="form-select"><option value="">Chọn thư mục...</option></select>
+                                <input id="newTopicName" class="form-control" placeholder="VD: Travel...">
+                                <button id="addTopicBtn" class="btn btn-outline-primary" type="button" style="white-space:nowrap;"><i class="bi bi-plus"></i> Chủ đề</button>
+                            </div>
+                            <p class="text-muted mt-2 mb-0" style="font-size:0.8rem;">Khi thêm từ ở phần "Thêm nhanh", chọn chủ đề để gán. Học viên sẽ thấy từ theo cây thư mục/chủ đề này.</p>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label fw-semibold" style="font-size:0.85rem;">Cây thư mục & chủ đề</label>
+                            <div id="taxonomyTree" class="small" style="max-height:260px;overflow:auto;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">Đang tải...</div>
                         </div>
                     </div>
                 </div>
@@ -190,12 +212,13 @@
                                     <th>Nghĩa (VI)</th>
                                     <th>Nghĩa (EN)</th>
                                     <th>Ví dụ</th>
+                                    <th>Chủ đề</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody id="vocabularyTableBody">
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Đang tải dữ liệu...</td>
+                                    <td colspan="8" class="text-center text-muted py-4">Đang tải dữ liệu...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -247,7 +270,7 @@
             if (!tbody) return;
 
             if (!rows.length) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu từ vựng.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Không có dữ liệu từ vựng.</td></tr>';
                 if (info) info.textContent = 'Hiển thị 0 từ';
                 return;
             }
@@ -260,6 +283,7 @@
                     <td>${item.viMeaning || '-'}</td>
                     <td>${item.meaning || '-'}</td>
                     <td>${Array.isArray(item.examples) ? item.examples.length : 0}</td>
+                    <td>${item.folderName ? (item.folderName + ' / ' + (item.topicName || '')) : '<span class="text-muted">—</span>'}</td>
                     <td>
                         <button class="btn-icon-sm danger" data-action="delete" data-id="${item.id}" title="Xóa từ này">
                             <i class="bi bi-trash"></i>
@@ -299,6 +323,7 @@
                 const result = response?.data || response;
                 renderImportSummary(result);
                 showToast('Import JSON thành công.');
+                await loadTaxonomy();
                 await loadVocabulary();
             } catch (error) {
                 showToast(`Import JSON thất bại: ${error.message || 'Unknown error'}`, 'danger');
@@ -320,6 +345,7 @@
                 const result = response?.data || response;
                 renderImportSummary(result);
                 showToast('Import file JSON thành công.');
+                await loadTaxonomy();
                 await loadVocabulary();
             } catch (error) {
                 showToast(`Không thể đọc/import file JSON: ${error.message || 'Unknown error'}`, 'danger');
@@ -339,6 +365,7 @@
                 const result = response?.data || response;
                 renderImportSummary(result);
                 showToast('Import file Excel thành công.');
+                await loadTaxonomy();
                 await loadVocabulary();
             } catch (error) {
                 showToast(`Import Excel thất bại: ${error.message || 'Unknown error'}`, 'danger');
@@ -351,6 +378,7 @@
             const partOfSpeech = document.getElementById('quickPartOfSpeech')?.value?.trim() || '';
             const meaning = document.getElementById('quickMeaning')?.value?.trim() || '';
             const viMeaning = document.getElementById('quickViMeaning')?.value?.trim() || '';
+            const topicId = document.getElementById('quickTopic')?.value || '';
 
             if (!word || !viMeaning) {
                 showToast('Word và nghĩa tiếng Việt là bắt buộc.', 'danger');
@@ -358,17 +386,125 @@
             }
 
             try {
-                await adminUpsertVocabulary({ word, partOfSpeech, meaning, viMeaning });
+                const payload = { word, partOfSpeech, meaning, viMeaning };
+                if (topicId) payload.topicId = Number(topicId);
+                await adminUpsertVocabulary(payload);
                 showToast('Đã lưu từ mới thành công.');
                 document.getElementById('quickAddForm')?.reset();
+                await loadTaxonomy();
                 await loadVocabulary();
             } catch (error) {
                 showToast(`Không thể lưu từ: ${error.message || 'Unknown error'}`, 'danger');
             }
         }
 
+        let taxonomyCache = [];
+
+        async function loadTaxonomy() {
+            try {
+                const res = await adminGetVocabTaxonomy();
+                taxonomyCache = res?.data || res || [];
+                renderTaxonomyTree(taxonomyCache);
+                populateTopicSelectors(taxonomyCache);
+            } catch (error) {
+                const tree = document.getElementById('taxonomyTree');
+                if (tree) tree.innerHTML = `<span class="text-danger">Không tải được: ${error.message || 'lỗi'}</span>`;
+            }
+        }
+
+        function renderTaxonomyTree(folders) {
+            const tree = document.getElementById('taxonomyTree');
+            if (!tree) return;
+            if (!Array.isArray(folders) || folders.length === 0) {
+                tree.innerHTML = '<span class="text-muted">Chưa có thư mục nào. Hãy tạo thư mục đầu tiên bên trái.</span>';
+                return;
+            }
+            tree.innerHTML = folders.map(f => {
+                const topics = (f.topics || []).map(t => `
+                    <div class="d-flex justify-content-between align-items-center ps-3 py-1">
+                        <span><i class="bi bi-tag me-1 text-primary"></i>${t.name} <span class="text-muted">(${t.wordCount || 0} từ)</span></span>
+                        <button class="btn btn-sm text-danger p-0" type="button" data-tax="topic" data-id="${t.id}" title="Xóa chủ đề"><i class="bi bi-trash"></i></button>
+                    </div>`).join('') || '<div class="ps-3 py-1 text-muted">(chưa có chủ đề)</div>';
+                return `
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong><i class="bi bi-folder-fill me-1 text-warning"></i>${f.name} <span class="text-muted fw-normal">(${f.wordCount || 0} từ)</span></strong>
+                            <button class="btn btn-sm text-danger p-0" type="button" data-tax="folder" data-id="${f.id}" title="Xóa thư mục"><i class="bi bi-trash"></i></button>
+                        </div>
+                        ${topics}
+                    </div>`;
+            }).join('');
+        }
+
+        function populateTopicSelectors(folders) {
+            const folderSel = document.getElementById('topicFolderSelect');
+            const quickTopic = document.getElementById('quickTopic');
+            if (folderSel) {
+                const cur = folderSel.value;
+                folderSel.innerHTML = '<option value="">Chọn thư mục...</option>' +
+                    folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+                folderSel.value = cur;
+            }
+            if (quickTopic) {
+                const cur = quickTopic.value;
+                let opts = '<option value="">— Chưa phân chủ đề —</option>';
+                folders.forEach(f => (f.topics || []).forEach(t => {
+                    opts += `<option value="${t.id}">${f.name} / ${t.name}</option>`;
+                }));
+                quickTopic.innerHTML = opts;
+                quickTopic.value = cur;
+            }
+        }
+
+        async function addFolder() {
+            const input = document.getElementById('newFolderName');
+            const name = input?.value?.trim() || '';
+            if (!name) { showToast('Nhập tên thư mục.', 'danger'); return; }
+            try {
+                await adminCreateVocabFolder(name);
+                input.value = '';
+                showToast('Đã tạo thư mục.');
+                await loadTaxonomy();
+            } catch (e) { showToast(`Tạo thư mục thất bại: ${e.message || ''}`, 'danger'); }
+        }
+
+        async function addTopic() {
+            const folderId = document.getElementById('topicFolderSelect')?.value || '';
+            const input = document.getElementById('newTopicName');
+            const name = input?.value?.trim() || '';
+            if (!folderId) { showToast('Chọn thư mục cho chủ đề.', 'danger'); return; }
+            if (!name) { showToast('Nhập tên chủ đề.', 'danger'); return; }
+            try {
+                await adminCreateVocabTopic(name, Number(folderId));
+                input.value = '';
+                showToast('Đã tạo chủ đề.');
+                await loadTaxonomy();
+            } catch (e) { showToast(`Tạo chủ đề thất bại: ${e.message || ''}`, 'danger'); }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (!requireAdminPage()) return;
+
+            document.getElementById('addFolderBtn')?.addEventListener('click', addFolder);
+            document.getElementById('addTopicBtn')?.addEventListener('click', addTopic);
+            document.getElementById('taxonomyTree')?.addEventListener('click', async (e) => {
+                const btn = e.target.closest('button[data-tax]');
+                if (!btn) return;
+                const id = Number(btn.dataset.id);
+                const kind = btn.dataset.tax;
+                const msg = kind === 'folder'
+                    ? 'Xóa thư mục này? Chủ đề con sẽ bị xóa, từ vựng về "chưa phân chủ đề" (KHÔNG mất từ).'
+                    : 'Xóa chủ đề này? Từ vựng trong đó về "chưa phân chủ đề" (KHÔNG mất từ).';
+                if (!confirm(msg)) return;
+                try {
+                    if (kind === 'folder') await adminDeleteVocabFolder(id);
+                    else await adminDeleteVocabTopic(id);
+                    showToast('Đã xóa.');
+                    await loadTaxonomy();
+                    await loadVocabulary();
+                } catch (err) { showToast(`Xóa thất bại: ${err.message || ''}`, 'danger'); }
+            });
+            loadTaxonomy();
 
             document.getElementById('importJsonTextBtn')?.addEventListener('click', importJsonText);
             document.getElementById('importJsonFileBtn')?.addEventListener('click', importJsonFile);

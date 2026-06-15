@@ -780,43 +780,92 @@ function renderQuestions() {
 }
 
 function renderGroup(g, sec) {
-        const display = normalizeDisplayType(g.displayType || g.type || '');
+    const display = normalizeDisplayType(g.displayType || g.type || '');
+    const sourceQuestions = (g.questions || []).length
+        ? (g.questions || [])
+        : buildFallbackQuestions(g, sec, display);
+
+    const kind = resolveRenderKind(g, sourceQuestions, display);
+
     let html = `<div class="qsh">
             <div class="qsh-title">${eh(g.groupTitle || g.title || '')}</div>
       <div class="qsh-inst">${eh(g.instruction||'')}</div>
     </div>`;
 
-    const sourceQuestions = (g.questions || []).length
-        ? (g.questions || [])
-        : buildFallbackQuestions(g, sec, display);
-
-    // Auto-detect MULTIPLE_CHOICE if display is empty but choices exist
-    let effDisplay = display;
-    if (!effDisplay && sourceQuestions.length > 0) {
-        if (sourceQuestions[0].choices && Array.isArray(sourceQuestions[0].choices)) {
-            effDisplay = 'MULTIPLE_CHOICE';
-        } else {
-            effDisplay = 'FILL_BLOCK';
-        }
-    }
-
-    switch(effDisplay) {
+    switch (kind) {
         case 'TRUE_FALSE_NG':
         case 'MULTIPLE_CHOICE':
-            sourceQuestions.forEach(q=>{ html+=renderQItem(q); });
+            sourceQuestions.forEach(q => { html += renderQItem(q); });
+            break;
+
+        case 'MULTIPLE_CHOICE_MULTI':
+            html += renderMcqMulti(g, sourceQuestions);
+            break;
+
+        case 'MATCHING':
+            html += renderMatchingDrag(sourceQuestions, g, 'MATCHING', sec);
+            break;
+
+        case 'MAP_LABELLING':
+        case 'DIAGRAM_LABELLING':
+            sourceQuestions.forEach(q => rememberQuestionId(q));
+            html += (window.ExamLabelling ? ExamLabelling.render(g) : renderMatchingDrag(sourceQuestions, g, 'MATCHING', sec));
+            break;
+
+        case 'TABLE_COMPLETION':
+            html += renderTableCompletion(g);
+            break;
+
+        case 'SUMMARY_COMPLETION':
+            html += renderSummaryCompletion(g);
+            break;
+
+        case 'SUMMARY_WORDBANK':
+            html += renderSummaryWordbank(g, sourceQuestions);
             break;
 
         case 'FILL_BLOCK':
             html += `<div class="fill-block">`;
-            if(g.blockTitle) html += `<div class="fill-title">${eh(g.blockTitle)}</div>`;
-            sourceQuestions.forEach(q=>{ html+=renderFillLine(q); });
+            if (g.blockTitle) html += `<div class="fill-title">${eh(g.blockTitle)}</div>`;
+            sourceQuestions.forEach(q => { html += renderFillLine(q); });
             html += `</div>`;
             break;
 
         default:
-            sourceQuestions.forEach(q=>{ html+=renderFillLine(q); });
+            sourceQuestions.forEach(q => { html += renderFillLine(q); });
     }
     return html;
+}
+
+// Quyết định renderer: ưu tiên canonical group.type (Pha 0), fallback displayType + cấu trúc.
+function resolveRenderKind(g, questions, display) {
+    const canonical = String(g.type || '').toUpperCase();
+    const CANON = new Set([
+        'MULTIPLE_CHOICE', 'MULTIPLE_CHOICE_MULTI', 'MATCHING', 'MAP_LABELLING', 'DIAGRAM_LABELLING',
+        'TABLE_COMPLETION', 'SUMMARY_COMPLETION', 'SUMMARY_WORDBANK',
+        'TRUE_FALSE_NOTGIVEN', 'YES_NO_NOTGIVEN',
+        'NOTE_COMPLETION', 'FORM_COMPLETION', 'FLOWCHART_COMPLETION', 'SENTENCE_COMPLETION'
+    ]);
+    if (CANON.has(canonical)) {
+        if (canonical === 'TRUE_FALSE_NOTGIVEN' || canonical === 'YES_NO_NOTGIVEN') return 'TRUE_FALSE_NG';
+        if (canonical === 'NOTE_COMPLETION' || canonical === 'FORM_COMPLETION'
+            || canonical === 'FLOWCHART_COMPLETION' || canonical === 'SENTENCE_COMPLETION') return 'FILL_BLOCK';
+        return canonical;
+    }
+
+    // Không có canonical → suy từ displayType + cấu trúc.
+    let eff = display;
+    if (!eff && questions.length > 0) {
+        eff = (questions[0].choices && Array.isArray(questions[0].choices)) ? 'MULTIPLE_CHOICE' : 'FILL_BLOCK';
+    }
+    if (eff === 'MULTIPLE_CHOICE' && looksLikeMultiSelect(g, questions)) return 'MULTIPLE_CHOICE_MULTI';
+    if (eff === 'MATCHING' && Array.isArray(g.dropZones) && g.dropZones.length) return 'MAP_LABELLING';
+    return eff;
+}
+
+function looksLikeMultiSelect(g, questions) {
+    if (Number(g.maxSelect) >= 2) return true;
+    return (questions || []).some(q => Number(q.maxSelect) >= 2);
 }
 
 function normalizeDisplayType(type) {
@@ -897,6 +946,231 @@ function renderFillLine(q) {
     return `<div class="fill-line">${tpl.replace('___',inputHtml)}</div>`;
 }
 
+// ── MCQ chọn-2 (MULTIPLE_CHOICE_MULTI) ──────────────────────────────────────
+// IELTS thật: 1 nhóm phủ ≥2 số câu, chọn đúng maxSelect đáp án. Nộp "A,E" cho TẤT CẢ
+// số câu trong nhóm (scorer Pha 7 nhận cả "A,E" lẫn từng chữ).
+function renderMcqMulti(g, questions) {
+    const qNums = questions.map(q => Number(q.questionNumber)).filter(n => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+    questions.forEach(q => rememberQuestionId(q));
+    const maxSelect = Number(g.maxSelect) || Number(questions[0]?.maxSelect) || qNums.length || 2;
+    const groupId = qNums.join('_');
+    const choices = (g.choices && g.choices.length) ? g.choices : (questions[0]?.choices || []);
+
+    const fromTo = qNums.length ? `${qNums[0]}–${qNums[qNums.length - 1]}` : '';
+    let html = `<div class="mcq-multi" id="mcm${groupId}" data-qnums="${qNums.join(',')}" data-max="${maxSelect}">
+        <div class="mcq-multi-head">
+            <span class="mcq-multi-badge" id="mcmb${groupId}">${fromTo}</span>
+            <span class="mcq-multi-hint">Chọn ${maxSelect} đáp án</span>
+        </div>`;
+    choices.forEach(c => {
+        const label = String(c.label || '').trim();
+        const display = formatChoiceDisplay(c);
+        html += `<label class="mcq-multi-opt" id="mco${groupId}_${eh(label)}">
+            <input type="checkbox" value="${eh(label)}" onchange="onMcqMultiChange('${groupId}')">
+            <span>${eh(display)}</span>
+        </label>`;
+    });
+    html += `</div>`;
+    return html;
+}
+
+function onMcqMultiChange(groupId) {
+    const wrap = document.getElementById('mcm' + groupId);
+    if (!wrap) return;
+    const max = Number(wrap.dataset.max) || 2;
+    const qNums = String(wrap.dataset.qnums || '').split(',').map(n => Number(n)).filter(Boolean);
+    const boxes = Array.from(wrap.querySelectorAll('input[type="checkbox"]'));
+    let selected = boxes.filter(b => b.checked).map(b => b.value);
+
+    // Chặn chọn quá maxSelect: bỏ ô vừa tick nếu vượt.
+    if (selected.length > max) {
+        const last = boxes.reverse().find(b => b.checked);
+        if (last) last.checked = false;
+        boxes.reverse();
+        selected = boxes.filter(b => b.checked).map(b => b.value);
+    }
+
+    boxes.forEach(b => b.closest('.mcq-multi-opt')?.classList.toggle('checked', b.checked));
+    const full = selected.length >= max;
+    const answer = full ? selected.slice().sort().join(',') : '';
+    qNums.forEach(qn => pa(qn, answer));
+
+    const badge = document.getElementById('mcmb' + groupId);
+    if (badge) badge.classList.toggle('done', full);
+}
+
+// ── Matching kéo-thả (port từ reading.js) ───────────────────────────────────
+function resolveMatchOptionValues(g) {
+    if (Array.isArray(g.matchOptions) && g.matchOptions.length) {
+        return g.matchOptions.map(o => {
+            if (o && typeof o === 'object') {
+                const letter = String(o.letter || o.label || o.id || '').trim();
+                const text = String(o.text || o.value || o.name || '').trim();
+                return { value: letter, text };
+            }
+            return { value: String(o || '').trim(), text: '' };
+        }).filter(o => o.value);
+    }
+    const ins = String(g.instruction || g.instructions || '');
+    const rangeMatch = ins.match(/\bA\s*[-–]\s*([A-Z])\b/i);
+    if (rangeMatch) {
+        const end = String(rangeMatch[1]).toUpperCase().charCodeAt(0);
+        if (end >= 65 && end <= 90) {
+            const out = [];
+            for (let c = 65; c <= end; c++) out.push({ value: String.fromCharCode(c), text: '' });
+            return out;
+        }
+    }
+    return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(l => ({ value: l, text: '' }));
+}
+
+function renderMatchingDrag(questions, g, display, sec) {
+    const opts = resolveMatchOptionValues(g);
+    let html = `<div class="match-block">`;
+
+    questions.forEach(q => {
+        rememberQuestionId(q);
+        const qn = q.questionNumber;
+        html += `<div id="qi${qn}" class="qi match-row" data-q="${qn}">
+          <input type="hidden" id="q${qn}" value="">
+          <button type="button" class="match-slot" id="ms${qn}" data-q="${qn}"
+              onclick="focusMatchSlot(${qn})"
+              ondblclick="clearMatchAnswer(${qn})"
+              ondragover="onMatchDragOver(event)"
+              ondrop="onMatchDrop(event,${qn})">
+            <span class="match-slot-text" id="mst${qn}">${qn}</span>
+          </button>
+          <div class="match-qtext">${eh(q.questionText || '')}</div>
+        </div>`;
+    });
+
+    html += `<div class="match-options-wrap">
+      <div class="match-options-title">List of options</div>
+      <div class="match-options">`;
+    opts.forEach(opt => {
+        const display = opt.text ? `${opt.value}. ${opt.text}` : opt.value;
+        html += `<button type="button" class="match-chip" data-val="${eh(opt.value)}"
+            draggable="true"
+            ondragstart="onMatchDragStart(event,this.dataset.val)"
+            onclick="onMatchOptionClick(this.dataset.val)">${eh(display)}</button>`;
+    });
+    html += `</div></div></div>`;
+    return html;
+}
+
+let activeMatchQuestion = null;
+function focusMatchSlot(q) {
+    activeMatchQuestion = q;
+    document.querySelectorAll('.match-slot').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('ms' + q);
+    if (target) target.classList.add('active');
+}
+function clearMatchAnswer(q) { pa(q, ''); }
+function onMatchDragStart(event, value) {
+    event.dataTransfer.setData('text/plain', String(value || ''));
+    event.dataTransfer.effectAllowed = 'copy';
+}
+function onMatchDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+}
+function onMatchDrop(event, q) {
+    event.preventDefault();
+    const value = String(event.dataTransfer.getData('text/plain') || '').trim();
+    if (!value) return;
+    focusMatchSlot(q);
+    pa(q, value);
+}
+function onMatchOptionClick(value) {
+    const val = String(value || '').trim();
+    if (!val) return;
+    let targetQ = activeMatchQuestion;
+    if (!targetQ) {
+        const firstEmpty = document.querySelector('.match-slot[data-q]:not(.filled)');
+        if (firstEmpty) targetQ = Number(firstEmpty.dataset.q);
+    }
+    if (!targetQ) {
+        const firstSlot = document.querySelector('.match-slot[data-q]');
+        if (firstSlot) targetQ = Number(firstSlot.dataset.q);
+    }
+    if (!targetQ) return;
+    focusMatchSlot(targetQ);
+    pa(targetQ, val);
+}
+function formatMatchValueForDisplay(value) {
+    const raw = String(value || '').trim();
+    return raw; // Listening matching/labelling hiển thị nguyên chữ cái.
+}
+
+// ── Table completion (port từ reading.js) ───────────────────────────────────
+function renderTableCompletion(g) {
+    const headers = g.tableHeaders || [];
+    let html = `<div class="real-tbl-wrap"><table class="qtbl"><thead><tr>`;
+    headers.forEach(h => { html += `<th>${eh(h)}</th>`; });
+    html += `</tr></thead><tbody>`;
+    (g.tableRows || []).forEach(row => {
+        html += `<tr><td><strong>${eh(row.strategy || row.label || '')}</strong></td>`;
+        (row.cells || []).forEach(cell => {
+            if (cell.questionNumber) {
+                rememberQuestionId({ questionNumber: cell.questionNumber, id: cell.questionId || cell.id });
+                const qn = cell.questionNumber;
+                const w = cell.inputWidth || 80;
+                const tpl = cell.cellText || '';
+                const inputHtml = `<span id="b${qn}" class="fb" style="display:inline-flex;vertical-align:middle;">${qn}</span> <input class="finp" id="q${qn}" placeholder="…" style="width:${w}px;" oninput="pa(${qn},this.value)">`;
+                html += `<td>${tpl.replace('___', inputHtml)}</td>`;
+            } else {
+                html += `<td>${eh(cell.cellText || '')}</td>`;
+            }
+        });
+        html += `</tr>`;
+    });
+    html += `</tbody></table></div>`;
+    return html;
+}
+
+// ── Summary completion (điền tự do) ─────────────────────────────────────────
+function renderSummaryCompletion(g) {
+    let tpl = g.summaryTemplate || '';
+    (g.questions || []).forEach(q => {
+        rememberQuestionId(q);
+        const qn = q.questionNumber;
+        const w = q.inputWidth || 80;
+        tpl = tpl.replace(`[${qn}]`,
+            `<span id="b${qn}" class="fb" style="display:inline-flex;vertical-align:middle;">${qn}</span><input class="finp" id="q${qn}" placeholder="…" style="width:${w}px;" oninput="pa(${qn},this.value)">`);
+    });
+    let html = `<div class="summary-block">`;
+    if (g.summaryTitle) html += `<strong>${eh(g.summaryTitle)}</strong><br><br>`;
+    html += tpl + `</div>`;
+    return html;
+}
+
+// ── Summary với word-bank (kéo cụm từ A–H vào ô) ────────────────────────────
+function renderSummaryWordbank(g, questions) {
+    const opts = resolveMatchOptionValues(g);
+    let tpl = g.summaryTemplate || '';
+    questions.forEach(q => {
+        rememberQuestionId(q);
+        const qn = q.questionNumber;
+        const slot = `<input type="hidden" id="q${qn}" value="">` +
+            `<button type="button" class="match-slot" id="ms${qn}" data-q="${qn}" style="display:inline-flex;min-width:90px;height:30px;vertical-align:middle;"
+                onclick="focusMatchSlot(${qn})" ondblclick="clearMatchAnswer(${qn})"
+                ondragover="onMatchDragOver(event)" ondrop="onMatchDrop(event,${qn})">
+                <span class="match-slot-text" id="mst${qn}">${qn}</span></button>`;
+        tpl = tpl.replace(`[${qn}]`, slot);
+    });
+    let html = `<div class="summary-block">`;
+    if (g.summaryTitle) html += `<strong>${eh(g.summaryTitle)}</strong><br><br>`;
+    html += tpl;
+    html += `<div class="match-options-wrap" style="margin-top:12px;"><div class="match-options-title">List of options</div><div class="match-options">`;
+    opts.forEach(opt => {
+        const display = opt.text ? `${opt.value}. ${opt.text}` : opt.value;
+        html += `<button type="button" class="match-chip" data-val="${eh(opt.value)}" draggable="true"
+            ondragstart="onMatchDragStart(event,this.dataset.val)" onclick="onMatchOptionClick(this.dataset.val)">${eh(display)}</button>`;
+    });
+    html += `</div></div></div>`;
+    return html;
+}
+
 // ─── AUDIO PLAYER ────────────────────────────────────────────────────────────
 let audioListenersBound = false;
 
@@ -926,8 +1200,22 @@ function updateAudioSrc() {
         });
         audioElement.addEventListener('loadedmetadata', updateAudioTotalTime);
         audioElement.addEventListener('ended', () => {
+            // Real mode (thi thật, full): nếu các part dùng file riêng → tự chuyển sang part kế tiếp
+            // và phát tiếp (mô phỏng audio chạy liên tục). File gộp 1 bản dùng chung sẽ không lặp lại.
+            if (isRealMode() && !isSingle && currentRealSec < 4) {
+                const nextSec = currentRealSec + 1;
+                const nextObj = (examData?.sections || [])[nextSec - 1];
+                const nextUrl = (nextObj && nextObj.audioUrl) ? nextObj.audioUrl : null;
+                if (nextUrl && nextUrl !== audioElement.src) {
+                    switchRealSec(nextSec);
+                    audioPlaying = true;
+                    audioElement.play().catch(() => {});
+                    return;
+                }
+            }
             audioPlaying = false;
-            document.getElementById('playIcon').className = 'bi bi-play-fill';
+            const icon = document.getElementById('playIcon');
+            if (icon) icon.className = 'bi bi-play-fill';
         });
         audioListenersBound = true;
     }
@@ -991,6 +1279,14 @@ function pa(q,v){
     ans[q]=v;
     const el=document.getElementById('qi'+q);
     if(el){el.classList.toggle('done',!!v);const b=el.querySelector('.qbadge');if(b)b.style.background=v?'var(--success)':'var(--primary)';}
+    const input=document.getElementById('q'+q);
+    if(input && input.tagName==='INPUT' && input.type==='hidden') input.value = v || '';
+    const slot=document.getElementById('ms'+q), slotText=document.getElementById('mst'+q);
+    if(slot && slotText){
+        const rendered=formatMatchValueForDisplay(v);
+        slotText.textContent = rendered || String(q);
+        slot.classList.toggle('filled', !!v);
+    }
     const fb=document.getElementById('b'+q); if(fb)fb.classList.toggle('done',!!v);
     const nb=document.getElementById('nb'+q); if(nb){nb.classList.toggle('done',!!v);}
     if(document.body.classList.contains('real-mode')) updateRealBot();

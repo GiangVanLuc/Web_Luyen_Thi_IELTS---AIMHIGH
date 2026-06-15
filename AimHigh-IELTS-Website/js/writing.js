@@ -505,38 +505,28 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Tạo một modal tràn màn hình để hiển thị kết quả chấm điểm cực đẹp
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);z-index:99999;display:flex;justify-content:center;align-items:center;';
-        
-        let feedbackHTML = result.feedback || 'Không có nhận xét chi tiết.';
-        // Format lại feedback từ AI cho đẹp mắt
-        feedbackHTML = feedbackHTML
-            .replace(/\n/g, '<br>')
-            .replace(/Band Score:\s*([0-9.]+)/gi, '<strong>Band Score: $1</strong>');
+
+        let reportHTML;
+        if (window.AiGradingReport) {
+            window.AiGradingReport.injectStylesOnce();
+            reportHTML = window.AiGradingReport.render(result.feedback, { bandScore: result.bandScore, skill: 'WRITING' });
+        } else {
+            reportHTML = `<div style="white-space:pre-wrap;">${(result.feedback || 'Không có nhận xét chi tiết.')}</div>`;
+        }
 
         modal.innerHTML = `
-            <div class="aim-card" style="width:90%;max-width:700px;max-height:85vh;overflow-y:auto;background:white;border-radius:24px;border:2px solid #C9A227;box-shadow:0 20px 50px rgba(0,0,0,0.15);padding:32px;">
+            <div class="aim-card" style="width:92%;max-width:760px;max-height:88vh;overflow-y:auto;background:white;border-radius:24px;border:2px solid #C9A227;box-shadow:0 20px 50px rgba(0,0,0,0.15);padding:32px;">
                 <div class="text-center mb-4">
                     <div style="width:80px;height:80px;background:#F5EDD5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:2px solid #C9A227;">
                         <i class="bi bi-award-fill text-warning" style="font-size:2.5rem;"></i>
                     </div>
                     <h3 class="fw-bold" style="color:#4a3800;font-family:\'Be Vietnam Pro\',sans-serif;">Kết quả chấm điểm AI</h3>
-                    <p class="text-muted">Hoàn thành bài luyện tập IELTS Writing</p>
-                </div>
-                
-                <div class="d-flex align-items-center justify-content-center gap-3 mb-4" style="background:#FFFDF5;border:1px solid #F0E8C8;padding:16px;border-radius:16px;">
-                    <span class="fs-5 fw-bold" style="color:var(--text-main);">Điểm tổng quan (Overall Band):</span>
-                    <span class="badge bg-warning text-dark fs-3 px-3 py-2 rounded-pill fw-extrabold" style="box-shadow:0 4px 10px rgba(201,162,39,0.25);">
-                        ${result.bandScore || '6.0'}
-                    </span>
+                    <p class="text-muted">Giám khảo AI Gemini chấm theo 4 tiêu chí IELTS Writing</p>
                 </div>
 
-                <div class="mb-4">
-                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-chat-left-text-fill text-warning me-2"></i>Nhận xét chi tiết từ Giám khảo AI:</h6>
-                    <div class="p-3 border rounded-16" style="background:#FAFAFA;font-size:0.95rem;line-height:1.7;color:#333;">
-                        ${feedbackHTML}
-                    </div>
-                </div>
+                ${reportHTML}
 
-                <div class="text-center">
+                <div class="text-center mt-4">
                     <button class="btn btn-warning rounded-pill px-5 py-2 fw-bold text-dark" style="border:none;box-shadow:0 4px 12px rgba(201,162,39,0.3);" onclick="window.location.href=\'dashboard.html\'">
                         Quay lại Dashboard
                     </button>

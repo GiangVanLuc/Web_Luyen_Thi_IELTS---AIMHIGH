@@ -22,6 +22,13 @@ public class AdminVocabularyUpsertRequest {
     private String imageUrl;
     private String related;
 
+    // Gán từ vào chủ đề (Topic) của kho AimHigh Pick. Có thể null (chưa phân loại).
+    private Long topicId;
+
+    // Gán theo TÊN khi import (tự tạo nếu chưa có). topicId ưu tiên hơn nếu có.
+    private String folder;
+    private String topic;
+
     @Valid
     private List<ExampleRequest> examples;
 

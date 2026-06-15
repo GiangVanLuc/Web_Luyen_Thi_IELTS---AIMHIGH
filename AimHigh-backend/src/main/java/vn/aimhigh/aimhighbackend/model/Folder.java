@@ -7,16 +7,22 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 /**
- * Chủ đề (cấp 2) thuộc một Thư mục (Folder). Từ vựng AimHigh Pick được gán vào chủ đề.
+ * Thư mục (cấp 1) để gom các chủ đề (Topic) của kho từ vựng AimHigh Pick.
+ * Cấu trúc: Folder (thư mục) 1—* Topic (chủ đề) 1—* Vocabulary.
  */
 @Entity
-@Table(name = "topics")
+@Table(
+    name = "vocabulary_folder",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_vocab_folder_normalized_name", columnNames = {"normalized_name"})
+    }
+)
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Topic {
+public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,12 +30,8 @@ public class Topic {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "normalized_name")
+    @Column(name = "normalized_name", nullable = false)
     private String normalizedName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_id")
-    private Folder folder;
 
     @Column(name = "display_order")
     private Integer displayOrder;

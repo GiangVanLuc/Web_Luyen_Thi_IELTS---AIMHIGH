@@ -19,8 +19,12 @@ import vn.aimhigh.aimhighbackend.dto.response.AdminVocabularyImportResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
+import vn.aimhigh.aimhighbackend.model.Folder;
+import vn.aimhigh.aimhighbackend.model.Topic;
 import vn.aimhigh.aimhighbackend.model.Vocabulary;
 import vn.aimhigh.aimhighbackend.model.VocabularyExample;
+import vn.aimhigh.aimhighbackend.repository.FolderRepository;
+import vn.aimhigh.aimhighbackend.repository.TopicRepository;
 import vn.aimhigh.aimhighbackend.repository.VocabularyExampleRepository;
 import vn.aimhigh.aimhighbackend.repository.VocabularyRepository;
 import vn.aimhigh.aimhighbackend.service.AdminVocabularyService;
@@ -43,7 +47,13 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
 
     private final VocabularyRepository vocabularyRepository;
     private final VocabularyExampleRepository vocabularyExampleRepository;
+    private final TopicRepository topicRepository;
+    private final FolderRepository folderRepository;
     private final ObjectMapper objectMapper;
+
+    /** Thư mục/chủ đề mặc định khi import thiếu thông tin phân loại. */
+    private static final String DEFAULT_FOLDER_NAME = "Khác";
+    private static final String DEFAULT_TOPIC_NAME = "Chung";
 
     @Override
     @Transactional(readOnly = true)
@@ -60,6 +70,7 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
         return vocabularyRepository.searchVocabulary(
                         normalizedKeyword,
                         normalizedPos,
+                        null,
                         PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.ASC, "word"))
                 )
                 .stream()
@@ -145,6 +156,8 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
                 data.put("audioUrl", firstNonBlank(getCell(row, headerMap, "audiourl"), getCell(row, headerMap, "audio_url")));
                 data.put("imageUrl", firstNonBlank(getCell(row, headerMap, "imageurl"), getCell(row, headerMap, "image_url")));
                 data.put("related", getCell(row, headerMap, "related"));
+                data.put("folder", firstNonBlank(getCell(row, headerMap, "folder"), getCell(row, headerMap, "thumuc"), getCell(row, headerMap, "thu_muc")));
+                data.put("topic", firstNonBlank(getCell(row, headerMap, "topic"), getCell(row, headerMap, "chude"), getCell(row, headerMap, "chu_de")));
 
                 String enExample = firstNonBlank(getCell(row, headerMap, "exampleen"), getCell(row, headerMap, "en_sentence"));
                 String viExample = firstNonBlank(getCell(row, headerMap, "examplevi"), getCell(row, headerMap, "vi_sentence"));
@@ -234,6 +247,12 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
         vocab.setImageUrl(trimToNull(request.getImageUrl()));
         vocab.setRelated(trimToNull(request.getRelated()));
 
+        Topic resolvedTopic = resolveImportTopic(request.getTopicId(), request.getFolder(), request.getTopic());
+        if (resolvedTopic != null) {
+            // Chỉ gán khi dòng có khai báo phân loại; không khai báo thì giữ nguyên chủ đề cũ.
+            vocab.setTopic(resolvedTopic);
+        }
+
         Vocabulary saved = vocabularyRepository.save(vocab);
 
         if (request.getExamples() != null) {
@@ -255,6 +274,52 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
         return new UpsertOutcome(existing.isEmpty(), toResponse(saved));
     }
 
+    /**
+     * Quyết định chủ đề cho từ khi upsert/import:
+     *  - Có topicId  -> dùng đúng chủ đề đó (ưu tiên cao nhất).
+     *  - Có topic/folder theo tên -> tìm hoặc tạo (thiếu folder thì dùng "Khác", thiếu topic thì dùng "Chung").
+     *  - Không có gì -> null (giữ nguyên / chưa phân chủ đề).
+     */
+    private Topic resolveImportTopic(Long topicId, String folderName, String topicName) {
+        if (topicId != null) {
+            return topicRepository.findById(topicId)
+                    .orElseThrow(() -> new BadRequestException("Không tìm thấy chủ đề id=" + topicId));
+        }
+
+        String folder = trimToNull(folderName);
+        String topic = trimToNull(topicName);
+        if (folder == null && topic == null) {
+            return null;
+        }
+
+        Folder targetFolder = findOrCreateFolder(folder != null ? folder : DEFAULT_FOLDER_NAME);
+        String topicToUse = topic != null ? topic : DEFAULT_TOPIC_NAME;
+        return findOrCreateTopic(topicToUse, targetFolder);
+    }
+
+    private Folder findOrCreateFolder(String name) {
+        String cleaned = name.trim();
+        String normalized = cleaned.toLowerCase(Locale.ROOT);
+        return folderRepository.findByNormalizedName(normalized)
+                .orElseGet(() -> folderRepository.save(Folder.builder()
+                        .name(cleaned)
+                        .normalizedName(normalized)
+                        .displayOrder(0)
+                        .build()));
+    }
+
+    private Topic findOrCreateTopic(String name, Folder folder) {
+        String cleaned = name.trim();
+        String normalized = cleaned.toLowerCase(Locale.ROOT);
+        return topicRepository.findByFolderIdAndNormalizedName(folder.getId(), normalized)
+                .orElseGet(() -> topicRepository.save(Topic.builder()
+                        .name(cleaned)
+                        .normalizedName(normalized)
+                        .folder(folder)
+                        .displayOrder(0)
+                        .build()));
+    }
+
     private VocabularyResponse toResponse(Vocabulary vocabulary) {
         List<VocabularyResponse.ExampleDto> examples = vocabularyExampleRepository.findByVocabularyId(vocabulary.getId())
                 .stream()
@@ -264,6 +329,9 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
                         .source(example.getSource())
                         .build())
                 .toList();
+
+        Topic topic = vocabulary.getTopic();
+        Folder folder = topic == null ? null : topic.getFolder();
 
         return VocabularyResponse.builder()
                 .id(vocabulary.getId())
@@ -275,6 +343,10 @@ public class AdminVocabularyServiceImpl implements AdminVocabularyService {
                 .audioUrl(vocabulary.getAudioUrl())
                 .imageUrl(vocabulary.getImageUrl())
                 .related(vocabulary.getRelated())
+                .topicId(topic == null ? null : topic.getId())
+                .topicName(topic == null ? null : topic.getName())
+                .folderId(folder == null ? null : folder.getId())
+                .folderName(folder == null ? null : folder.getName())
                 .examples(examples)
                 .isSaved(false)
                 .build();

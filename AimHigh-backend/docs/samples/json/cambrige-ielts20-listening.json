@@ -13,6 +13,7 @@
       "groups": [
         {
           "groupTitle": "Questions 1-10",
+          "type": "NOTE_COMPLETION",
           "questionFrom": 1,
           "questionTo": 10,
           "instruction": "Complete the table below. Write ONE WORD AND/OR A NUMBER for each answer.",
@@ -164,8 +165,8 @@
             },
             {
               "questionNumber": 18,
-              "questionText": "Question 18 depends on 17",
-              "correctAnswer": "blank"
+              "questionText": "(second answer for the Choose TWO question above)",
+              "correctAnswer": "A,E"
             }
           ]
         },
@@ -189,8 +190,8 @@
             },
             {
               "questionNumber": 20,
-              "questionText": "Question 20 depends on 19",
-              "correctAnswer": "blank"
+              "questionText": "(second answer for the Choose TWO question above)",
+              "correctAnswer": "C,E"
             }
           ]
         }
@@ -221,8 +222,8 @@
             },
             {
               "questionNumber": 22,
-              "questionText": "Question 22 depends on 21",
-              "correctAnswer": "blank"
+              "questionText": "(second answer for the Choose TWO question above)",
+              "correctAnswer": "C,E"
             }
           ]
         },
@@ -246,8 +247,8 @@
             },
             {
               "questionNumber": 24,
-              "questionText": "Question 24 depends on 23",
-              "correctAnswer": "blank"
+              "questionText": "(second answer for the Choose TWO question above)",
+              "correctAnswer": "A,C"
             }
           ]
         },
@@ -271,8 +272,8 @@
             },
             {
               "questionNumber": 26,
-              "questionText": "Question 26 depends on 25",
-              "correctAnswer": "blank"
+              "questionText": "(second answer for the Choose TWO question above)",
+              "correctAnswer": "A,B"
             }
           ]
         },

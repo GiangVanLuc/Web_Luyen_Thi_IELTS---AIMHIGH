@@ -453,6 +453,33 @@ async function adminDeleteVocabulary(vocabularyId) {
     });
 }
 
+// ===== Kho từ vựng: Thư mục > Chủ đề (taxonomy) =====
+async function adminGetVocabTaxonomy() {
+    return apiFetch('/admin/vocabulary/taxonomy');
+}
+async function adminCreateVocabFolder(name) {
+    return apiFetch('/admin/vocabulary/folders', { method: 'POST', body: JSON.stringify({ name }) });
+}
+async function adminUpdateVocabFolder(id, name) {
+    return apiFetch(`/admin/vocabulary/folders/${id}`, { method: 'PUT', body: JSON.stringify({ name }) });
+}
+async function adminDeleteVocabFolder(id) {
+    return apiFetch(`/admin/vocabulary/folders/${id}`, { method: 'DELETE' });
+}
+async function adminCreateVocabTopic(name, folderId) {
+    return apiFetch('/admin/vocabulary/topics', { method: 'POST', body: JSON.stringify({ name, folderId }) });
+}
+async function adminUpdateVocabTopic(id, name, folderId) {
+    return apiFetch(`/admin/vocabulary/topics/${id}`, { method: 'PUT', body: JSON.stringify({ name, folderId }) });
+}
+async function adminDeleteVocabTopic(id) {
+    return apiFetch(`/admin/vocabulary/topics/${id}`, { method: 'DELETE' });
+}
+// Student: cây chủ đề kho AimHigh Pick (dùng chung, admin cập nhật là thấy)
+async function getVocabTaxonomy() {
+    return apiFetch('/vocabulary/taxonomy');
+}
+
 async function adminImportVocabularyJson(payload) {
     return apiFetch('/admin/vocabulary/import/json', {
         method: 'POST',

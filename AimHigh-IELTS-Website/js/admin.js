@@ -40,6 +40,26 @@ function showAdminToast(message, type = 'success') {
     showToast(message, type);
 }
 
+// ===== Đăng xuất khỏi khu vực admin =====
+async function adminLogout() {
+    const refreshToken = localStorage.getItem('aimhigh_refreshToken');
+    // Báo backend thu hồi token (best-effort, chỉ khi api.js đã được nạp)
+    try {
+        if (typeof apiFetch === 'function' && refreshToken) {
+            await apiFetch('/auth/logout', {
+                method: 'POST',
+                body: JSON.stringify({ refreshToken })
+            });
+        }
+    } catch (_) {
+        // Bỏ qua lỗi mạng — vẫn xóa phiên ở client
+    }
+    ['aimhigh_token', 'aimhigh_refreshToken', 'aimhigh_loggedIn',
+     'aimhigh_currentUser', 'aimhigh_user', 'aimhigh_role']
+        .forEach(k => localStorage.removeItem(k));
+    window.location.href = '../login.html';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname.includes('/admin/')) {
         requireAdminPage();

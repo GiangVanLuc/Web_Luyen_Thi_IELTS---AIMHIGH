@@ -55,10 +55,6 @@
                 </a>
 
                 <div class="sidebar-nav-label">Vận hành</div>
-                <a href="notifications.html" class="sidebar-link">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Thông báo</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -68,12 +64,6 @@
                 <a href="settings.html" class="sidebar-link">
                     <i class="bi bi-gear"></i>
                     <span>Cài đặt</span>
-                </a>
-
-                <div class="sidebar-nav-label">Khác</div>
-                <a href="../index.html" class="sidebar-link">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                    <span>Xem Website</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -98,16 +88,14 @@
                         <i class="bi bi-search"></i>
                         <input type="text" placeholder="Tìm kiếm...">
                     </div>
-                    <button class="topbar-btn">
-                        <i class="bi bi-bell"></i>
-                        <span class="notif-dot"></span>
-                    </button>
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="../profile.html"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-up-right me-2"></i>Xem Website</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="if(typeof adminLogout === 'function') { adminLogout(); } else { window.location.href='../login.html'; } return false;"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -120,10 +108,10 @@
                         <div class="filter-bar">
                             <select class="form-select" id="filterSkill">
                                 <option value="">Tất cả kỹ năng</option>
-                                <option value="listening">Listening</option>
-                                <option value="reading">Reading</option>
-                                <option value="writing">Writing</option>
-                                <option value="speaking">Speaking</option>
+                                <option value="LISTENING">Listening</option>
+                                <option value="READING">Reading</option>
+                                <option value="WRITING">Writing</option>
+                                <option value="SPEAKING">Speaking</option>
                             </select>
                             <select class="form-select" id="filterStatus">
                                 <option value="">Tất cả trạng thái</option>
@@ -206,10 +194,13 @@
 
             body.innerHTML = exams.map(exam => {
                 const status = String(exam.status || 'archived').toLowerCase();
-                const nextStatus = status === 'published' ? 'archived' : 'published';
-                const toggleLabel = status === 'published' ? 'Ẩn' : 'Xuất bản';
+                const isPublished = status === 'published';
+                const nextStatus = isPublished ? 'archived' : 'published';
+                const toggleLabel = isPublished ? 'Ẩn đề khỏi trang luyện tập' : 'Xuất bản đề cho học viên';
+                const toggleIcon = isPublished ? 'bi-toggle2-on' : 'bi-toggle2-off';
+                const rowClass = status === 'archived' ? ' class="table-row-archived"' : '';
                 return `
-                    <tr>
+                    <tr${rowClass}>
                         <td><strong>${exam.title || '(Không có tên)'}</strong></td>
                         <td>${exam.skill || '--'}</td>
                         <td>${exam.totalQuestions || '--'}</td>
@@ -219,7 +210,16 @@
                         <td>--</td>
                         <td>
                             <button class="btn-icon-sm" title="Sửa" data-action="edit" data-id="${exam.id}"><i class="bi bi-pencil"></i></button>
-                            <button class="btn-icon-sm" title="${toggleLabel}" data-action="status" data-status="${nextStatus}" data-id="${exam.id}"><i class="bi bi-toggle2-off"></i></button>
+                            <button class="btn-icon-sm publish-toggle ${isPublished ? 'is-on' : 'is-off'}"
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="${isPublished}"
+                                    title="${toggleLabel}"
+                                    data-action="status"
+                                    data-status="${nextStatus}"
+                                    data-id="${exam.id}">
+                                <i class="bi ${toggleIcon}"></i>
+                            </button>
                             <button class="btn-icon-sm danger" title="Xóa" data-action="delete" data-id="${exam.id}"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>`;
@@ -256,6 +256,7 @@
                 const id = btn.dataset.id;
                 const action = btn.dataset.action;
                 if (!id || !action) return;
+                const originalHtml = btn.innerHTML;
 
                 try {
                     if (action === 'delete') {
@@ -264,13 +265,24 @@
                         showToast('Xóa đề thi thành công');
                         await loadAdminExams();
                     } else if (action === 'status') {
-                        await adminUpdateTestStatus(id, btn.dataset.status || 'published');
-                        showToast('Cập nhật trạng thái thành công');
+                        const targetStatus = btn.dataset.status || 'published';
+                        btn.disabled = true;
+                        btn.classList.add('is-loading');
+                        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+                        await adminUpdateTestStatus(id, targetStatus);
+                        showToast(targetStatus === 'published'
+                            ? 'Đã xuất bản đề cho học viên'
+                            : 'Đã ẩn đề khỏi trang luyện tập');
                         await loadAdminExams();
                     } else if (action === 'edit') {
                         window.location.href = `test-builder.html?examId=${encodeURIComponent(id)}`;
                     }
                 } catch (error) {
+                    if (action === 'status') {
+                        btn.disabled = false;
+                        btn.classList.remove('is-loading');
+                        btn.innerHTML = originalHtml;
+                    }
                     showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
                 }
             });

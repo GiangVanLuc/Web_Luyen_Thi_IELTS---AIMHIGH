@@ -56,6 +56,7 @@ public class ExamImportServiceImpl implements ExamImportService {
     private final QuestionRepository questionRepository;
     private final ChoiceRepository choiceRepository;
     private final ObjectMapper objectMapper;
+    private final ExamSchemaNormalizer schemaNormalizer;
 
     @Transactional
     public Exam importFromJson(JsonNode rootNode) {
@@ -66,6 +67,8 @@ public class ExamImportServiceImpl implements ExamImportService {
         }
 
         JsonNode workingNode = rootNode.deepCopy();
+        // Pha 0: chuẩn hoá type nhóm câu + correctAnswer (| -> /) trước khi persist
+        schemaNormalizer.normalize(workingNode);
         JsonNode examNode = workingNode.get("exam");
         if (examNode == null) {
             throw new BadRequestException("Thiáº¿u object 'exam'");

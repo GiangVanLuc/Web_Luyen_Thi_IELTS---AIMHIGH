@@ -18,6 +18,10 @@ public class VocabularyResponse {
     private String audioUrl;
     private String imageUrl;
     private String related;
+    private Long topicId;
+    private String topicName;
+    private Long folderId;
+    private String folderName;
     private List<ExampleDto> examples;
     private Boolean isSaved;
     private Long userVocabularyId;

@@ -1,0 +1,53 @@
+{
+  "exam": {
+    "title": "Cambridge 20 IELTS - Test 1 Writing",
+    "skill": "WRITING",
+    "duration": 60,
+    "totalQuestions": 2,
+    "description": "Đề Writing Cambridge 20 Test 1 (Task 1: bảng dân số New York; Task 2: nước sạch miễn phí)."
+  },
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "label": "Writing Task 1",
+      "questionFrom": 1,
+      "questionTo": 1,
+      "groups": [
+        {
+          "groupTitle": "Task 1",
+          "type": "WRITING_TASK",
+          "instruction": "You should spend about 20 minutes on this task. Write at least 150 words.",
+          "questions": [
+            {
+              "questionNumber": 1,
+              "taskNumber": 1,
+              "prompt": "The first table below shows changes in the total population of New York City from 1800 to 2000. The second and third tables show changes in the population of the five districts of the city (Manhattan, Brooklyn, Bronx, Queens, Staten Island) over the same period. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\nNew York City (all five districts) – Population\n1800: 79,216 | 1900: 3,437,202 | 2000: 8,009,185\n\nManhattan – Population (and % of total)\n1800: 60,515 (76%) | 1900: 1,850,093 (54%) | 2000: 1,538,096 (19%)\n\nOther districts (Brooklyn, Bronx, Queens, Staten Island) – Population (and % of total)\n1800: 18,701 (24%) | 1900: 1,587,109 (46%) | 2000: 6,471,089 (81%)",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionNumber": 2,
+      "label": "Writing Task 2",
+      "questionFrom": 2,
+      "questionTo": 2,
+      "groups": [
+        {
+          "groupTitle": "Task 2",
+          "type": "WRITING_TASK",
+          "instruction": "You should spend about 40 minutes on this task. Write at least 250 words.",
+          "questions": [
+            {
+              "questionNumber": 2,
+              "taskNumber": 2,
+              "topic": "Access to clean water is a basic human right. Therefore every home should have a water supply that is provided free of charge.\n\nDo you agree or disagree?\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

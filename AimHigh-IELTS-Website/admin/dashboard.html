@@ -56,10 +56,6 @@
                 </a>
 
                 <div class="sidebar-nav-label">Vận hành</div>
-                <a href="notifications.html" class="sidebar-link">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Thông báo</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -69,12 +65,6 @@
                 <a href="settings.html" class="sidebar-link">
                     <i class="bi bi-gear"></i>
                     <span>Cài đặt</span>
-                </a>
-
-                <div class="sidebar-nav-label">Khác</div>
-                <a href="../index.html" class="sidebar-link">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                    <span>Xem Website</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -100,17 +90,14 @@
                         <i class="bi bi-search"></i>
                         <input type="text" placeholder="Tìm kiếm...">
                     </div>
-                    <button class="topbar-btn">
-                        <i class="bi bi-bell"></i>
-                        <span class="notif-dot"></span>
-                    </button>
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="../profile.html"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-up-right me-2"></i>Xem Website</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="if(typeof adminLogout === 'function') { adminLogout(); } else { window.location.href='../login.html'; } return false;"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -270,12 +257,6 @@
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-md-6 col-xl-3">
-                        <a href="notifications.html" class="admin-card text-decoration-none h-100 d-block">
-                            <h3 class="admin-card-title"><i class="bi bi-megaphone me-2"></i>Trung tâm thông báo</h3>
-                            <p class="mb-0" style="font-size:0.85rem;color:var(--admin-text-muted);">Gửi thông báo theo nhóm học viên, theo dõi trạng thái gửi và lịch sử chiến dịch.</p>
-                        </a>
-                    </div>
                     <div class="col-md-6 col-xl-3">
                         <a href="audit-log.html" class="admin-card text-decoration-none h-100 d-block">
                             <h3 class="admin-card-title"><i class="bi bi-journal-check me-2"></i>Audit Log</h3>

@@ -278,6 +278,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             block.innerHTML = renderSpeakingMain(question, part);
             block.classList.add('active');
         }
+
+        // Chuyển câu thì luôn dừng timer cũ; Part 2 thì khởi động đếm ngược chuẩn bị.
+        clearSpeakingTimers();
+        if (part === 2 && !isRecording) startPrepCountdown();
     }
 
     function renderSpeakingMain(question, part) {
@@ -294,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     <p class="mb-3 fw-bold text-muted">You should say:</p>
                     ${cuePoints.length ? `<ul>${cuePoints.map(item => `<li>${formatMultilineText(item)}</li>`).join('')}</ul>` : `<p class="mb-0">${formatMultilineText(question.cueCard || question.instruction || '')}</p>`}
                 </div>
-                ${part === 2 ? '<div class="px-4 py-2 bg-white rounded-pill border border-warning text-warning fw-bold d-flex align-items-center gap-2 shadow-sm"><i class="bi bi-stopwatch"></i> Preparation Time: 01:00</div>' : ''}
+                ${part === 2 ? '<div class="px-4 py-2 bg-white rounded-pill border border-warning text-warning fw-bold d-flex align-items-center gap-2 shadow-sm"><i class="bi bi-stopwatch"></i> <span id="prepTimer">Chuẩn bị: 01:00</span></div>' : ''}
             ` : ''}
         `;
     }
@@ -363,8 +367,49 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function resetRecordButton() {
-            resetRecordButton();
+        isRecording = false;
+        btnRecord.innerHTML = '<i class="bi bi-mic-fill fs-5"></i> Ghi âm câu trả lời';
+        btnRecord.style.backgroundColor = '';
+        btnRecord.style.boxShadow = '';
+        btnRecord.disabled = false;
         btnRecord.classList.remove('pulsate-animation');
+        canvas.style.display = 'none';
+    }
+
+    // ── Part 2: đếm ngược 1 phút chuẩn bị + giới hạn 2 phút ghi âm (IELTS thật) ──
+    let prepInterval = null;
+    let recordCapTimeout = null;
+    let recordTickInterval = null;
+    const PART2_PREP_SECONDS = 60;
+    const PART2_RECORD_CAP_SECONDS = 120;
+
+    function clearSpeakingTimers() {
+        if (prepInterval) { clearInterval(prepInterval); prepInterval = null; }
+        if (recordCapTimeout) { clearTimeout(recordCapTimeout); recordCapTimeout = null; }
+        if (recordTickInterval) { clearInterval(recordTickInterval); recordTickInterval = null; }
+    }
+
+    function fmtMmss(total) {
+        const m = Math.floor(Math.max(0, total) / 60);
+        const s = Math.max(0, total) % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function startPrepCountdown() {
+        const el = document.getElementById('prepTimer');
+        if (!el) return;
+        let left = PART2_PREP_SECONDS;
+        el.textContent = `Chuẩn bị: ${fmtMmss(left)}`;
+        prepInterval = setInterval(() => {
+            left--;
+            if (left <= 0) {
+                clearInterval(prepInterval); prepInterval = null;
+                el.textContent = 'Đã sẵn sàng — hãy bắt đầu nói!';
+                el.classList.add('text-success');
+            } else {
+                el.textContent = `Chuẩn bị: ${fmtMmss(left)}`;
+            }
+        }, 1000);
     }
 
     function getQuestionPart(question) {
@@ -452,11 +497,31 @@ document.addEventListener('DOMContentLoaded', async function () {
             mediaRecorder.start();
             isRecording = true;
 
+            // Part 2 đang chuẩn bị → bắt đầu ghi thì dừng đếm ngược chuẩn bị.
+            clearSpeakingTimers();
+
             // Cập nhật UI nút ghi âm sang hiệu ứng Pulsating màu cam
-            btnRecord.innerHTML = '<i class="bi bi-stop-fill fs-5"></i> Dừng ghi âm';
+            btnRecord.innerHTML = '<i class="bi bi-stop-fill fs-5"></i> Dừng ghi âm (00:00)';
             btnRecord.style.backgroundColor = '#d85928';
             btnRecord.style.boxShadow = '0 0 20px rgba(216, 89, 40, 0.6)';
             btnRecord.classList.add('pulsate-animation');
+
+            // Đồng hồ ghi âm chạy lên; Part 2 tự dừng khi đạt 2 phút (IELTS thật).
+            const part = getQuestionPart(speakingQuestions[currentQuestionIndex] || {});
+            let recSec = 0;
+            recordTickInterval = setInterval(() => {
+                recSec++;
+                const cap = part === 2 ? ` / ${fmtMmss(PART2_RECORD_CAP_SECONDS)}` : '';
+                if (isRecording) btnRecord.innerHTML = `<i class="bi bi-stop-fill fs-5"></i> Dừng ghi âm (${fmtMmss(recSec)}${cap})`;
+            }, 1000);
+            if (part === 2) {
+                recordCapTimeout = setTimeout(() => {
+                    if (isRecording) {
+                        showCustomToast('Đã đạt giới hạn 2 phút của Part 2. Tự động dừng ghi âm.', 'success');
+                        stopRecordingFlow();
+                    }
+                }, PART2_RECORD_CAP_SECONDS * 1000);
+            }
 
             // Bắt đầu vẽ Sóng âm Canvas
             canvas.style.display = 'block';
@@ -473,6 +538,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function stopRecordingFlow() {
         if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
+        clearSpeakingTimers();
         mediaRecorder.stop();
         isRecording = false;
 
@@ -672,36 +738,27 @@ document.addEventListener('DOMContentLoaded', async function () {
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);z-index:99999;display:flex;justify-content:center;align-items:center;';
         
-        let feedbackHTML = result.feedback || 'Không có nhận xét chi tiết.';
-        feedbackHTML = feedbackHTML
-            .replace(/\n/g, '<br>')
-            .replace(/Band Score:\s*([0-9.]+)/gi, '<strong>Band Score: $1</strong>');
+        let reportHTML;
+        if (window.AiGradingReport) {
+            window.AiGradingReport.injectStylesOnce();
+            reportHTML = window.AiGradingReport.render(result.feedback, { bandScore: result.bandScore, skill: 'SPEAKING' });
+        } else {
+            reportHTML = `<div style="white-space:pre-wrap;">${(result.feedback || 'Không có nhận xét chi tiết.')}</div>`;
+        }
 
         modal.innerHTML = `
-            <div class="aim-card" style="width:90%;max-width:700px;max-height:85vh;overflow-y:auto;background:white;border-radius:24px;border:2px solid var(--record-color);box-shadow:0 25px 60px rgba(0,0,0,0.2);padding:32px;">
+            <div class="aim-card" style="width:92%;max-width:760px;max-height:88vh;overflow-y:auto;background:white;border-radius:24px;border:2px solid var(--record-color);box-shadow:0 25px 60px rgba(0,0,0,0.2);padding:32px;">
                 <div class="text-center mb-4">
                     <div style="width:80px;height:80px;background:#F5EDD5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:2px solid var(--record-color);">
                         <i class="bi bi-mic-fill text-danger" style="font-size:2.3rem;"></i>
                     </div>
                     <h3 class="fw-bold" style="color:#4a3800;font-family:\'Be Vietnam Pro\',sans-serif;">Kết quả chấm nói AI</h3>
-                    <p class="text-muted">Đánh giá phát âm & vốn nói IELTS Speaking</p>
-                </div>
-                
-                <div class="d-flex align-items-center justify-content-center gap-3 mb-4" style="background:#FFFDF5;border:1px solid #F0E8C8;padding:16px;border-radius:16px;">
-                    <span class="fs-5 fw-bold" style="color:var(--text-main);">Điểm phát âm (Pronunciation Band):</span>
-                    <span class="badge bg-danger text-white fs-3 px-3 py-2 rounded-pill fw-extrabold" style="box-shadow:0 4px 10px rgba(242,106,54,0.25);">
-                        ${result.bandScore || '6.0'}
-                    </span>
+                    <p class="text-muted">Giám khảo AI chấm theo 4 tiêu chí IELTS Speaking</p>
                 </div>
 
-                <div class="mb-4">
-                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-chat-left-text-fill text-danger me-2"></i>Nhận xét từ Giám khảo AI:</h6>
-                    <div class="p-3 border rounded-16" style="background:#FAFAFA;font-size:0.95rem;line-height:1.7;color:#333;">
-                        ${feedbackHTML}
-                    </div>
-                </div>
+                ${reportHTML}
 
-                <div class="text-center">
+                <div class="text-center mt-4">
                     <button class="btn btn-danger rounded-pill px-5 py-2 fw-bold text-white" style="border:none;box-shadow:0 4px 12px rgba(242,106,54,0.3);" onclick="window.location.href=\'dashboard.html\'">
                         Quay lại Dashboard
                     </button>

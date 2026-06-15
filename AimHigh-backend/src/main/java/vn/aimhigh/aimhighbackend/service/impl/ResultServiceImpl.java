@@ -70,6 +70,7 @@ public class ResultServiceImpl implements ResultService {
                 .totalWrong(attempt.getTotalWrong() == null ? 0 : attempt.getTotalWrong())
                 .score(attempt.getScore())
                 .bandScore(attempt.getBandScore())
+                .feedback(attempt.getFeedback())
                 .timeSpent(attempt.getTimeSpent())
                 .parts(attempt.getExam().getListeningParts() == null ? null : 
                     buildPartResponses(attempt.getExam().getListeningParts(), answerMap, questionTypes))

@@ -20,6 +20,8 @@ import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.BadRequestException;
 import vn.aimhigh.aimhighbackend.exception.ResourceNotFoundException;
 import vn.aimhigh.aimhighbackend.enums.VocabularySourceType;
+import vn.aimhigh.aimhighbackend.model.Folder;
+import vn.aimhigh.aimhighbackend.model.Topic;
 import vn.aimhigh.aimhighbackend.model.User;
 import vn.aimhigh.aimhighbackend.model.UserVocabulary;
 import vn.aimhigh.aimhighbackend.model.UserVocabularyGroup;
@@ -73,7 +75,7 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Integer page, Integer size, Long userId) {
+    public List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Long topicId, Integer page, Integer size, Long userId) {
         int safePage = page == null || page < 0 ? 0 : page;
         int safeSize = size == null ? 50 : Math.min(Math.max(size, 1), 200);
         String normalizedPos = trimToNull(partOfSpeech);
@@ -84,6 +86,7 @@ public class VocabularyServiceImpl implements VocabularyService {
         return vocabularyRepository.searchVocabulary(
                         trimToNull(keyword),
                         normalizedPos,
+                        topicId,
                         PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.ASC, "word"))
                 )
                 .stream()
@@ -185,7 +188,7 @@ public class VocabularyServiceImpl implements VocabularyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<VocabularyResponse> getUserVocabulary(
             Long userId,
             Boolean learned,
@@ -373,7 +376,7 @@ public class VocabularyServiceImpl implements VocabularyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<UserVocabularyGroupResponse> getUserVocabularyGroups(Long userId) {
         ensureDefaultGroup(userId);
         return userVocabularyGroupRepository.findByUserIdOrderByCreatedAtAsc(userId).stream()
@@ -625,6 +628,8 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .toList();
 
         UserVocabularyGroup group = userVocabulary == null ? null : userVocabulary.getGroup();
+        Topic topic = effectiveVocab == null ? null : effectiveVocab.getTopic();
+        Folder folder = topic == null ? null : topic.getFolder();
 
         return VocabularyResponse.builder()
                 .id(effectiveVocab == null ? null : effectiveVocab.getId())
@@ -636,6 +641,10 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .audioUrl(effectiveVocab == null ? null : effectiveVocab.getAudioUrl())
                 .imageUrl(effectiveVocab == null ? null : effectiveVocab.getImageUrl())
                 .related(effectiveVocab == null ? null : effectiveVocab.getRelated())
+                .topicId(topic == null ? null : topic.getId())
+                .topicName(topic == null ? null : topic.getName())
+                .folderId(folder == null ? null : folder.getId())
+                .folderName(folder == null ? null : folder.getName())
                 .examples(examples)
                 .isSaved(userVocabulary != null)
                 .userVocabularyId(userVocabulary == null ? null : userVocabulary.getId())

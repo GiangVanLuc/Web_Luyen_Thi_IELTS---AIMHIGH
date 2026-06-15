@@ -4092,3 +4092,84 @@ body.listening-page.review-mode .review-focus-highlight {
     }
 }
 
+
+/* ============================================================
+   PHA 1+2+3 — Matching listening / Map-Diagram labelling / MCQ chọn-2
+   ============================================================ */
+
+/* Matching kéo-thả cho Listening (mirror từ reading-page) */
+body.listening-page .match-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 12px 10px;margin-bottom:9px;}
+body.listening-page .match-row{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:center;border:none;background:transparent;padding:0;margin:0 0 10px;}
+body.listening-page .match-row:last-child{margin-bottom:0;}
+body.listening-page .match-slot{height:40px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text-1);
+    font-size:1.05rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+body.listening-page .match-slot:hover{border-color:var(--primary);}
+body.listening-page .match-slot.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(212,160,23,.16);}
+body.listening-page .match-slot.filled{border-color:var(--success);background:rgba(22,163,74,.06);color:#166534;}
+body.listening-page .match-qtext{font-size:.85rem;color:var(--text-1);line-height:1.5;}
+body.listening-page .match-options-wrap{margin-top:6px;}
+body.listening-page .match-options-title{font-size:.72rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-2);margin-bottom:8px;}
+body.listening-page .match-options{display:flex;flex-wrap:wrap;gap:8px;}
+body.listening-page .match-chip{border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:7px 12px;
+    font-size:.9rem;font-weight:600;color:var(--text-1);cursor:grab;transition:all .15s;font-family:var(--font);}
+body.listening-page .match-chip:hover{border-color:var(--primary);background:rgba(212,160,23,.05);}
+body.listening-page .match-chip:active{cursor:grabbing;}
+body.listening-page .summary-block{background:#fff;border:1px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:9px;font-size:.85rem;line-height:2.1;color:var(--text-1);}
+body.listening-page .fill-block{background:#fff;border-radius:9px;border:1px solid var(--border);padding:13px 15px;margin-bottom:9px;}
+body.listening-page .fill-title{font-size:.75rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;}
+
+/* Chip đang chọn (touch flow) — dùng chung */
+body.reading-page .match-chip.selected,
+body.listening-page .match-chip.selected{border-color:var(--primary);background:var(--primary);color:#fff;}
+
+/* ── Map / Diagram labelling (dùng chung Reading + Listening) ── */
+body.reading-page .map-label-block,
+body.listening-page .map-label-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:9px;}
+body.reading-page .map-label-canvas,
+body.listening-page .map-label-canvas{position:relative;display:inline-block;max-width:100%;line-height:0;}
+body.reading-page .map-label-img,
+body.listening-page .map-label-img{max-width:100%;height:auto;border-radius:8px;display:block;user-select:none;}
+body.reading-page .map-zone,
+body.listening-page .map-zone{position:absolute;transform:translate(-50%,-50%);min-width:34px;height:30px;padding:0 6px;
+    display:inline-flex;align-items:center;gap:4px;border:2px solid var(--primary);border-radius:8px;background:rgba(255,255,255,.95);
+    color:var(--text-1);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.12);}
+body.reading-page .map-zone:hover,
+body.listening-page .map-zone:hover{box-shadow:0 0 0 3px rgba(212,160,23,.2);}
+body.reading-page .map-zone.active,
+body.listening-page .map-zone.active{box-shadow:0 0 0 3px rgba(212,160,23,.35);}
+body.reading-page .map-zone.filled,
+body.listening-page .map-zone.filled{border-color:var(--success);background:rgba(22,163,74,.12);color:#166534;}
+body.reading-page .map-zone-num,
+body.listening-page .map-zone-num{opacity:.65;font-size:.7rem;}
+body.reading-page .map-zone-val,
+body.listening-page .map-zone-val{font-weight:800;}
+body.reading-page .map-label-rows,
+body.listening-page .map-label-rows{display:flex;flex-direction:column;gap:9px;margin-top:10px;}
+body.reading-page .map-row,
+body.listening-page .map-row{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;}
+body.reading-page .map-label-options,
+body.listening-page .map-label-options{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;}
+
+/* ── MCQ chọn-2 (MULTIPLE_CHOICE_MULTI) — dùng chung ── */
+body.reading-page .mcq-multi,
+body.listening-page .mcq-multi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:9px;}
+body.reading-page .mcq-multi-head,
+body.listening-page .mcq-multi-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+body.reading-page .mcq-multi-badge,
+body.listening-page .mcq-multi-badge{min-width:24px;height:24px;border-radius:6px;background:var(--primary);color:#fff;
+    font-size:.72rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;}
+body.reading-page .mcq-multi-badge.done,
+body.listening-page .mcq-multi-badge.done{background:var(--success);}
+body.reading-page .mcq-multi-hint,
+body.listening-page .mcq-multi-hint{font-size:.74rem;color:var(--text-2);font-weight:600;}
+body.reading-page .mcq-multi-opt,
+body.listening-page .mcq-multi-opt{display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border:1.5px solid var(--border);
+    border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;font-size:.86rem;color:var(--text-1);}
+body.reading-page .mcq-multi-opt:hover,
+body.listening-page .mcq-multi-opt:hover{border-color:var(--primary);background:rgba(212,160,23,.04);}
+body.reading-page .mcq-multi-opt.checked,
+body.listening-page .mcq-multi-opt.checked{border-color:var(--success);background:rgba(22,163,74,.06);}
+body.reading-page .mcq-multi-opt input,
+body.listening-page .mcq-multi-opt input{margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;}
+body.reading-page .mcq-multi-opt.disabled,
+body.listening-page .mcq-multi-opt.disabled{opacity:.55;cursor:not-allowed;}

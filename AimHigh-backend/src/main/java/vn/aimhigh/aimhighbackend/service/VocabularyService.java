@@ -18,7 +18,7 @@ import java.util.List;
 public interface VocabularyService {
     VocabularyResponse lookup(String word, Long userId);
 
-    List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Integer page, Integer size, Long userId);
+    List<VocabularyResponse> getGlobalVocabulary(String keyword, String partOfSpeech, Long topicId, Integer page, Integer size, Long userId);
 
     VocabularyResponse saveToUserVocabulary(SaveVocabularyRequest request, Long userId);
 

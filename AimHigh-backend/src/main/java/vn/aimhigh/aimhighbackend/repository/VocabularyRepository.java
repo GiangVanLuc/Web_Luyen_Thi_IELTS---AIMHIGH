@@ -19,6 +19,8 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
 
     List<Vocabulary> findByTopicId(Long topicId);
 
+    long countByTopicId(Long topicId);
+
     @Query("""
         select v from Vocabulary v
         where (:keyword is null
@@ -26,10 +28,12 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
                 or lower(coalesce(v.meaning, '')) like lower(concat('%', :keyword, '%'))
                 or lower(coalesce(v.viMeaning, '')) like lower(concat('%', :keyword, '%')))
           and (:partOfSpeech is null or lower(coalesce(v.partOfSpeech, '')) = lower(:partOfSpeech))
+          and (:topicId is null or v.topic.id = :topicId)
     """)
     Page<Vocabulary> searchVocabulary(
             @Param("keyword") String keyword,
             @Param("partOfSpeech") String partOfSpeech,
+            @Param("topicId") Long topicId,
             Pageable pageable
     );
 }

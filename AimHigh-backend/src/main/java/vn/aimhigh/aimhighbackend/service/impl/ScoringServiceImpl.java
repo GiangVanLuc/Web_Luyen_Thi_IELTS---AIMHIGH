@@ -89,15 +89,23 @@ public class ScoringServiceImpl implements ScoringService {
 
     public Boolean scoreAnswer(Question question, String answerText) {
         if (answerText == null || answerText.trim().isEmpty() || question.getCorrectAnswer() == null) return false;
-        
+
+        String key = question.getCorrectAnswer().trim();
+
+        // Câu chọn-2 / đa đáp án: đáp án là tập chữ cái (vd "A,E" hoặc "AE") -> so khớp không phụ thuộc thứ tự.
+        if (isLetterSet(key)) {
+            return scoreLetterSet(key, answerText);
+        }
+
         String actualStr = sanitize(answerText);
-        String[] possibleAnswers = question.getCorrectAnswer().split("/");
-        
+        // Chấp nhận cả '/' và '|' làm dấu phân tách biến thể đáp án.
+        String[] possibleAnswers = key.split("[/|]");
+
         for (String expectedVar : possibleAnswers) {
             if (isTrueFalseShortcut(actualStr, sanitize(expectedVar))) {
                 return true;
             }
-            
+
             java.util.List<String> combinations = generateCombinations(expectedVar);
             for (String combo : combinations) {
                 if (actualStr.equals(sanitize(combo))) {
@@ -106,6 +114,53 @@ public class ScoringServiceImpl implements ScoringService {
             }
         }
         return false;
+    }
+
+    /**
+     * Đáp án dạng tập chữ cái (choose-two / multiple answers), vd "A,E", "A E", "AE", "BD".
+     * KHÔNG coi "A/E" hay "A|E" là tập (đó là biến thể OR cho câu điền).
+     */
+    private boolean isLetterSet(String key) {
+        if (key == null || key.contains("/") || key.contains("|")) {
+            return false;
+        }
+        String trimmed = key.trim();
+        // Dạng có dấu phân tách: "A,E" | "A E" | "A, E"
+        if (trimmed.matches("(?i)[a-i]([,\\s]+[a-i])+")) {
+            return true;
+        }
+        // Dạng chữ HOA viết liền (đáp án choose-two chuẩn): "AE", "BD"
+        return trimmed.matches("[A-I]{2,5}");
+    }
+
+    /**
+     * Chấm câu chọn nhiều đáp án:
+     *  - FE nộp nguyên bộ ("A,E") -> đúng khi tập trùng khớp hoàn toàn.
+     *  - FE nộp tách từng số câu ("A") -> đúng khi chữ cái đó nằm trong tập đáp án.
+     */
+    private boolean scoreLetterSet(String key, String answerText) {
+        java.util.Set<Character> keySet = lettersOf(key);
+        java.util.Set<Character> ansSet = lettersOf(answerText);
+        if (ansSet.isEmpty() || keySet.isEmpty()) {
+            return false;
+        }
+        if (ansSet.equals(keySet)) {
+            return true;
+        }
+        return ansSet.size() == 1 && keySet.containsAll(ansSet);
+    }
+
+    private java.util.Set<Character> lettersOf(String value) {
+        java.util.Set<Character> set = new java.util.LinkedHashSet<>();
+        if (value == null) {
+            return set;
+        }
+        for (char c : value.toUpperCase(java.util.Locale.ROOT).toCharArray()) {
+            if (c >= 'A' && c <= 'I') {
+                set.add(c);
+            }
+        }
+        return set;
     }
 
     private java.util.List<String> generateCombinations(String format) {

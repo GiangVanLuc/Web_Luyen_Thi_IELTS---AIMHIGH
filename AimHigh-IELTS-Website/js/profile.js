@@ -21,10 +21,7 @@
         bindEvents();
 
         const user = getStoredUser();
-        if (String(user.role || '').toUpperCase() === 'ADMIN') {
-            window.location.href = 'admin/dashboard.html';
-            return;
-        }
+
 
         if (!isAuthenticated()) {
             const redirect = encodeURIComponent('profile.html');

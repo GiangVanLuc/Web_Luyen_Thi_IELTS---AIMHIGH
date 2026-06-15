@@ -1,0 +1,35 @@
+[
+  {
+    "word": "ubiquitous",
+    "ipa": "/juːˈbɪkwɪtəs/",
+    "partOfSpeech": "adjective",
+    "meaning": "present, appearing, or found everywhere",
+    "viMeaning": "có mặt ở khắp nơi",
+    "folder": "Advanced",
+    "topic": "Technology",
+    "exampleEn": "Computers are becoming increasingly ubiquitous.",
+    "exampleVi": "Máy tính đang ngày càng trở nên phổ biến ở khắp nơi."
+  },
+  {
+    "word": "mitigate",
+    "ipa": "/ˈmɪtɪɡeɪt/",
+    "partOfSpeech": "verb",
+    "meaning": "make less severe, serious, or painful",
+    "viMeaning": "làm giảm nhẹ, làm dịu bớt",
+    "folder": "Advanced",
+    "topic": "Environment",
+    "exampleEn": "Action is needed to mitigate the effects of climate change.",
+    "exampleVi": "Cần có hành động để giảm thiểu tác động của biến đổi khí hậu."
+  },
+  {
+    "word": "sustainable",
+    "ipa": "/səˈsteɪnəbl/",
+    "partOfSpeech": "adjective",
+    "meaning": "able to be maintained at a certain rate or level",
+    "viMeaning": "bền vững",
+    "folder": "Basic",
+    "topic": "Environment",
+    "exampleEn": "We need to find sustainable sources of energy.",
+    "exampleVi": "Chúng ta cần tìm ra các nguồn năng lượng bền vững."
+  }
+]

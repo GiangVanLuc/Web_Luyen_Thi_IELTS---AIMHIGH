@@ -999,6 +999,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.add('practice-mode');
     }
     await loadExam();
+
+    // Đồng bộ danh sách nhóm từ vựng của người dùng (nếu đã đăng nhập) để chọn khi lưu từ
+    if (localStorage.getItem('aimhigh_token') && typeof apiGetUserVocabGroups === 'function') {
+        try {
+            const res = await apiGetUserVocabGroups();
+            const remote = res?.data || res || [];
+            const names = Array.isArray(remote)
+                ? remote.map(g => String(g?.name || '').trim()).filter(Boolean)
+                : [];
+            if (names.length) saveVocabGroups([...new Set(names)]);
+        } catch (_) { /* giữ nhóm mặc định nếu đồng bộ lỗi */ }
+    }
 });
 
 async function loadExam() {
@@ -1493,11 +1505,42 @@ function getGroupInstruction(g, sec, display, questions) {
     return `Answer questions ${from}-${to} based on the reading passage.`;
 }
 
+// Ưu tiên canonical group.type (Pha 0); fallback heuristic resolveDisplayTypeForGroup.
+function resolveRenderKind(g) {
+    const canonical = String(g.type || '').toUpperCase();
+    switch (canonical) {
+        case 'MULTIPLE_CHOICE_MULTI': return 'MULTIPLE_CHOICE_MULTI';
+        case 'MULTIPLE_CHOICE': return 'MULTIPLE_CHOICE';
+        case 'TRUE_FALSE_NOTGIVEN':
+        case 'YES_NO_NOTGIVEN': return 'TRUE_FALSE_NG';
+        case 'MATCHING': return 'MATCHING';
+        case 'MAP_LABELLING': return 'MAP_LABELLING';
+        case 'DIAGRAM_LABELLING': return 'DIAGRAM_LABELLING';
+        case 'TABLE_COMPLETION': return 'TABLE_COMPLETION';
+        case 'SUMMARY_COMPLETION': return 'SUMMARY_COMPLETION';
+        case 'SUMMARY_WORDBANK': return 'SUMMARY_WORDBANK';
+        case 'NOTE_COMPLETION':
+        case 'FORM_COMPLETION':
+        case 'FLOWCHART_COMPLETION':
+        case 'SENTENCE_COMPLETION': return 'FILL_BLOCK';
+        default: break;
+    }
+    // Không có canonical → dùng heuristic cũ, rồi tinh chỉnh chọn-2/labelling.
+    let display = resolveDisplayTypeForGroup(g);
+    if (display === 'MULTIPLE_CHOICE') {
+        const qs = Array.isArray(g.questions) ? g.questions : [];
+        if (Number(g.maxSelect) >= 2 || qs.some(q => Number(q.maxSelect) >= 2)) return 'MULTIPLE_CHOICE_MULTI';
+    }
+    if (display === 'MATCHING' && Array.isArray(g.dropZones) && g.dropZones.length) return 'MAP_LABELLING';
+    if (display === 'MATCHING_HEADINGS') return 'MATCHING';
+    return display;
+}
+
 function renderGroup(g, sec) {
-    const display = resolveDisplayTypeForGroup(g);
+    const display = resolveRenderKind(g);
     const sourceQuestions = (g.questions || []).length
         ? (g.questions || [])
-        : buildFallbackQuestions(g, sec, display);
+        : buildFallbackQuestions(g, sec, display === 'MULTIPLE_CHOICE_MULTI' ? 'MULTIPLE_CHOICE' : display);
     const groupInstruction = getGroupInstruction(g, sec, display, sourceQuestions);
 
     let html = `<div style="height:8px;"></div>
@@ -1510,6 +1553,20 @@ function renderGroup(g, sec) {
         case 'TRUE_FALSE_NG':
         case 'MULTIPLE_CHOICE':
             sourceQuestions.forEach(q => { html += renderQItem(q); });
+            break;
+
+        case 'MULTIPLE_CHOICE_MULTI':
+            html += renderMcqMulti(g, sourceQuestions);
+            break;
+
+        case 'MAP_LABELLING':
+        case 'DIAGRAM_LABELLING':
+            sourceQuestions.forEach(q => rememberQuestionId(q));
+            html += (window.ExamLabelling ? ExamLabelling.render(g) : renderMatchingDrag(sourceQuestions, g, 'MATCHING', sec));
+            break;
+
+        case 'SUMMARY_WORDBANK':
+            html += renderSummaryWordbank(g, sourceQuestions);
             break;
 
         case 'MATCHING':
@@ -1731,6 +1788,95 @@ function renderSummaryCompletion(g) {
     let html = `<div class="summary-block">`;
     if (g.summaryTitle) html += `<strong>${eh(g.summaryTitle)}</strong><br><br>`;
     html += tpl + `</div>`;
+    return html;
+}
+
+// ── MCQ chọn-2 (MULTIPLE_CHOICE_MULTI) ──────────────────────────────────────
+function renderMcqMulti(g, questions) {
+    const qNums = questions.map(q => Number(q.questionNumber)).filter(n => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+    questions.forEach(q => rememberQuestionId(q));
+    const maxSelect = Number(g.maxSelect) || Number(questions[0]?.maxSelect) || qNums.length || 2;
+    const groupId = qNums.join('_');
+    const choices = (g.choices && g.choices.length) ? g.choices : (questions[0]?.choices || []);
+    const fromTo = qNums.length ? `${qNums[0]}–${qNums[qNums.length - 1]}` : '';
+
+    let html = `<div class="mcq-multi" id="mcm${groupId}" data-qnums="${qNums.join(',')}" data-max="${maxSelect}">
+        <div class="mcq-multi-head">
+            <span class="mcq-multi-badge" id="mcmb${groupId}">${fromTo}</span>
+            <span class="mcq-multi-hint">Chọn ${maxSelect} đáp án</span>
+        </div>`;
+    choices.forEach(c => {
+        const label = String(c.label || '').trim();
+        const display = formatChoiceDisplay(c);
+        html += `<label class="mcq-multi-opt" id="mco${groupId}_${eh(label)}">
+            <input type="checkbox" value="${eh(label)}" onchange="onMcqMultiChange('${groupId}')">
+            <span>${eh(display)}</span>
+        </label>`;
+    });
+    html += `</div>`;
+    return html;
+}
+
+function onMcqMultiChange(groupId) {
+    const wrap = document.getElementById('mcm' + groupId);
+    if (!wrap) return;
+    const max = Number(wrap.dataset.max) || 2;
+    const qNums = String(wrap.dataset.qnums || '').split(',').map(n => Number(n)).filter(Boolean);
+    const boxes = Array.from(wrap.querySelectorAll('input[type="checkbox"]'));
+    let selected = boxes.filter(b => b.checked).map(b => b.value);
+
+    if (selected.length > max) {
+        const last = boxes.slice().reverse().find(b => b.checked);
+        if (last) last.checked = false;
+        selected = boxes.filter(b => b.checked).map(b => b.value);
+    }
+
+    boxes.forEach(b => b.closest('.mcq-multi-opt')?.classList.toggle('checked', b.checked));
+    const full = selected.length >= max;
+    const answer = full ? selected.slice().sort().join(',') : '';
+    qNums.forEach(qn => pa(qn, answer));
+
+    const badge = document.getElementById('mcmb' + groupId);
+    if (badge) badge.classList.toggle('done', full);
+}
+
+// Token cho word-bank: chấp nhận matchOptions là chuỗi ("A") hoặc object {letter,text}.
+function resolveWordbankOptions(g) {
+    if (Array.isArray(g.matchOptions) && g.matchOptions.length) {
+        return g.matchOptions.map(o => {
+            if (o && typeof o === 'object') {
+                return { value: String(o.letter || o.label || o.id || '').trim(), text: String(o.text || o.value || o.name || '').trim() };
+            }
+            return { value: String(o || '').trim(), text: '' };
+        }).filter(o => o.value);
+    }
+    return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(l => ({ value: l, text: '' }));
+}
+
+// ── Summary với word-bank (kéo cụm từ A–H vào ô) ────────────────────────────
+function renderSummaryWordbank(g, questions) {
+    const opts = resolveWordbankOptions(g);
+    let tpl = g.summaryTemplate || '';
+    questions.forEach(q => {
+        rememberQuestionId(q);
+        const qn = q.questionNumber;
+        const slot = `<input type="hidden" id="q${qn}" value="">` +
+            `<button type="button" class="match-slot" id="ms${qn}" data-q="${qn}" style="display:inline-flex;min-width:90px;height:30px;vertical-align:middle;"
+                onclick="focusMatchSlot(${qn})" ondblclick="clearMatchAnswer(${qn})"
+                ondragover="onMatchDragOver(event)" ondrop="onMatchDrop(event,${qn})">
+                <span class="match-slot-text" id="mst${qn}">${qn}</span></button>`;
+        tpl = tpl.replace(`[${qn}]`, slot);
+    });
+    let html = `<div class="summary-block">`;
+    if (g.summaryTitle) html += `<strong>${eh(g.summaryTitle)}</strong><br><br>`;
+    html += tpl;
+    html += `<div class="match-options-wrap" style="margin-top:12px;"><div class="match-options-title">List of options</div><div class="match-options">`;
+    opts.forEach(opt => {
+        const display = opt.text ? `${opt.value}. ${opt.text}` : opt.value;
+        html += `<button type="button" class="match-chip" data-val="${eh(opt.value)}" draggable="true"
+            ondragstart="onMatchDragStart(event,this.dataset.val)" onclick="onMatchOptionClick(this.dataset.val)">${eh(display)}</button>`;
+    });
+    html += `</div></div></div>`;
     return html;
 }
 
@@ -2363,6 +2509,10 @@ function showVP(x,y,word) {
             opt.textContent = g;
             select.appendChild(opt);
         });
+        const newOpt = document.createElement('option');
+        newOpt.value = '__new__';
+        newOpt.textContent = '➕ Tạo nhóm mới…';
+        select.appendChild(newOpt);
     }
 
     // Position popup
@@ -2381,33 +2531,63 @@ function closeVP(){
 
 async function saveVW() {
     const groupSelect = document.getElementById('vocabGroupSelect');
-    const group = groupSelect ? groupSelect.value : 'IELTS Reading';
-    
+    let group = groupSelect ? groupSelect.value : 'IELTS Reading';
+
     if (!selectedWord) return;
-    if (!group && groupSelect) {
+
+    // Cho phép tạo nhóm mới ngay khi lưu
+    if (group === '__new__') {
+        const newName = (prompt('Tên nhóm từ vựng mới:') || '').trim();
+        if (!newName) return;
+        group = newName;
+        const groups = getVocabGroups();
+        if (!groups.includes(newName)) {
+            groups.push(newName);
+            saveVocabGroups(groups);
+        }
+    }
+
+    if (!group) {
         alert('Vui lòng chọn hoặc tạo nhóm từ!');
         return;
     }
 
+    if (!localStorage.getItem('aimhigh_token')) {
+        alert('Bạn cần đăng nhập để lưu từ vựng vào sổ tay.');
+        return;
+    }
+
     try {
-        // Gọi lookup để lấy vocabId và kiểm tra xem đã lưu chưa
-        const response = await apiLookupVocab(selectedWord);
-        const vocabData = response.data || response;
-        if (vocabData.isSaved) {
+        // 1) Thử tra trong kho AimHigh Pick để lấy vocabId
+        let vocabData = null;
+        try {
+            const response = await apiLookupVocab(selectedWord);
+            vocabData = response?.data || response;
+        } catch (lookupErr) {
+            vocabData = null; // Không có trong AimHigh Pick -> lưu dạng từ cá nhân
+        }
+
+        if (vocabData && vocabData.isSaved) {
             alert(`Từ "${selectedWord}" đã có sẵn trong sổ tay từ vựng!`);
             closeVP();
             return;
         }
-        // Gọi API lưu từ vựng
-        await apiSaveUserVocab(vocabData.id, group);
-        
+
+        if (vocabData && vocabData.id) {
+            // Từ có trong AimHigh Pick -> lưu theo vocabId
+            await apiSaveUserVocab(vocabData.id, { groupName: group });
+        } else {
+            // Từ không có trong AimHigh Pick -> lưu thành từ cá nhân (custom)
+            await apiSaveCustomUserVocab({ word: selectedWord, groupName: group });
+        }
+
         recordVocabActivity();
         highlightWordInPassage(selectedWord);
-        
-        alert(`Đã lưu từ vựng: "${selectedWord}"`);
+        alert(`Đã lưu từ "${selectedWord}" vào nhóm "${group}"`);
         closeVP();
     } catch (e) {
-        alert("Có lỗi xảy ra khi lưu từ vựng!");
+        const msg = e?.message || 'Lỗi không xác định';
+        alert(`Có lỗi xảy ra khi lưu từ vựng: ${msg}`);
         console.error("Save Vocab Error:", e);
     }
 }

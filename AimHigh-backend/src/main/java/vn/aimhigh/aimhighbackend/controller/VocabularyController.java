@@ -17,10 +17,12 @@ import vn.aimhigh.aimhighbackend.dto.request.UserVocabularyUpdateRequest;
 import vn.aimhigh.aimhighbackend.dto.response.ApiResponse;
 import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyBatchResultResponse;
 import vn.aimhigh.aimhighbackend.dto.response.UserVocabularyGroupResponse;
+import vn.aimhigh.aimhighbackend.dto.response.VocabularyFolderResponse;
 import vn.aimhigh.aimhighbackend.dto.response.VocabularyResponse;
 import vn.aimhigh.aimhighbackend.exception.UnauthorizedException;
 import vn.aimhigh.aimhighbackend.service.UserService;
 import vn.aimhigh.aimhighbackend.service.VocabularyService;
+import vn.aimhigh.aimhighbackend.service.VocabularyTaxonomyService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +33,13 @@ import java.util.List;
 public class VocabularyController {
 
     private final VocabularyService vocabularyService;
+    private final VocabularyTaxonomyService vocabularyTaxonomyService;
     private final UserService userService;
+
+    @GetMapping("/vocabulary/taxonomy")
+    public ResponseEntity<ApiResponse<List<VocabularyFolderResponse>>> getVocabularyTaxonomy() {
+        return ResponseEntity.ok(ApiResponse.success(vocabularyTaxonomyService.getTree()));
+    }
 
     @GetMapping("/vocabulary/lookup")
     public ResponseEntity<ApiResponse<VocabularyResponse>> lookup(
@@ -45,11 +53,12 @@ public class VocabularyController {
     public ResponseEntity<ApiResponse<List<VocabularyResponse>>> getGlobalVocabulary(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String partOfSpeech,
+            @RequestParam(required = false) Long topicId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             Authentication authentication) {
         Long userId = userService.requireUser(authentication).getId();
-        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getGlobalVocabulary(q, partOfSpeech, page, size, userId)));
+        return ResponseEntity.ok(ApiResponse.success(vocabularyService.getGlobalVocabulary(q, partOfSpeech, topicId, page, size, userId)));
     }
 
     @PostMapping("/user-vocabulary")

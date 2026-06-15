@@ -255,27 +255,29 @@ async function syncUserVocabularyFromBackend() {
         ]);
 
         const remoteGroups = groupsResponse?.data || groupsResponse || [];
-        const localGroups = getGroups();
+        // Backend là nguồn sự thật: dựng lại danh sách nhóm từ backend (không giữ nhóm mẫu cũ)
+        const groups = [];
         if (Array.isArray(remoteGroups)) {
             remoteGroups.forEach((groupItem) => {
                 const groupName = String(groupItem?.name || '').trim();
                 const groupId = Number(groupItem?.id);
                 if (!groupName) return;
-                if (!localGroups.includes(groupName)) {
-                    localGroups.push(groupName);
-                }
+                if (!groups.includes(groupName)) groups.push(groupName);
                 if (Number.isFinite(groupId) && groupId > 0) {
                     setGroupMeta(groupName, { id: groupId, name: groupName });
                 }
             });
-            saveGroups(localGroups);
         }
 
         const remoteList = response?.data || response || [];
-        if (!Array.isArray(remoteList)) return;
+        if (!Array.isArray(remoteList)) {
+            saveGroups(groups);
+            saveData([]);
+            return;
+        }
 
-        const data = getData();
-        const groups = getGroups();
+        // Dựng lại toàn bộ từ vựng đã lưu từ backend (ghi đè cache local)
+        const data = [];
 
         remoteList.forEach((item) => {
             const backendVocabId = Number(item?.id);
@@ -448,21 +450,15 @@ saveWordToBackend = saveWordToBackendV2;
 function initData() {
     normalizeVocabularyStorage();
 
-    let initialized = localStorage.getItem('aimhigh_vocab_init');
-    const groups = getGroups();
-    const hasBasicGroup = groups.some((name) => name.startsWith('Basic'));
-    const hasAdvancedGroup = groups.some((name) => name.startsWith('Adv'));
-
-    if (!initialized || !hasBasicGroup || !hasAdvancedGroup) {
-        seedPresetVocabularies();
-        localStorage.setItem('aimhigh_vocab_init', 'true');
-    }
-
-    let customSeeded = localStorage.getItem('aimhigh_custom_seeded_v3');
-    const hasCustomWords = getData().some((item) => item?.group && !String(item.group).startsWith('Basic') && !String(item.group).startsWith('Adv'));
-    if (!customSeeded || !hasCustomWords) {
-        seedCustomVocabularies();
-        localStorage.setItem('aimhigh_custom_seeded_v3', 'true');
+    // Migration 1 lần: xoá dữ liệu mẫu cũ trong localStorage để chuyển sang backend-first.
+    // Sổ từ vựng nay lấy dữ liệu thật từ backend (đồng bộ tại syncUserVocabularyFromBackend).
+    if (!localStorage.getItem('aimhigh_vocab_backend_v1')) {
+        localStorage.removeItem(VOCAB_KEY);
+        localStorage.removeItem(GROUPS_KEY);
+        localStorage.removeItem(GROUP_META_KEY);
+        localStorage.removeItem('aimhigh_vocab_init');
+        localStorage.removeItem('aimhigh_custom_seeded_v3');
+        localStorage.setItem('aimhigh_vocab_backend_v1', 'true');
     }
 
     normalizeVocabularyStorage();
@@ -858,6 +854,12 @@ function setCategoryTab(tab) {
 }
 
 function renderGroups() {
+    // Trang chính (không phải sổ cá nhân): hiển thị kho AimHigh Pick từ backend
+    if (currentVocabularyPage !== 'notebook' && activeCategoryTab !== 'custom') {
+        renderPickFolders();
+        renderPickTopics();
+        return;
+    }
     const groups = getGroups();
     const data = getData();
     const container = document.getElementById('groupsContainer');
@@ -1131,6 +1133,11 @@ function initWordTableControls() {
 
 // ===== WORD TABLE & MODAL =====
 function renderWordTable() {
+    // Trang chính (không phải sổ cá nhân): hiển thị từ vựng AimHigh Pick theo chủ đề
+    if (currentVocabularyPage !== 'notebook' && activeCategoryTab !== 'custom') {
+        renderPickWords();
+        return;
+    }
     const data = getData();
     const scopedWords = data
         .map((item, realIndex) => ({ ...item, _realIndex: realIndex }))
@@ -2047,6 +2054,148 @@ async function syncHeatmapFromBackend() {
 }
 
 // ===== INITIATE =====
+// ===== AimHigh Pick: kho từ vựng chung do admin quản lý (Thư mục > Chủ đề) =====
+let pickFolders = [];
+let pickActiveFolderId = null;
+let pickActiveTopicId = null;
+let pickWords = [];
+
+async function loadAimhighPick() {
+    try {
+        const res = (typeof getVocabTaxonomy === 'function') ? await getVocabTaxonomy() : null;
+        const data = res && (res.data || res);
+        pickFolders = Array.isArray(data) ? data : [];
+    } catch (e) {
+        pickFolders = [];
+    }
+    if (pickFolders.length) {
+        pickActiveFolderId = pickFolders[0].id;
+        const firstTopic = (pickFolders[0].topics || [])[0];
+        pickActiveTopicId = firstTopic ? firstTopic.id : null;
+    } else {
+        pickActiveFolderId = null;
+        pickActiveTopicId = null;
+    }
+    renderPickFolders();
+    renderPickTopics();
+    await loadPickWords();
+}
+
+function renderPickFolders() {
+    const tabs = document.getElementById('categoryTabs');
+    if (!tabs) return;
+    if (!pickFolders.length) {
+        tabs.innerHTML = '<span class="text-muted" style="font-size:0.85rem;">Kho AimHigh Pick chưa có thư mục nào (chờ admin cập nhật).</span>';
+        return;
+    }
+    tabs.innerHTML = pickFolders.map(f =>
+        `<button class="btn btn-sm ${f.id === pickActiveFolderId ? 'btn-primary' : 'btn-outline-primary'}" type="button" onclick="selectPickFolder(${f.id})">${escapeHtml(f.name)} (${f.wordCount || 0})</button>`
+    ).join('');
+}
+
+function renderPickTopics() {
+    const container = document.getElementById('groupsContainer');
+    if (!container) return;
+    const folder = pickFolders.find(f => f.id === pickActiveFolderId);
+    const topics = folder ? (folder.topics || []) : [];
+    if (!topics.length) {
+        container.innerHTML = '<p class="text-muted" style="font-size:0.9rem;padding:8px;">Thư mục này chưa có chủ đề.</p>';
+        return;
+    }
+    container.innerHTML = '<div class="group-cards">' + topics.map(t =>
+        `<div class="group-card ${t.id === pickActiveTopicId ? 'active' : ''}" onclick="selectPickTopic(${t.id})">
+            <div class="group-card-header"><h4 class="mb-0" style="font-size:1rem;font-weight:700;">${escapeHtml(t.name)}</h4><span class="group-word-count">${t.wordCount || 0} từ</span></div>
+            <p>Chủ đề</p>
+        </div>`
+    ).join('') + '</div>';
+}
+
+function selectPickFolder(folderId) {
+    pickActiveFolderId = folderId;
+    const folder = pickFolders.find(f => f.id === folderId);
+    const firstTopic = folder ? (folder.topics || [])[0] : null;
+    pickActiveTopicId = firstTopic ? firstTopic.id : null;
+    renderPickFolders();
+    renderPickTopics();
+    loadPickWords();
+}
+
+function selectPickTopic(topicId) {
+    pickActiveTopicId = topicId;
+    renderPickTopics();
+    loadPickWords();
+}
+
+async function loadPickWords() {
+    if (!pickActiveTopicId) {
+        pickWords = [];
+        renderPickWords();
+        return;
+    }
+    try {
+        const res = (typeof apiGetGlobalVocab === 'function')
+            ? await apiGetGlobalVocab({ topicId: pickActiveTopicId, size: 200 })
+            : null;
+        const data = res && (res.data || res);
+        pickWords = Array.isArray(data) ? data : [];
+    } catch (e) {
+        pickWords = [];
+    }
+    renderPickWords();
+}
+
+function renderPickWords() {
+    const body = document.getElementById('wordTableBody');
+    const title = document.getElementById('wordTableTitle');
+    const count = document.getElementById('wordTableCount');
+    const folder = pickFolders.find(f => f.id === pickActiveFolderId);
+    const topic = folder ? (folder.topics || []).find(t => t.id === pickActiveTopicId) : null;
+
+    if (title) title.innerHTML = `<i class="bi bi-card-text"></i> ${topic ? escapeHtml(topic.name) : 'AimHigh Pick'}`;
+    if (count) count.textContent = `${pickWords.length} từ`;
+
+    const saveAction = document.getElementById('saveWordsAction');
+    if (saveAction) saveAction.classList.add('d-none');
+
+    if (!body) return;
+    if (!pickWords.length) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Chưa có từ vựng trong chủ đề này.</td></tr>';
+        return;
+    }
+    body.innerHTML = pickWords.map(w => {
+        const example = (w.examples && w.examples[0]) ? (w.examples[0].enSentence || '') : '';
+        const action = w.isSaved
+            ? '<span class="badge bg-success">Đã lưu</span>'
+            : `<button class="btn btn-sm btn-outline-primary" type="button" onclick="savePickWord(${w.id})"><i class="bi bi-bookmark-plus"></i> Lưu</button>`;
+        return `
+        <tr>
+            <td></td>
+            <td style="display:none;"></td>
+            <td><strong>${escapeHtml(w.word || '')}</strong>${w.ipa ? `<div style="font-size:0.8rem;color:#64748b;">${escapeHtml(w.ipa)}</div>` : ''}</td>
+            <td>${escapeHtml(w.partOfSpeech || '')}</td>
+            <td>${escapeHtml(w.viMeaning || w.meaning || '')}</td>
+            <td>${escapeHtml(w.related || '')}</td>
+            <td>${escapeHtml(example)}</td>
+            <td>${action}</td>
+        </tr>`;
+    }).join('');
+}
+
+async function savePickWord(vocabId) {
+    if (!hasBackendAuthToken()) {
+        alert('Bạn cần đăng nhập để lưu từ vào sổ.');
+        return;
+    }
+    const groupName = (prompt('Lưu vào nhóm nào? (nhập tên nhóm, để trống = "Sổ từ vựng")') || '').trim() || 'Sổ từ vựng';
+    try {
+        await apiSaveUserVocab(vocabId, { groupName });
+        alert(`Đã lưu từ vào nhóm "${groupName}".`);
+        await loadPickWords();
+    } catch (e) {
+        alert('Lưu thất bại: ' + (e.message || 'lỗi không xác định'));
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (redirectLegacyVocabularyRoutes()) return;
 
@@ -2061,7 +2210,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         setCategoryTab('custom');
         syncVocabularyMenuActive('custom');
     } else {
-        setCategoryTab('basic');
+        // Trang chính: hiển thị kho AimHigh Pick (Thư mục > Chủ đề) lấy từ backend
+        activeCategoryTab = 'basic';
+        const addGroupContainer = document.getElementById('addGroupContainer');
+        if (addGroupContainer) addGroupContainer.style.display = 'none';
+        const addWordBtn = document.getElementById('addWordBtn');
+        if (addWordBtn) addWordBtn.style.display = 'none';
+        await loadAimhighPick();
         syncVocabularyMenuActive('list');
     }
 

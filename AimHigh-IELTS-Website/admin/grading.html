@@ -55,10 +55,6 @@
                 </a>
 
                 <div class="sidebar-nav-label">Vận hành</div>
-                <a href="notifications.html" class="sidebar-link">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Thông báo</span>
-                </a>
                 <a href="audit-log.html" class="sidebar-link">
                     <i class="bi bi-journal-check"></i>
                     <span>Nhật ký hệ thống</span>
@@ -68,12 +64,6 @@
                 <a href="settings.html" class="sidebar-link">
                     <i class="bi bi-gear"></i>
                     <span>Cài đặt</span>
-                </a>
-
-                <div class="sidebar-nav-label">Khác</div>
-                <a href="../index.html" class="sidebar-link">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                    <span>Xem Website</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -101,9 +91,11 @@
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="../profile.html"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-up-right me-2"></i>Xem Website</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../login.html"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="if(typeof adminLogout === 'function') { adminLogout(); } else { window.location.href='../login.html'; } return false;"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>

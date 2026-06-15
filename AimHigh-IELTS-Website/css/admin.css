@@ -480,6 +480,14 @@
     background: var(--admin-hover);
 }
 
+.admin-table tbody tr.table-row-archived td {
+    color: var(--admin-text-muted);
+}
+
+.admin-table tbody tr.table-row-archived td:first-child strong {
+    color: var(--admin-text-muted);
+}
+
 .admin-table tbody tr:last-child td {
     border-bottom: none;
 }
@@ -642,6 +650,41 @@
 
 .btn-icon-sm:hover { background: var(--admin-hover); color: var(--primary-color); }
 .btn-icon-sm.danger:hover { background: rgba(239, 68, 68, 0.08); color: var(--error-color); }
+
+.btn-icon-sm.publish-toggle {
+    font-size: 1.1rem;
+}
+
+.btn-icon-sm.publish-toggle.is-on {
+    color: var(--success-color);
+}
+
+.btn-icon-sm.publish-toggle.is-off {
+    color: var(--admin-text-muted);
+}
+
+.btn-icon-sm.publish-toggle.is-on:hover {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.btn-icon-sm.publish-toggle.is-off:hover {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary-color);
+}
+
+.btn-icon-sm.publish-toggle.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-icon-sm.publish-toggle.is-loading i {
+    animation: admin-spin 0.8s linear infinite;
+}
+
+@keyframes admin-spin {
+    to { transform: rotate(360deg); }
+}
 
 /* --- Test Builder Split Screen --- */
 .builder-split {
