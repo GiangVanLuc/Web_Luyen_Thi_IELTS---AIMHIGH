@@ -86,7 +86,7 @@
                 <div class="topbar-right">
                     <div class="topbar-search d-none d-md-block">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Tìm kiếm...">
+                        <input type="text" placeholder="Tìm đề thi..." id="topbarSearchTest">
                     </div>
                     <div class="dropdown">
                         <div class="topbar-avatar" data-bs-toggle="dropdown">AD</div>
@@ -102,28 +102,61 @@
             </header>
 
             <main class="admin-content">
+                <section class="manager-summary-grid" aria-label="Tổng quan đề thi">
+                    <div class="manager-stat-item">
+                        <span>Tổng đề</span>
+                        <strong id="statTotal">0</strong>
+                    </div>
+                    <div class="manager-stat-item is-published">
+                        <span>Published</span>
+                        <strong id="statPublished">0</strong>
+                    </div>
+                    <div class="manager-stat-item is-archived">
+                        <span>Archived</span>
+                        <strong id="statArchived">0</strong>
+                    </div>
+                </section>
+
                 <!-- Toolbar -->
-                <div class="admin-card">
-                    <div class="admin-card-header">
-                        <div class="filter-bar">
-                            <select class="form-select" id="filterSkill">
-                                <option value="">Tất cả kỹ năng</option>
-                                <option value="LISTENING">Listening</option>
-                                <option value="READING">Reading</option>
-                                <option value="WRITING">Writing</option>
-                                <option value="SPEAKING">Speaking</option>
-                            </select>
-                            <select class="form-select" id="filterStatus">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="published">Published</option>
-                                <option value="draft">Draft</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                            <input type="text" class="form-control" placeholder="Tìm theo tên đề thi..." id="searchTest">
+                <div class="admin-card test-manager-card">
+                    <div class="admin-card-header test-manager-toolbar">
+                        <div>
+                            <h2 class="admin-card-title">Danh sách đề thi</h2>
+                            <p class="manager-subtitle mb-0">Quản lý hiển thị đề luyện tập, trạng thái và dữ liệu import.</p>
                         </div>
                         <a href="test-builder.html" class="btn-admin-primary">
                             <i class="bi bi-plus-lg"></i> Tạo đề mới
                         </a>
+                    </div>
+
+                    <div class="test-manager-filters">
+                        <div class="filter-bar">
+                            <label class="filter-field">
+                                <span>Kỹ năng</span>
+                                <select class="form-select" id="filterSkill">
+                                    <option value="">Tất cả kỹ năng</option>
+                                    <option value="LISTENING">Listening</option>
+                                    <option value="READING">Reading</option>
+                                    <option value="WRITING">Writing</option>
+                                    <option value="SPEAKING">Speaking</option>
+                                </select>
+                            </label>
+                            <label class="filter-field">
+                                <span>Trạng thái</span>
+                                <select class="form-select" id="filterStatus">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="published">Published</option>
+                                    <option value="archived">Archived</option>
+                                </select>
+                            </label>
+                            <label class="filter-field filter-field-search">
+                                <span>Tìm kiếm</span>
+                                <input type="text" class="form-control" placeholder="Tìm theo tên đề thi..." id="searchTest">
+                            </label>
+                        </div>
+                        <button class="btn-admin-outline" id="btnResetFilters" type="button">
+                            <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+                        </button>
                     </div>
 
                     <!-- Table -->
@@ -147,16 +180,19 @@
 
                     <!-- Pagination -->
                     <div class="admin-pagination">
-                        <div class="admin-pagination-info" id="testTableInfo">Đang tải dữ liệu...</div>
-                        <div class="admin-pagination-btns">
-                            <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn">2</button>
-                            <button class="page-btn">3</button>
-                            <button class="page-btn">...</button>
-                            <button class="page-btn">18</button>
-                            <button class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        <div class="admin-pagination-left">
+                            <div class="admin-pagination-info" id="testTableInfo">Đang tải dữ liệu...</div>
+                            <label class="page-size-control">
+                                <span>Mỗi trang</span>
+                                <select id="pageSizeSelect" class="form-select form-select-sm">
+                                    <option value="5">5</option>
+                                    <option value="8" selected>8</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </label>
                         </div>
+                        <div class="admin-pagination-btns" id="paginationBtns"></div>
                     </div>
                 </div>
             </main>
@@ -181,34 +217,124 @@
             return 'archived';
         }
 
-        function renderExamRows(exams) {
+        function statusLabel(status) {
+            const s = String(status || '').toLowerCase();
+            if (s === 'published') return 'Đã xuất bản';
+            if (s === 'draft') return 'Bản nháp';
+            return 'Đã lưu trữ';
+        }
+
+        function skillLabel(skill) {
+            const s = String(skill || '').toUpperCase();
+            if (s === 'LISTENING') return 'Listening';
+            if (s === 'READING') return 'Reading';
+            if (s === 'WRITING') return 'Writing';
+            if (s === 'SPEAKING') return 'Speaking';
+            return skill || '--';
+        }
+
+        function skillClass(skill) {
+            return String(skill || '').toLowerCase();
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        const tableState = {
+            exams: [],
+            currentPage: 1,
+            pageSize: 8,
+            isLoading: false
+        };
+
+        function getFilters() {
+            return {
+                skill: document.getElementById('filterSkill')?.value || '',
+                status: document.getElementById('filterStatus')?.value || '',
+                search: document.getElementById('searchTest')?.value?.trim() || ''
+            };
+        }
+
+        function updateStats(exams) {
+            const list = Array.isArray(exams) ? exams : [];
+            const count = (status) => list.filter(exam => String(exam.status || '').toLowerCase() === status).length;
+            document.getElementById('statTotal').textContent = String(list.length);
+            document.getElementById('statPublished').textContent = String(count('published'));
+            document.getElementById('statArchived').textContent = String(count('archived'));
+        }
+
+        function setTableLoading() {
+            const body = document.getElementById('testTableBody');
+            const info = document.getElementById('testTableInfo');
+            if (!body) return;
+            body.innerHTML = '<tr><td colspan="8"><div class="manager-table-state"><span class="spinner-border spinner-border-sm"></span> Đang tải danh sách đề...</div></td></tr>';
+            if (info) info.textContent = 'Đang tải dữ liệu...';
+            renderPagination(0);
+        }
+
+        function getVisiblePageItems() {
+            const total = tableState.exams.length;
+            const totalPages = Math.max(1, Math.ceil(total / tableState.pageSize));
+            tableState.currentPage = Math.min(Math.max(1, tableState.currentPage), totalPages);
+            const startIndex = (tableState.currentPage - 1) * tableState.pageSize;
+            return tableState.exams.slice(startIndex, startIndex + tableState.pageSize);
+        }
+
+        function renderExamRows() {
             const body = document.getElementById('testTableBody');
             const info = document.getElementById('testTableInfo');
             if (!body) return;
 
-            if (!Array.isArray(exams) || exams.length === 0) {
-                body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Chưa có đề thi nào</td></tr>';
+            const total = tableState.exams.length;
+
+            if (total === 0) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="manager-empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <strong>Không tìm thấy đề thi</strong>
+                                <span>Thử đổi bộ lọc hoặc tạo/import đề mới.</span>
+                            </div>
+                        </td>
+                    </tr>`;
                 if (info) info.textContent = 'Hiển thị 0 đề thi';
+                renderPagination(0);
                 return;
             }
 
-            body.innerHTML = exams.map(exam => {
+            const pageItems = getVisiblePageItems();
+            body.innerHTML = pageItems.map(exam => {
                 const status = String(exam.status || 'archived').toLowerCase();
                 const isPublished = status === 'published';
                 const nextStatus = isPublished ? 'archived' : 'published';
                 const toggleLabel = isPublished ? 'Ẩn đề khỏi trang luyện tập' : 'Xuất bản đề cho học viên';
                 const toggleIcon = isPublished ? 'bi-toggle2-on' : 'bi-toggle2-off';
-                const rowClass = status === 'archived' ? ' class="table-row-archived"' : '';
+                const rowClass = status === 'archived' ? 'table-row-archived' : '';
+                const attemptCount = exam.attemptCount ?? exam.totalAttempts ?? 0;
+                const totalQuestions = exam.totalQuestions ?? '--';
+                const duration = exam.duration ?? '--';
                 return `
-                    <tr${rowClass}>
-                        <td><strong>${exam.title || '(Không có tên)'}</strong></td>
-                        <td>${exam.skill || '--'}</td>
-                        <td>${exam.totalQuestions || '--'}</td>
-                        <td>${exam.duration || '--'} phút</td>
-                        <td><span class="status-badge ${statusClass(status)}">${status}</span></td>
-                        <td>${formatDateTime(exam.createdAt)}</td>
-                        <td>--</td>
+                    <tr class="${rowClass}">
                         <td>
+                            <div class="exam-title-cell">
+                                <strong>${escapeHtml(exam.title || '(Không có tên)')}</strong>
+                                <span>ID #${escapeHtml(exam.id || '--')}</span>
+                            </div>
+                        </td>
+                        <td><span class="skill-pill ${skillClass(exam.skill)}">${escapeHtml(skillLabel(exam.skill))}</span></td>
+                        <td>${escapeHtml(totalQuestions)}</td>
+                        <td>${escapeHtml(duration)} phút</td>
+                        <td><span class="status-badge ${statusClass(status)}">${statusLabel(status)}</span></td>
+                        <td>${formatDateTime(exam.createdAt)}</td>
+                        <td>${attemptCount == null ? '<span class="muted-cell">0</span>' : attemptCount}</td>
+                        <td class="row-actions">
                             <button class="btn-icon-sm" title="Sửa" data-action="edit" data-id="${exam.id}"><i class="bi bi-pencil"></i></button>
                             <button class="btn-icon-sm publish-toggle ${isPublished ? 'is-on' : 'is-off'}"
                                     type="button"
@@ -217,6 +343,7 @@
                                     title="${toggleLabel}"
                                     data-action="status"
                                     data-status="${nextStatus}"
+                                    data-current-status="${escapeHtml(status)}"
                                     data-id="${exam.id}">
                                 <i class="bi ${toggleIcon}"></i>
                             </button>
@@ -225,29 +352,143 @@
                     </tr>`;
             }).join('');
 
-            if (info) info.textContent = `Hiển thị ${exams.length} đề thi`;
+            const start = (tableState.currentPage - 1) * tableState.pageSize + 1;
+            const end = Math.min(start + pageItems.length - 1, total);
+            if (info) info.textContent = `Hiển thị ${start}-${end} / ${total} đề thi`;
+            renderPagination(total);
         }
 
-        async function loadAdminExams() {
-            const skill = document.getElementById('filterSkill')?.value || '';
-            const status = document.getElementById('filterStatus')?.value || '';
-            const search = document.getElementById('searchTest')?.value || '';
+        function buildPageList(totalPages, currentPage) {
+            if (totalPages <= 7) {
+                return Array.from({ length: totalPages }, (_, idx) => idx + 1);
+            }
+
+            const pages = [1];
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            if (start > 2) pages.push('...');
+            for (let page = start; page <= end; page++) pages.push(page);
+            if (end < totalPages - 1) pages.push('...');
+            pages.push(totalPages);
+            return pages;
+        }
+
+        function renderPagination(totalItems) {
+            const container = document.getElementById('paginationBtns');
+            if (!container) return;
+
+            const totalPages = Math.max(1, Math.ceil(totalItems / tableState.pageSize));
+            const currentPage = Math.min(Math.max(1, tableState.currentPage), totalPages);
+            const pageItems = buildPageList(totalPages, currentPage);
+
+            if (totalItems === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const pageButtons = pageItems.map(page => {
+                if (page === '...') {
+                    return '<button class="page-btn" type="button" disabled>...</button>';
+                }
+                return `<button class="page-btn ${page === currentPage ? 'active' : ''}" type="button" data-page="${page}">${page}</button>`;
+            }).join('');
+
+            container.innerHTML = `
+                <button class="page-btn" type="button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                ${pageButtons}
+                <button class="page-btn" type="button" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="bi bi-chevron-right"></i>
+                </button>`;
+        }
+
+        async function loadAdminExams({ resetPage = true } = {}) {
+            const filters = getFilters();
+            setTableLoading();
 
             try {
-                const response = await adminGetTests({ skill, status, search });
+                const [statsResponse, response] = await Promise.all([
+                    adminGetTests({}),
+                    adminGetTests(filters)
+                ]);
+                updateStats(statsResponse?.data || []);
                 const exams = response?.data || [];
-                renderExamRows(exams);
+                tableState.exams = Array.isArray(exams) ? exams : [];
+                if (resetPage) tableState.currentPage = 1;
+                renderExamRows();
             } catch (error) {
-                renderExamRows([]);
+                tableState.exams = [];
+                updateStats([]);
+                renderExamRows();
                 showToast(`Không thể tải danh sách đề: ${error.message || 'Unknown error'}`, 'danger');
             }
         }
 
+        let searchDebounceTimer = null;
+
+        function syncSearchInputs(value) {
+            const searchInput = document.getElementById('searchTest');
+            const topbarSearch = document.getElementById('topbarSearchTest');
+            if (searchInput && searchInput.value !== value) searchInput.value = value;
+            if (topbarSearch && topbarSearch.value !== value) topbarSearch.value = value;
+        }
+
+        function scheduleSearchRefresh(value) {
+            syncSearchInputs(value);
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => loadAdminExams({ resetPage: true }), 250);
+        }
+
+        async function updateExamStatusFromButton(button, targetStatus) {
+            const id = button.dataset.id;
+            const currentStatus = String(button.dataset.currentStatus || '').toLowerCase();
+            const normalizedTarget = String(targetStatus || '').toLowerCase();
+            if (!id || !normalizedTarget || normalizedTarget === currentStatus) return;
+
+            const originalHtml = button.innerHTML;
+
+            try {
+                button.disabled = true;
+                button.classList.add('is-loading');
+                button.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+
+                await adminUpdateTestStatus(id, normalizedTarget);
+                showToast(normalizedTarget === 'published'
+                    ? 'Đã xuất bản đề cho học viên'
+                    : 'Đã ẩn đề khỏi trang luyện tập');
+                await loadAdminExams({ resetPage: false });
+            } catch (error) {
+                button.disabled = false;
+                button.classList.remove('is-loading');
+                button.innerHTML = originalHtml;
+                showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const refresh = () => loadAdminExams();
+            const refresh = () => loadAdminExams({ resetPage: true });
             document.getElementById('filterSkill')?.addEventListener('change', refresh);
             document.getElementById('filterStatus')?.addEventListener('change', refresh);
-            document.getElementById('searchTest')?.addEventListener('input', refresh);
+            document.getElementById('searchTest')?.addEventListener('input', (e) => scheduleSearchRefresh(e.target.value));
+            document.getElementById('topbarSearchTest')?.addEventListener('input', (e) => scheduleSearchRefresh(e.target.value));
+            document.getElementById('pageSizeSelect')?.addEventListener('change', (e) => {
+                tableState.pageSize = Number(e.target.value) || 8;
+                tableState.currentPage = 1;
+                renderExamRows();
+            });
+            document.getElementById('paginationBtns')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-page]');
+                if (!btn || btn.disabled) return;
+                tableState.currentPage = Number(btn.dataset.page) || 1;
+                renderExamRows();
+            });
+            document.getElementById('btnResetFilters')?.addEventListener('click', () => {
+                document.getElementById('filterSkill').value = '';
+                document.getElementById('filterStatus').value = '';
+                syncSearchInputs('');
+                loadAdminExams({ resetPage: true });
+            });
 
             document.getElementById('testTableBody')?.addEventListener('click', async (e) => {
                 const btn = e.target.closest('button[data-action]');
@@ -256,38 +497,24 @@
                 const id = btn.dataset.id;
                 const action = btn.dataset.action;
                 if (!id || !action) return;
-                const originalHtml = btn.innerHTML;
 
-                try {
-                    if (action === 'delete') {
+                if (action === 'delete') {
+                    try {
                         if (!confirm('Bạn chắc chắn muốn xóa đề thi này?')) return;
                         await adminDeleteTest(id);
                         showToast('Xóa đề thi thành công');
-                        await loadAdminExams();
-                    } else if (action === 'status') {
-                        const targetStatus = btn.dataset.status || 'published';
-                        btn.disabled = true;
-                        btn.classList.add('is-loading');
-                        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
-                        await adminUpdateTestStatus(id, targetStatus);
-                        showToast(targetStatus === 'published'
-                            ? 'Đã xuất bản đề cho học viên'
-                            : 'Đã ẩn đề khỏi trang luyện tập');
-                        await loadAdminExams();
-                    } else if (action === 'edit') {
-                        window.location.href = `test-builder.html?examId=${encodeURIComponent(id)}`;
+                        await loadAdminExams({ resetPage: false });
+                    } catch (error) {
+                        showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
                     }
-                } catch (error) {
-                    if (action === 'status') {
-                        btn.disabled = false;
-                        btn.classList.remove('is-loading');
-                        btn.innerHTML = originalHtml;
-                    }
-                    showToast(`Thao tác thất bại: ${error.message || 'Unknown error'}`, 'danger');
+                } else if (action === 'status') {
+                    await updateExamStatusFromButton(btn, btn.dataset.status || 'published');
+                } else if (action === 'edit') {
+                    window.location.href = `test-builder.html?examId=${encodeURIComponent(id)}`;
                 }
             });
 
-            loadAdminExams();
+            loadAdminExams({ resetPage: true });
         });
     </script>
 </body>

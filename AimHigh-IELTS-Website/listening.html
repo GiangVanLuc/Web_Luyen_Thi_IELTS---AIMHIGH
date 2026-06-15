@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/test.css?v=20260420-5">
+<link rel="stylesheet" href="css/test.css?v=20260615-5">
 </head>
 <body class="listening-page">
 
@@ -64,7 +64,7 @@
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+            <li><a class="dropdown-item" href="#" onclick="if(typeof apiLogout === 'function') { apiLogout(); } else { window.location.href='login.html'; } return false;"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
           </ul>
         </div>
       </div>
@@ -216,8 +216,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/api.js"></script>
-<script src="js/exam-labelling.js?v=20260614-1"></script>
-<script src="js/listening.js?v=20260614-1"></script>
+<script src="js/exam-labelling.js?v=20260615-5"></script>
+<script src="js/listening.js?v=20260615-5"></script>
 
     <script src="js/navbar.js"></script>
 </body>

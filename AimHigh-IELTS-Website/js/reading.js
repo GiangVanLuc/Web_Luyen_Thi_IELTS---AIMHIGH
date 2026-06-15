@@ -862,8 +862,50 @@ function addReviewCorrectHint(questionNumber, anchorElement, answerText) {
     hint.textContent = `Đáp án đúng: ${answerText || 'Chưa cập nhật đáp án'}`;
 }
 
+// Tách chuỗi đáp án thành tập chữ cái (cho câu chọn-2): "A,E" / "AE" -> {A,E}
+function lettersOfAnswer(value) {
+    const set = new Set();
+    String(value || '').toUpperCase().replace(/[^A-I]/g, ' ').split(/\s+/).forEach(t => {
+        if (t.length >= 1) for (const ch of t) if (ch >= 'A' && ch <= 'I') set.add(ch);
+    });
+    return set;
+}
+
+// Review cho khối MCQ chọn-2 (mcq-multi): tick lại lựa chọn, tô đúng/sai, hiện đáp án đúng.
+function decorateMcqMultiReview(qNum, resultQuestion) {
+    const wrap = Array.from(document.querySelectorAll('.mcq-multi[data-qnums]'))
+        .find(w => String(w.dataset.qnums || '').split(',').map(Number).includes(Number(qNum)));
+    if (!wrap || wrap.dataset.reviewed === 'true') return !!wrap;
+    wrap.dataset.reviewed = 'true';
+
+    const correctSet = lettersOfAnswer(resolveCorrectAnswerForReview(resultQuestion));
+    const userSet = lettersOfAnswer(resultQuestion?.userAnswer);
+
+    wrap.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+        const val = String(box.value || '').trim().toUpperCase();
+        box.disabled = true;
+        box.checked = userSet.has(val);
+        const opt = box.closest('.mcq-multi-opt');
+        if (!opt) return;
+        if (correctSet.has(val)) opt.classList.add('review-correct-option');
+        if (userSet.has(val) && !correctSet.has(val)) opt.classList.add('review-wrong-option');
+    });
+
+    const badge = wrap.querySelector('.mcq-multi-badge');
+    if (badge) badge.classList.add(resultQuestion?.isCorrect ? 'review-correct' : 'review-wrong');
+
+    if (!wrap.querySelector('.review-correct-hint')) {
+        const hint = document.createElement('div');
+        hint.className = 'review-correct-hint';
+        hint.textContent = `Đáp án đúng: ${Array.from(correctSet).join(', ') || '(chưa cập nhật)'}`;
+        wrap.appendChild(hint);
+    }
+    return true;
+}
+
 function decorateReviewQuestion(questionNumber, resultQuestion) {
     const qNum = Number(questionNumber);
+    if (decorateMcqMultiReview(qNum, resultQuestion)) return;
     const questionContainer = getReviewQuestionContainer(qNum);
     if (!questionContainer) return;
 
@@ -970,6 +1012,23 @@ function applyReviewMode(result) {
         }
         decorateReviewQuestion(qNum, resultQuestion);
     });
+
+    // Bài làm 1 phần: chỉ giữ lại các passage/part đã làm; ẩn passage không làm khỏi review.
+    const attemptedSecs = new Set();
+    normalizedParts.forEach((p) => {
+        for (let q = p.from; q <= p.to; q++) {
+            if (reviewQuestionMap.has(q)) { attemptedSecs.add(p.secNum); break; }
+        }
+    });
+    if (attemptedSecs.size > 0 && attemptedSecs.size < normalizedParts.length) {
+        const boxes = document.querySelectorAll('.partbox');
+        normalizedParts.forEach((p, idx) => {
+            if (attemptedSecs.has(p.secNum)) return;
+            if (boxes[idx]) boxes[idx].style.display = 'none';
+            document.querySelectorAll(`#passagePanel [data-section="${p.secNum}"]`).forEach(el => el.style.display = 'none');
+            document.querySelectorAll(`#questionPanel [data-section="${p.secNum}"]`).forEach(el => el.style.display = 'none');
+        });
+    }
 
     const sortedQuestionNumbers = Array.from(reviewQuestionMap.keys()).sort((a, b) => a - b);
     reviewQuestionOrder = sortedQuestionNumbers.slice();
@@ -1595,12 +1654,25 @@ function renderGroup(g, sec) {
         }
 
         case 'TABLE_COMPLETION': {
-            html += renderTableCompletion(g);
+            // Fallback: đề gắn nhãn "table" nhưng câu để phẳng → render fill-block, tránh bảng rỗng.
+            if (Array.isArray(g.tableRows) && g.tableRows.length) {
+                html += renderTableCompletion(g);
+            } else {
+                html += `<div class="fill-block">`;
+                sourceQuestions.forEach(q => { html += renderFillLine(q); });
+                html += `</div>`;
+            }
             break;
         }
 
         case 'SUMMARY_COMPLETION': {
-            html += renderSummaryCompletion(g);
+            if (String(g.summaryTemplate || '').trim()) {
+                html += renderSummaryCompletion(g);
+            } else {
+                html += `<div class="fill-block">`;
+                sourceQuestions.forEach(q => { html += renderFillLine(q); });
+                html += `</div>`;
+            }
             break;
         }
 
@@ -1650,21 +1722,29 @@ function renderFillLine(q) {
     const tpl = q.lineTemplate || q.questionText || `Question ${qn}: ___`;
     const w   = q.inputWidth   || 100;
 
-    // Thay ___ trong template bằng badge + input
+    // Thay chỗ trống (___ hoặc dãy gạch dài _______) bằng badge + input; nếu không có thì gắn vào cuối.
     const inputHtml = `<span id="b${qn}" class="fb">${qn}</span> <input class="finp" id="q${qn}" placeholder="……" style="width:${w}px;" oninput="pa(${qn},this.value)">`;
-    const line = tpl.replace('___', inputHtml);
+    const line = tpl.includes('___') ? tpl.replace(/_{3,}/, inputHtml) : `${tpl} ${inputHtml}`;
     return `<div class="fill-line">${line}</div>`;
 }
 
 // ── Matching options ──────────────────────────────────────────────────────────
+// Trả về [{value, text}]: value = chữ cái nộp/đáp án, text = mô tả (rỗng cho matching-paragraph).
 function resolveMatchOptionValues(g, display, sec) {
-    const buildLetterValues = (letters) => letters.map(o => String(o));
+    const letterObjs = (letters) => letters.map(l => ({ value: String(l), text: '' }));
 
     if (display === 'MATCHING_HEADINGS' && g.headingList) {
-        return g.headingList.map(h => String(h.label || '').trim()).filter(Boolean);
+        return g.headingList
+            .map(h => ({ value: String(h.label || '').trim(), text: String(h.text || h.heading || '').trim() }))
+            .filter(o => o.value);
     }
-    if (g.matchOptions) {
-        return g.matchOptions.map(o => String(o || '').trim()).filter(Boolean);
+    if (Array.isArray(g.matchOptions) && g.matchOptions.length) {
+        return g.matchOptions.map(o => {
+            if (o && typeof o === 'object') {
+                return { value: String(o.letter || o.label || o.id || '').trim(), text: String(o.text || o.value || o.name || '').trim() };
+            }
+            return { value: String(o || '').trim(), text: '' };
+        }).filter(o => o.value);
     }
 
     const ins = String(g?.instruction || g?.instructions || '');
@@ -1674,7 +1754,7 @@ function resolveMatchOptionValues(g, display, sec) {
         if (end >= 65 && end <= 90) {
             const letters = [];
             for (let c = 65; c <= end; c++) letters.push(String.fromCharCode(c));
-            return buildLetterValues(letters);
+            return letterObjs(letters);
         }
     }
 
@@ -1688,10 +1768,10 @@ function resolveMatchOptionValues(g, display, sec) {
 
     const letters = Array.from(labelSet).sort();
     if (letters.length >= 3 && letters[0] === 'A') {
-        return buildLetterValues(letters);
+        return letterObjs(letters);
     }
 
-    return buildLetterValues(['A','B','C','D','E','F','G']);
+    return letterObjs(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
 }
 
 function formatMatchingOptionLabel(value, display) {
@@ -1703,8 +1783,7 @@ function formatMatchingOptionLabel(value, display) {
 
 function formatMatchValueForDisplay(value) {
     const raw = String(value || '').trim();
-    if (!raw) return '';
-    if (/^[A-Z]$/.test(raw)) return `Paragraph ${raw}`;
+    // Ô slot chỉ hiện chữ cái (gọn, đúng cho mọi loại matching: đoạn văn / người / sentence-ending / word-bank).
     return raw;
 }
 
@@ -1733,9 +1812,10 @@ function renderMatchingDrag(questions, g, display, sec) {
       <div class="match-options">`;
 
     opts.forEach(opt => {
-        const raw = String(opt || '').trim();
-        const label = formatMatchingOptionLabel(raw, display);
-        html += `<button type="button" class="match-chip" data-val="${eh(raw)}"
+        const val = String(opt.value || '').trim();
+        if (!val) return;
+        const label = opt.text ? `${val}. ${opt.text}` : formatMatchingOptionLabel(val, display);
+        html += `<button type="button" class="match-chip" data-val="${eh(val)}"
             draggable="true"
             ondragstart="onMatchDragStart(event,this.dataset.val)"
             onclick="onMatchOptionClick(this.dataset.val)">${eh(label)}</button>`;

@@ -184,6 +184,16 @@ public class VocabularyServiceImpl implements VocabularyService {
         userVocabulary.setNote(trimToNull(request.getNote()));
 
         UserVocabulary saved = userVocabularyRepository.save(userVocabulary);
+
+        // Ghi nhật ký học tập lưu từ vựng tuỳ chỉnh
+        studyLogRepository.save(StudyLog.builder()
+                .user(saved.getUser())
+                .activity("VOCABULARY_SAVE")
+                .detail(saved.getCustomWord())
+                .duration(1)
+                .createdAt(LocalDateTime.now())
+                .build());
+
         return toResponse(null, saved);
     }
 
@@ -554,11 +564,14 @@ public class VocabularyServiceImpl implements VocabularyService {
             Integer current = userVocabulary.getReviewCount() == null ? 0 : userVocabulary.getReviewCount();
             userVocabulary.setReviewCount(current + 1);
 
+            String wordDetail = userVocabulary.getVocabulary() != null ? 
+                    userVocabulary.getVocabulary().getWord() : userVocabulary.getCustomWord();
+
             // Ghi nhật ký học tập ôn tập Flashcard
             studyLogRepository.save(StudyLog.builder()
                     .user(userVocabulary.getUser())
                     .activity("FLASHCARD_REVIEW")
-                    .detail(userVocabulary.getVocabulary().getWord())
+                    .detail(wordDetail)
                     .duration(1)
                     .createdAt(LocalDateTime.now())
                     .build());

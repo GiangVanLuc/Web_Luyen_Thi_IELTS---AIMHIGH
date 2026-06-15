@@ -71,7 +71,7 @@ public class RedisServiceImpl implements RedisService {
         return count > maxRequests;
     }
 
-    // ===== CACHE Äá»€ THI =====
+    // ===== CACHE ĐỀ THI =====
 
     public void cacheExam(Long examId, Object examData) {
         set("exam:" + examId, examData, 1, TimeUnit.HOURS);
@@ -85,7 +85,7 @@ public class RedisServiceImpl implements RedisService {
         delete("exam:" + examId);
     }
 
-    // ===== TRáº NG THÃI LÃ€M BÃ€I =====
+    // ===== TRẠNG THÁI LÀM BÀI =====
 
     public void saveExamProgress(Long userId, Long examId, Object answers) {
         set("exam_progress:" + userId + ":" + examId, answers, 2, TimeUnit.HOURS);
@@ -99,7 +99,7 @@ public class RedisServiceImpl implements RedisService {
         delete("exam_progress:" + userId + ":" + examId);
     }
 
-    // ===== Äáº¾M NGÆ¯á»¢C THá»œI GIAN THI =====
+    // ===== ĐẾM NGƯỢC THỜI GIAN THI =====
 
     public void startExamTimer(Long userId, Long examId, int durationMinutes) {
         set("exam_timer:" + userId + ":" + examId,
@@ -113,7 +113,7 @@ public class RedisServiceImpl implements RedisService {
         return time != null ? Long.parseLong(time.toString()) : null;
     }
 
-    // ===== CACHE Káº¾T QUáº¢ BÃ€I THI =====
+    // ===== CACHE KẾT QUẢ BÀI THI =====
 
     public void cacheExamResult(Long attemptId, Object result) {
         set("exam_result:" + attemptId, result, 24, TimeUnit.HOURS);

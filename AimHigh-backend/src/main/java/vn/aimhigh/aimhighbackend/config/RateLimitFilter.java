@@ -46,8 +46,9 @@ public class RateLimitFilter implements Filter {
                 ip = request.getRemoteAddr();
             }
 
-            // Giới hạn: Tối đa 5 request nhạy cảm trong vòng 60 giây
-            boolean isLimited = redisService.isRateLimited(ip, 5, 60);
+            // Giới hạn: tối đa 30 request nhạy cảm/60s (đủ cho nộp bài, upload audio Speaking nhiều câu,
+            // và các lần thử lại — vẫn chặn được spam/abuse).
+            boolean isLimited = redisService.isRateLimited(ip, 30, 60);
             
             if (isLimited) {
                 log.warn("IP {} đang bị Rate Limit trên endpoint: {} {}", ip, method, path);

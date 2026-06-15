@@ -397,8 +397,17 @@ async function adminDeleteTest(testId) {
  * @param {object} params - { page, limit, skill, status, search }
  */
 async function adminGetTests(params = {}) {
-    const query = new URLSearchParams({ page: 1, limit: 10, ...params });
-    return apiFetch(`/admin/exams?${query}`);
+    const query = new URLSearchParams();
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') return;
+        if (key === 'skill') {
+            query.set(key, String(value).toUpperCase());
+        } else {
+            query.set(key, String(value));
+        }
+    });
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return apiFetch(`/admin/exams${suffix}`);
 }
 
 async function adminImportExamJson(payload) {
@@ -599,6 +608,20 @@ async function adminToggleUserLock(userId, locked) {
         method: 'PATCH',
         body: JSON.stringify({ locked })
     });
+}
+
+/**
+ * Lấy danh sách nhật ký hệ thống (Admin)
+ * @param {object} params - { page, limit, action, accountEmail, search }
+ */
+async function adminGetAuditLogs(params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') return;
+        query.set(key, String(value));
+    });
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return apiFetch(`/admin/audit-logs${suffix}`);
 }
 
 

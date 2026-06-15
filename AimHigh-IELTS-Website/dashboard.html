@@ -306,11 +306,17 @@
             }
 
             if (logoutLink) {
-                logoutLink.addEventListener('click', function (event) {
+                logoutLink.addEventListener('click', async function (event) {
                     event.preventDefault();
-                    localStorage.removeItem('aimhigh_loggedIn');
-                    localStorage.removeItem('aimhigh_currentUser');
-                    window.location.href = 'login.html';
+                    if (typeof apiLogout === 'function') {
+                        await apiLogout();
+                    } else {
+                        localStorage.removeItem('aimhigh_token');
+                        localStorage.removeItem('aimhigh_refreshToken');
+                        localStorage.removeItem('aimhigh_loggedIn');
+                        localStorage.removeItem('aimhigh_currentUser');
+                        window.location.href = 'login.html';
+                    }
                 });
             }
         })();

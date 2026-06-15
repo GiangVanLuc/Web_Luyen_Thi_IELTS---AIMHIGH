@@ -122,7 +122,7 @@ public class JwtServiceImpl implements JwtService {
         }
     }
 
-    // âœ… ThÃªm method extractRole â€” dÃ¹ng trong SecurityConfig sau nÃ y
+    // ✅ Thêm method extractRole — dùng trong SecurityConfig sau này
     public String extractRole(String token) {
         if (token == null || token.isBlank()) {
             throw new JwtServiceException("Token is null or empty");

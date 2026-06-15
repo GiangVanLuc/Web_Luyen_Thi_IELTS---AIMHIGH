@@ -1312,130 +1312,130 @@ rg -n "adminImportExamJson|import/json|importFromJson" AimHigh-IELTS-Website Aim
 
 ## 10) Phân Tích Cấu Trúc Database (ERD) Quan Trọng
 
-# PhÃ¢n tÃ­ch CÆ¡ sá»Ÿ dá»¯ liá»‡u: Pháº§n Äá» Thi & Luá»“ng LÃ m BÃ i (Exam & Attempt Flow)
+# Phân tích Cơ sở dữ liệu: Phần Đề Thi & Luồng Làm Bài (Exam & Attempt Flow)
 
-Há»‡ thá»‘ng thi cá»§a AimHigh Ä‘Æ°á»£c thiáº¿t káº¿ linh hoáº¡t nháº±m Ä‘Ã¡p á»©ng cáº¥u trÃºc phá»©c táº¡p cá»§a má»™t bÃ i thi chuáº©n IELTS (bao gá»“m Reading, Listening, Writing, Speaking) cÅ©ng nhÆ° lÆ°u trá»¯ chÃ­nh xÃ¡c lá»‹ch sá»­ lÃ m bÃ i cá»§a há»c viÃªn.
+Hệ thống thi của AimHigh được thiết kế linh hoạt nhằm đáp ứng cấu trúc phức tạp của một bài thi chuẩn IELTS (bao gồm Reading, Listening, Writing, Speaking) cũng như lưu trữ chính xác lịch sử làm bài của học viên.
 
-DÆ°á»›i Ä‘Ã¢y lÃ  sÆ¡ Ä‘á»“ thá»±c thá»ƒ liÃªn káº¿t (ERD) vÃ  giáº£i thÃ­ch chi tiáº¿t cáº¥u trÃºc cÃ¡c báº£ng:
+Dưới đây là sơ đồ thực thể liên kết (ERD) và giải thích chi tiết cấu trúc các bảng:
 
-## SÆ¡ Ä‘á»“ quan há»‡ (ERD)
+## Sơ đồ quan hệ (ERD)
 
 ```mermaid
 erDiagram
-    %% KHá»I Cáº¤U TRÃšC Äá»€ THI
-    exams ||--o{ listening_parts : "chá»©a (1-n)"
-    exams ||--o{ reading_passages : "chá»©a (1-n)"
-    exams ||--o{ questions : "chá»©a (1-n)"
+    %% KHỐI CẤU TRÚC ĐỀ THI
+    exams ||--o{ listening_parts : "chứa (1-n)"
+    exams ||--o{ reading_passages : "chứa (1-n)"
+    exams ||--o{ questions : "chứa (1-n)"
     
-    listening_parts ||--o{ questions : "gá»“m cÃ¡c cÃ¢u há»i (1-n)"
-    reading_passages ||--o{ questions : "gá»“m cÃ¡c cÃ¢u há»i (1-n)"
+    listening_parts ||--o{ questions : "gồm các câu hỏi (1-n)"
+    reading_passages ||--o{ questions : "gồm các câu hỏi (1-n)"
     
-    question_types ||--o{ questions : "Ä‘á»‹nh dáº¡ng (1-n)"
+    question_types ||--o{ questions : "định dạng (1-n)"
 
-    %% KHá»I Cáº¤U TRÃšC ÄÃP ÃN (DÃ€NH CHO Äá»€ BÃ€I)
-    questions ||--o{ choices : "cÃ³ cÃ¡c lá»±a chá»n tráº¯c nghiá»‡m (1-n)"
-    questions ||--o{ matching_items : "cÃ³ cÃ¡c lá»±a chá»n ná»‘i (1-n)"
-    questions ||--o{ map_labels : "cÃ³ nhÃ£n báº£n Ä‘á»“ (1-n)"
+    %% KHỐI CẤU TRÚC ĐÁP ÁN (DÀNH CHO ĐỀ BÀI)
+    questions ||--o{ choices : "có các lựa chọn trắc nghiệm (1-n)"
+    questions ||--o{ matching_items : "có các lựa chọn nối (1-n)"
+    questions ||--o{ map_labels : "có nhãn bản đồ (1-n)"
 
-    %% KHá»I LUá»’NG LÃ€M BÃ€I (ATTEMPT)
-    users ||--o{ attempts : "thá»±c hiá»‡n bÃ i thi (1-n)"
-    exams ||--o{ attempts : "cÃ³ nhiá»u lÆ°á»£t lÃ m (1-n)"
+    %% KHỐI LUỒNG LÀM BÀI (ATTEMPT)
+    users ||--o{ attempts : "thực hiện bài thi (1-n)"
+    exams ||--o{ attempts : "có nhiều lượt làm (1-n)"
     
-    attempts ||--o{ answers : "lÆ°u bÃ i lÃ m chi tiáº¿t (1-n)"
-    questions ||--o{ answers : "chá»©a cÃ¢u tráº£ lá»i cá»§a user (1-n)"
+    attempts ||--o{ answers : "lưu bài làm chi tiết (1-n)"
+    questions ||--o{ answers : "chứa câu trả lời của user (1-n)"
 ```
 
 ---
 
-## Giáº£i thÃ­ch chi tiáº¿t cÃ¡c má»‘i quan há»‡
+## Giải thích chi tiết các mối quan hệ
 
-### 1. Khá»‘i Cáº¥u trÃºc Ä‘á» thi (Exam Structure)
-Khá»‘i nÃ y lÆ°u trá»¯ ná»™i dung Ä‘á» thi (tÄ©nh) do Admin táº¡o ra. Thiáº¿t káº¿ phÃ¢n cáº¥p nhÆ° sau:
+### 1. Khối Cấu trúc đề thi (Exam Structure)
+Khối này lưu trữ nội dung đề thi (tĩnh) do Admin tạo ra. Thiết kế phân cấp như sau:
 
-*   **Báº£ng `exams`:** Báº£ng trung tÃ¢m Ä‘á»‹nh nghÄ©a bÃ i thi (VD: "Cambridge 18 Test 1 Reading"). LÆ°u cÃ¡c thÃ´ng tin nhÆ° thá»i gian (`duration`), ká»¹ nÄƒng (`skill`), cáº¥p Ä‘á»™ (`level`).
-*   **Báº£ng `listening_parts` / `reading_passages`:** 
-    *   LiÃªn káº¿t **n-1** vá»›i báº£ng `exams`.
-    *   DÃ¹ng Ä‘á»ƒ chia Ä‘á» thi thÃ nh cÃ¡c pháº§n nhá» (Part 1, 2, 3, 4 Ä‘á»‘i vá»›i Listening vÃ  Passage 1, 2, 3 Ä‘á»‘i vá»›i Reading).
-    *   LÆ°u trá»¯ Audio, Transcript (cho Listening) hoáº·c Äoáº¡n vÄƒn, áº¢nh minh há»a (cho Reading).
-*   **Báº£ng `questions`:** Báº£ng lÆ°u Ä‘á» bÃ i/cÃ¢u há»i cá»¥ thá»ƒ.
-    *   CÃ³ thá»ƒ káº¿t ná»‘i **n-1** tá»›i `listening_parts` hoáº·c `reading_passages` Ä‘á»ƒ xÃ¡c Ä‘á»‹nh cÃ¢u há»i nÃ y náº±m trong Ä‘oáº¡n vÄƒn nÃ o.
-    *   *TrÆ°á»ng há»£p Writing/Speaking:* Do khÃ´ng cáº§n Ä‘oáº¡n vÄƒn hay file audio phá»©c táº¡p, cÃ¢u há»i Writing/Speaking Ä‘Æ°á»£c ná»‘i tháº³ng tá»›i báº£ng `exams` (trÆ°á»ng id cá»§a part/passage Ä‘á»ƒ null).
-*   **CÃ¡c báº£ng phá»¥ `choices`, `matching_items`, `map_labels`:**
-    *   DÃ¹ng Ä‘á»ƒ biá»ƒu diá»…n Ä‘a dáº¡ng cÃ¡c format thi IELTS: Tráº¯c nghiá»‡m (Multiple Choice), Ná»‘i Ä‘Ã¡p Ã¡n (Matching), Äiá»n nhÃ£n báº£n Ä‘á»“ (Map Labeling). ChÃºng liÃªn káº¿t **n-1** vá» báº£ng `questions`.
+*   **Bảng `exams`:** Bảng trung tâm định nghĩa bài thi (VD: "Cambridge 18 Test 1 Reading"). Lưu các thông tin như thời gian (`duration`), kỹ năng (`skill`), cấp độ (`level`).
+*   **Bảng `listening_parts` / `reading_passages`:** 
+    *   Liên kết **n-1** với bảng `exams`.
+    *   Dùng để chia đề thi thành các phần nhỏ (Part 1, 2, 3, 4 đối với Listening và Passage 1, 2, 3 đối với Reading).
+    *   Lưu trữ Audio, Transcript (cho Listening) hoặc Đoạn văn, Ảnh minh họa (cho Reading).
+*   **Bảng `questions`:** Bảng lưu đề bài/câu hỏi cụ thể.
+    *   Có thể kết nối **n-1** tới `listening_parts` hoặc `reading_passages` để xác định câu hỏi này nằm trong đoạn văn nào.
+    *   *Trường hợp Writing/Speaking:* Do không cần đoạn văn hay file audio phức tạp, câu hỏi Writing/Speaking được nối thẳng tới bảng `exams` (trường id của part/passage để null).
+*   **Các bảng phụ `choices`, `matching_items`, `map_labels`:**
+    *   Dùng để biểu diễn đa dạng các format thi IELTS: Trắc nghiệm (Multiple Choice), Nối đáp án (Matching), Điền nhãn bản đồ (Map Labeling). Chúng liên kết **n-1** về bảng `questions`.
 
-### 2. Khá»‘i Luá»“ng lÃ m bÃ i (Attempt Flow)
-Khá»‘i nÃ y lÆ°u trá»¯ dá»¯ liá»‡u sinh ra khi má»™t há»c viÃªn báº¥m nÃºt "LÃ m bÃ i".
+### 2. Khối Luồng làm bài (Attempt Flow)
+Khối này lưu trữ dữ liệu sinh ra khi một học viên bấm nút "Làm bài".
 
-*   **Báº£ng `attempts` (LÆ°á»£t lÃ m bÃ i):**
-    *   ÄÃ³ng vai trÃ² lÃ  cáº§u ná»‘i giá»¯a báº£ng `users` (NgÆ°á»i lÃ m bÃ i) vÃ  báº£ng `exams` (Äá» Ä‘Æ°á»£c lÃ m).
-    *   Quáº£n lÃ½ toÃ n bá»™ vÃ²ng Ä‘á»i lÃ m bÃ i: tá»« lÃºc báº¯t Ä‘áº§u (`started_at`), tá»›i lÃºc ná»™p (`submitted_at`, tráº¡ng thÃ¡i `SUBMITTED`), vÃ  sau khi cháº¥m (`GRADED`).
-    *   LÆ°u trá»¯ káº¿t quáº£ cuá»‘i cÃ¹ng: `total_correct` (Sá»‘ cÃ¢u Ä‘Ãºng), `total_wrong` (Sá»‘ cÃ¢u sai), `band_score` (Äiá»ƒm sá»‘ 1.0 - 9.0) vÃ  `feedback` (Nháº­n xÃ©t cá»§a AI hoáº·c GiÃ¡o viÃªn).
-*   **Báº£ng `answers` (CÃ¢u tráº£ lá»i chi tiáº¿t):**
-    *   LiÃªn káº¿t **n-1** vá»›i báº£ng `attempts` (Má»—i lÆ°á»£t lÃ m bÃ i cÃ³ nhiá»u cÃ¢u tráº£ lá»i).
-    *   LiÃªn káº¿t **n-1** vá»›i báº£ng `questions` (Äá»ƒ biáº¿t user Ä‘ang tráº£ lá»i cho cÃ¢u há»i gá»‘c nÃ o).
-    *   LÆ°u láº¡i chÃ­nh xÃ¡c nhá»¯ng gÃ¬ há»c viÃªn Ä‘iá»n (`answer_text`) vÃ  káº¿t quáº£ mÃ¡y cháº¥m (`is_correct`).
+*   **Bảng `attempts` (Lượt làm bài):**
+    *   Đóng vai trò là cầu nối giữa bảng `users` (Người làm bài) và bảng `exams` (Đề được làm).
+    *   Quản lý toàn bộ vòng đời làm bài: từ lúc bắt đầu (`started_at`), tới lúc nộp (`submitted_at`, trạng thái `SUBMITTED`), và sau khi chấm (`GRADED`).
+    *   Lưu trữ kết quả cuối cùng: `total_correct` (Số câu đúng), `total_wrong` (Số câu sai), `band_score` (Điểm số 1.0 - 9.0) và `feedback` (Nhận xét của AI hoặc Giáo viên).
+*   **Bảng `answers` (Câu trả lời chi tiết):**
+    *   Liên kết **n-1** với bảng `attempts` (Mỗi lượt làm bài có nhiều câu trả lời).
+    *   Liên kết **n-1** với bảng `questions` (Để biết user đang trả lời cho câu hỏi gốc nào).
+    *   Lưu lại chính xác những gì học viên điền (`answer_text`) và kết quả máy chấm (`is_correct`).
 
 > [!IMPORTANT]
-> **Äiá»ƒm ná»•i báº­t cá»§a kiáº¿n trÃºc:**
-> Báº±ng cÃ¡ch tÃ¡ch biá»‡t báº£ng `questions` (cÃ¢u há»i gá»‘c) vÃ  `answers` (cÃ¢u tráº£ lá»i cá»§a thÃ­ sinh), há»‡ thá»‘ng khÃ´ng chá»‰ dá»… dÃ ng Ä‘á»‘i chiáº¿u Ä‘á»ƒ **cháº¥m Ä‘iá»ƒm tá»± Ä‘á»™ng** (auto-grading) cho Reading/Listening, mÃ  cÃ²n cung cáº¥p kháº£ nÄƒng lÆ°u váº¿t bÃ i luáº­n (Writing text) hay bÃ i nÃ³i (Speaking audio URL) vÃ o báº£ng `answers` Ä‘á»ƒ chuyá»ƒn qua cho AI hoáº·c giÃ¡o viÃªn cháº¥m Ä‘á»™c láº­p, pháº£n há»“i thÃ´ng qua báº£ng `attempts`.
+> **Điểm nổi bật của kiến trúc:**
+> Bằng cách tách biệt bảng `questions` (câu hỏi gốc) và `answers` (câu trả lời của thí sinh), hệ thống không chỉ dễ dàng đối chiếu để **chấm điểm tự động** (auto-grading) cho Reading/Listening, mà còn cung cấp khả năng lưu vết bài luận (Writing text) hay bài nói (Speaking audio URL) vào bảng `answers` để chuyển qua cho AI hoặc giáo viên chấm độc lập, phản hồi thông qua bảng `attempts`.
 
 
-# PhÃ¢n tÃ­ch CÆ¡ sá»Ÿ dá»¯ liá»‡u Pháº§n Tá»« vá»±ng
+# Phân tích Cơ sở dữ liệu Phần Từ vựng
 
-Há»‡ thá»‘ng quáº£n lÃ½ tá»« vá»±ng cá»§a AimHigh Ä‘Æ°á»£c thiáº¿t káº¿ linh hoáº¡t Ä‘á»ƒ há»— trá»£ cáº£ **Tá»« vá»±ng chung cá»§a há»‡ thá»‘ng (AimHigh Pick)** láº«n **Sá»• tá»« vá»±ng cÃ¡ nhÃ¢n hÃ³a cá»§a Há»c viÃªn (My Journal)**. 
+Hệ thống quản lý từ vựng của AimHigh được thiết kế linh hoạt để hỗ trợ cả **Từ vựng chung của hệ thống (AimHigh Pick)** lẫn **Sổ từ vựng cá nhân hóa của Học viên (My Journal)**. 
 
-DÆ°á»›i Ä‘Ã¢y lÃ  sÆ¡ Ä‘á»“ thá»±c thá»ƒ liÃªn káº¿t (ERD) vÃ  giáº£i thÃ­ch chi tiáº¿t má»‘i quan há»‡ giá»¯a cÃ¡c báº£ng:
+Dưới đây là sơ đồ thực thể liên kết (ERD) và giải thích chi tiết mối quan hệ giữa các bảng:
 
-## SÆ¡ Ä‘á»“ quan há»‡ (ERD)
+## Sơ đồ quan hệ (ERD)
 
 ```mermaid
 erDiagram
-    %% CÃ¡c báº£ng Há»‡ thá»‘ng (Admin quáº£n lÃ½)
-    vocabulary_folder ||--o{ topics : "chá»©a (1-n)"
-    topics ||--o{ vocabulary : "phÃ¢n loáº¡i (1-n)"
-    vocabulary ||--o{ vocabulary_examples : "minh há»a (1-n)"
+    %% Các bảng Hệ thống (Admin quản lý)
+    vocabulary_folder ||--o{ topics : "chứa (1-n)"
+    topics ||--o{ vocabulary : "phân loại (1-n)"
+    vocabulary ||--o{ vocabulary_examples : "minh họa (1-n)"
 
-    %% CÃ¡c báº£ng NgÆ°á»i dÃ¹ng (Há»c viÃªn quáº£n lÃ½)
-    users ||--o{ user_vocabulary_group : "táº¡o nhÃ³m (1-n)"
-    users ||--o{ user_vocabulary : "lÆ°u tá»« vá»±ng (1-n)"
-    user_vocabulary_group ||--o{ user_vocabulary : "gom nhÃ³m (1-n)"
+    %% Các bảng Người dùng (Học viên quản lý)
+    users ||--o{ user_vocabulary_group : "tạo nhóm (1-n)"
+    users ||--o{ user_vocabulary : "lưu từ vựng (1-n)"
+    user_vocabulary_group ||--o{ user_vocabulary : "gom nhóm (1-n)"
 
-    %% Giao thoa Há»‡ thá»‘ng & NgÆ°á»i dÃ¹ng
-    vocabulary ||--o{ user_vocabulary : "Ä‘Æ°á»£c lÆ°u (1-n)"
+    %% Giao thoa Hệ thống & Người dùng
+    vocabulary ||--o{ user_vocabulary : "được lưu (1-n)"
 ```
 
 ---
 
-## Giáº£i thÃ­ch chi tiáº¿t
+## Giải thích chi tiết
 
-### 1. Luá»“ng dá»¯ liá»‡u Há»‡ thá»‘ng (Kho AimHigh Pick)
-ÄÃ¢y lÃ  kho dá»¯ liá»‡u tÄ©nh Ä‘Æ°á»£c Admin cáº¥u trÃºc theo phÃ¢n cáº¥p hÃ¬nh cÃ¢y:
+### 1. Luồng dữ liệu Hệ thống (Kho AimHigh Pick)
+Đây là kho dữ liệu tĩnh được Admin cấu trúc theo phân cấp hình cây:
 
-*   **`vocabulary_folder` (ThÆ° má»¥c)** cÃ³ liÃªn káº¿t **1-n** vá»›i **`topics` (Chá»§ Ä‘á»)**.
-    *   *VÃ­ dá»¥:* ThÆ° má»¥c "IELTS Cambridge" cÃ³ thá»ƒ chá»©a nhiá»u chá»§ Ä‘á» con nhÆ° "Test 1", "Test 2", "Test 3".
-*   **`topics` (Chá»§ Ä‘á»)** cÃ³ liÃªn káº¿t **1-n** vá»›i **`vocabulary` (Tá»« vá»±ng)**.
-    *   Má»—i tá»« vá»±ng báº¯t buá»™c pháº£i náº±m trong 1 chá»§ Ä‘á» cá»¥ thá»ƒ (nhá» khÃ³a ngoáº¡i `topic_id`). Äiá»u nÃ y giÃºp há»c viÃªn lá»c tá»« theo chá»§ Ä‘á».
-*   **`vocabulary` (Tá»« vá»±ng)** cÃ³ liÃªn káº¿t **1-n** vá»›i **`vocabulary_examples` (VÃ­ dá»¥)**.
-    *   Má»™t tá»« vá»±ng gá»‘c (vÃ­ dá»¥ "Environment") cÃ³ thá»ƒ cÃ³ nhiá»u cÃ¢u vÃ­ dá»¥ (sentence) Ä‘i kÃ¨m Ä‘á»ƒ giáº£i thÃ­ch ngá»¯ cáº£nh.
+*   **`vocabulary_folder` (Thư mục)** có liên kết **1-n** với **`topics` (Chủ đề)**.
+    *   *Ví dụ:* Thư mục "IELTS Cambridge" có thể chứa nhiều chủ đề con như "Test 1", "Test 2", "Test 3".
+*   **`topics` (Chủ đề)** có liên kết **1-n** với **`vocabulary` (Từ vựng)**.
+    *   Mỗi từ vựng bắt buộc phải nằm trong 1 chủ đề cụ thể (nhờ khóa ngoại `topic_id`). Điều này giúp học viên lọc từ theo chủ đề.
+*   **`vocabulary` (Từ vựng)** có liên kết **1-n** với **`vocabulary_examples` (Ví dụ)**.
+    *   Một từ vựng gốc (ví dụ "Environment") có thể có nhiều câu ví dụ (sentence) đi kèm để giải thích ngữ cảnh.
 
-### 2. Luá»“ng dá»¯ liá»‡u CÃ¡ nhÃ¢n (Sá»• tá»« vá»±ng - My Journal)
-ÄÃ¢y lÃ  dá»¯ liá»‡u sinh ra trong quÃ¡ trÃ¬nh há»c viÃªn Ã´n luyá»‡n trÃªn website.
+### 2. Luồng dữ liệu Cá nhân (Sổ từ vựng - My Journal)
+Đây là dữ liệu sinh ra trong quá trình học viên ôn luyện trên website.
 
-*   **`users` (NgÆ°á»i dÃ¹ng)** cÃ³ liÃªn káº¿t **1-n** vá»›i **`user_vocabulary_group` (NhÃ³m tá»« vá»±ng cÃ¡ nhÃ¢n)**.
-    *   Má»—i há»c viÃªn cÃ³ thá»ƒ tá»± do táº¡o cÃ¡c "ThÆ° má»¥c cÃ¡ nhÃ¢n" (VÃ­ dá»¥: "Tá»« vá»±ng Writing", "Tá»« cáº§n Ã´n gáº¥p") dá»±a vÃ o `user_id`.
-*   **`user_vocabulary_group`** cÃ³ liÃªn káº¿t **1-n** vá»›i **`user_vocabulary`**.
-    *   Khi há»c viÃªn lÆ°u tá»« vÃ o sá»•, há» cÃ³ thá»ƒ nhÃ©t tá»« Ä‘Ã³ vÃ o 1 nhÃ³m cá»¥ thá»ƒ (nhá» khÃ³a ngoáº¡i `group_id`). Náº¿u khÃ´ng chá»n nhÃ³m, nÃ³ sáº½ náº±m á»Ÿ "Uncategorized".
-*   **`users` (NgÆ°á»i dÃ¹ng)** liÃªn káº¿t **1-n** trá»±c tiáº¿p vá»›i **`user_vocabulary`** thÃ´ng qua `user_id` Ä‘á»ƒ biáº¿t tá»« Ä‘Ã³ thuá»™c sá»• cá»§a ai.
+*   **`users` (Người dùng)** có liên kết **1-n** với **`user_vocabulary_group` (Nhóm từ vựng cá nhân)**.
+    *   Mỗi học viên có thể tự do tạo các "Thư mục cá nhân" (Ví dụ: "Từ vựng Writing", "Từ cần ôn gấp") dựa vào `user_id`.
+*   **`user_vocabulary_group`** có liên kết **1-n** với **`user_vocabulary`**.
+    *   Khi học viên lưu từ vào sổ, họ có thể nhét từ đó vào 1 nhóm cụ thể (nhờ khóa ngoại `group_id`). Nếu không chọn nhóm, nó sẽ nằm ở "Uncategorized".
+*   **`users` (Người dùng)** liên kết **1-n** trực tiếp với **`user_vocabulary`** thông qua `user_id` để biết từ đó thuộc sổ của ai.
 
-### 3. Sá»± giao thoa (LÆ°u tá»« vá»±ng)
-Báº£ng quan trá»ng nháº¥t káº¿t ná»‘i 2 luá»“ng nÃ y lÃ  **`user_vocabulary`**.
+### 3. Sự giao thoa (Lưu từ vựng)
+Bảng quan trọng nhất kết nối 2 luồng này là **`user_vocabulary`**.
 
-*   **TrÆ°á»ng há»£p 1: LÆ°u tá»« há»‡ thá»‘ng (GLOBAL)**
-    *   Báº£ng `user_vocabulary` cÃ³ liÃªn káº¿t **n-1** vá»›i báº£ng `vocabulary` thÃ´ng qua `vocab_id`. NghÄ©a lÃ , khi há»c viÃªn Ä‘ang lÆ°á»›t AimHigh Pick vÃ  báº¥m "LÆ°u", há»‡ thá»‘ng chá»‰ cáº§n ghi ID cá»§a tá»« Ä‘Ã³ vÃ o sá»• cÃ¡ nhÃ¢n. Ráº¥t nhiá»u ngÆ°á»i cÃ³ thá»ƒ cÃ¹ng lÆ°u 1 tá»«.
-*   **TrÆ°á»ng há»£p 2: Há»c viÃªn tá»± thÃªm tá»« má»›i (CUSTOM)**
-    *   Náº¿u há»c viÃªn muá»‘n tá»± chÃ©p tay má»™t tá»« khÃ´ng cÃ³ trong kho há»‡ thá»‘ng, báº£ng `user_vocabulary` cÃ³ sáºµn trÆ°á»ng `source_type = CUSTOM` vÃ  cÃ¡c cá»™t má»Ÿ rá»™ng nhÆ° `custom_word`, `custom_meaning`. LÃºc nÃ y, cá»™t khÃ³a ngoáº¡i `vocab_id` sáº½ Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng (NULL).
+*   **Trường hợp 1: Lưu từ hệ thống (GLOBAL)**
+    *   Bảng `user_vocabulary` có liên kết **n-1** với bảng `vocabulary` thông qua `vocab_id`. Nghĩa là, khi học viên đang lướt AimHigh Pick và bấm "Lưu", hệ thống chỉ cần ghi ID của từ đó vào sổ cá nhân. Rất nhiều người có thể cùng lưu 1 từ.
+*   **Trường hợp 2: Học viên tự thêm từ mới (CUSTOM)**
+    *   Nếu học viên muốn tự chép tay một từ không có trong kho hệ thống, bảng `user_vocabulary` có sẵn trường `source_type = CUSTOM` và các cột mở rộng như `custom_word`, `custom_meaning`. Lúc này, cột khóa ngoại `vocab_id` sẽ được để trống (NULL).
 
 > [!TIP]
 > **Spaced Repetition Algorithm**
-> Báº£ng `user_vocabulary` khÃ´ng chá»‰ lÆ°u danh sÃ¡ch tá»«, mÃ  cÃ²n chá»©a cÃ¡c cá»™t `learn_level` (má»©c Ä‘á»™ thuá»™c), `review_count` (sá»‘ láº§n Ã´n), vÃ  `last_reviewed_at` (ngÃ y Ã´n gáº§n nháº¥t). Cáº¥u trÃºc nÃ y giÃºp Backend tÃ­nh toÃ¡n vÃ  nháº¯c nhá»Ÿ há»c viÃªn Ã´n láº¡i tá»« vá»±ng Ä‘Ãºng thá»i Ä‘iá»ƒm.
+> Bảng `user_vocabulary` không chỉ lưu danh sách từ, mà còn chứa các cột `learn_level` (mức độ thuộc), `review_count` (số lần ôn), và `last_reviewed_at` (ngày ôn gần nhất). Cấu trúc này giúp Backend tính toán và nhắc nhở học viên ôn lại từ vựng đúng thời điểm.
 

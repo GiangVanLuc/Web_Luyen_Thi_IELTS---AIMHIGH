@@ -60,10 +60,10 @@ public class ExamImportServiceImpl implements ExamImportService {
 
     @Transactional
     public Exam importFromJson(JsonNode rootNode) {
-        log.info("Tiáº¿n hÃ nh import JSON...");
+        log.info("Tiến hành import JSON...");
 
         if (rootNode == null || !rootNode.isObject()) {
-            throw new BadRequestException("Payload JSON khÃ´ng há»£p lá»‡");
+            throw new BadRequestException("Payload JSON không hợp lệ");
         }
 
         JsonNode workingNode = rootNode.deepCopy();
@@ -71,7 +71,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         schemaNormalizer.normalize(workingNode);
         JsonNode examNode = workingNode.get("exam");
         if (examNode == null) {
-            throw new BadRequestException("Thiáº¿u object 'exam'");
+            throw new BadRequestException("Thiếu object 'exam'");
         }
 
         // 1. Parse metadata
@@ -88,7 +88,7 @@ public class ExamImportServiceImpl implements ExamImportService {
 
         JsonNode sectionsNode = workingNode.path("sections");
         if (!sectionsNode.isArray() || sectionsNode.isEmpty()) {
-            throw new BadRequestException("Thiáº¿u máº£ng 'sections' hoáº·c sections rá»—ng");
+            throw new BadRequestException("Thiếu mảng 'sections' hoặc sections rỗng");
         }
 
         Exam exam = Exam.builder()
@@ -119,7 +119,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         injectExamMetadata(workingNode, exam, createdQuestionCount);
 
         if (createdQuestionCount <= 0) {
-            throw new BadRequestException("KhÃ´ng tÃ¬m tháº¥y questionNumber hay correctAnswer nÃ o trong JSON data!");
+            throw new BadRequestException("Không tìm thấy questionNumber hay correctAnswer nào trong JSON data!");
         }
 
         // 3. Save purely the stripped JSON as clientData
@@ -140,7 +140,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         for (JsonNode sectionNode : sectionsNode) {
             int sectionNumber = sectionNode.path("sectionNumber").asInt(0);
             if (sectionNumber <= 0) {
-                throw new BadRequestException("Listening section thiáº¿u sectionNumber há»£p lá»‡");
+                throw new BadRequestException("Listening section thiếu sectionNumber hợp lệ");
             }
 
             ListeningPart part = ListeningPart.builder()
@@ -171,12 +171,12 @@ public class ExamImportServiceImpl implements ExamImportService {
         for (JsonNode sectionNode : sectionsNode) {
             int sectionNumber = sectionNode.path("sectionNumber").asInt(0);
             if (sectionNumber <= 0) {
-                throw new BadRequestException("Reading section thiáº¿u sectionNumber há»£p lá»‡");
+                throw new BadRequestException("Reading section thiếu sectionNumber hợp lệ");
             }
 
             JsonNode passagesNode = sectionNode.path("passages");
             if (!passagesNode.isArray() || passagesNode.isEmpty()) {
-                throw new BadRequestException("Reading section " + sectionNumber + " pháº£i cÃ³ passages");
+                throw new BadRequestException("Reading section " + sectionNumber + " phải có passages");
             }
 
             List<ReadingPassage> passageEntities = new ArrayList<>();
@@ -283,16 +283,16 @@ public class ExamImportServiceImpl implements ExamImportService {
         for (JsonNode questionNode : questionNodes) {
             int questionNumber = questionNode.path("questionNumber").asInt(0);
             if (questionNumber <= 0) {
-                throw new BadRequestException("CÃ³ cÃ¢u há»i thiáº¿u questionNumber há»£p lá»‡");
+                throw new BadRequestException("Có câu hỏi thiếu questionNumber hợp lệ");
             }
 
             if (!uniqueQuestionNumbers.add(questionNumber)) {
-                throw new BadRequestException("TrÃ¹ng questionNumber: " + questionNumber);
+                throw new BadRequestException("Trùng questionNumber: " + questionNumber);
             }
 
             String correctAnswer = questionNode.path("correctAnswer").asText(null);
             if (correctAnswer == null || correctAnswer.isBlank()) {
-                throw new BadRequestException("CÃ¢u " + questionNumber + " thiáº¿u correctAnswer");
+                throw new BadRequestException("Câu " + questionNumber + " thiếu correctAnswer");
             }
 
             order++;
@@ -381,7 +381,7 @@ public class ExamImportServiceImpl implements ExamImportService {
 
     private void ensureSectionHasQuestions(List<JsonNode> questionNodes, int sectionNumber) {
         if (questionNodes.isEmpty()) {
-            throw new BadRequestException("Section " + sectionNumber + " khÃ´ng cÃ³ cÃ¢u há»i há»£p lá»‡");
+            throw new BadRequestException("Section " + sectionNumber + " không có câu hỏi hợp lệ");
         }
     }
 
@@ -491,18 +491,18 @@ public class ExamImportServiceImpl implements ExamImportService {
     }
 
     public Exam importFromExcel(MultipartFile file) {
-        log.info("Tiáº¿n hÃ nh import Excel báº±ng POI...");
+        log.info("Tiến hành import Excel bằng POI...");
 
         if (file == null || file.isEmpty()) {
-            throw new BadRequestException("File Excel rá»—ng hoáº·c khÃ´ng tá»“n táº¡i");
+            throw new BadRequestException("File Excel rỗng hoặc không tồn tại");
         }
 
         try (InputStream in = file.getInputStream(); Workbook workbook = new XSSFWorkbook(in)) {
             JsonNode payload = buildJsonPayloadFromWorkbook(workbook);
             return importFromJson(payload);
         } catch (IOException e) {
-            log.error("KhÃ´ng thá»ƒ Ä‘á»c file Excel", e);
-            throw new BadRequestException("KhÃ´ng thá»ƒ Ä‘á»c file Excel");
+            log.error("Không thể đọc file Excel", e);
+            throw new BadRequestException("Không thể đọc file Excel");
         }
     }
 
@@ -517,8 +517,8 @@ public class ExamImportServiceImpl implements ExamImportService {
             workbook.write(out);
             return out.toByteArray();
         } catch (IOException e) {
-            log.error("KhÃ´ng thá»ƒ táº¡o template Excel", e);
-            throw new BadRequestException("KhÃ´ng thá»ƒ táº¡o template Excel");
+            log.error("Không thể tạo template Excel", e);
+            throw new BadRequestException("Không thể tạo template Excel");
         }
     }
 
@@ -533,8 +533,8 @@ public class ExamImportServiceImpl implements ExamImportService {
             workbook.write(out);
             return out.toByteArray();
         } catch (IOException e) {
-            log.error("KhÃ´ng thá»ƒ táº¡o full sample Excel", e);
-            throw new BadRequestException("KhÃ´ng thá»ƒ táº¡o full sample Excel");
+            log.error("Không thể tạo full sample Excel", e);
+            throw new BadRequestException("Không thể tạo full sample Excel");
         }
     }
 
@@ -547,7 +547,7 @@ public class ExamImportServiceImpl implements ExamImportService {
 
         Sheet sectionsSheet = workbook.getSheet("Sections");
         if (sectionsSheet == null) {
-            throw new BadRequestException("Thiáº¿u sheet Sections");
+            throw new BadRequestException("Thiếu sheet Sections");
         }
         forEachDataRow(sectionsSheet, row -> {
             int sectionNumber = parseInt(getCellString(row, 0), 0);
@@ -571,13 +571,13 @@ public class ExamImportServiceImpl implements ExamImportService {
         });
 
         if (sectionMap.isEmpty()) {
-            throw new BadRequestException("Sheet Sections khÃ´ng cÃ³ dá»¯ liá»‡u há»£p lá»‡");
+            throw new BadRequestException("Sheet Sections không có dữ liệu hợp lệ");
         }
 
         if (skill == Skill.READING) {
             Sheet passagesSheet = workbook.getSheet("Passages");
             if (passagesSheet == null) {
-                throw new BadRequestException("Thiáº¿u sheet Passages cho Ä‘á» Reading");
+                throw new BadRequestException("Thiếu sheet Passages cho đề Reading");
             }
             forEachDataRow(passagesSheet, row -> {
                 int sectionNumber = parseInt(getCellString(row, 0), 0);
@@ -596,7 +596,7 @@ public class ExamImportServiceImpl implements ExamImportService {
         Map<Integer, ObjectNode> groupMap = new LinkedHashMap<>();
         Sheet questionsSheet = workbook.getSheet("Questions");
         if (questionsSheet == null) {
-            throw new BadRequestException("Thiáº¿u sheet Questions");
+            throw new BadRequestException("Thiếu sheet Questions");
         }
         forEachDataRow(questionsSheet, row -> {
             int sectionNumber = parseInt(getCellString(row, 0), 0);
@@ -699,7 +699,7 @@ public class ExamImportServiceImpl implements ExamImportService {
     private void validateExcelPayload(JsonNode payload, Skill skill, Map<String, String> examMeta) {
         JsonNode sections = payload.path("sections");
         if (!sections.isArray() || sections.isEmpty()) {
-            throw new BadRequestException("Excel khÃ´ng cÃ³ section há»£p lá»‡");
+            throw new BadRequestException("Excel không có section hợp lệ");
         }
 
         Set<Integer> sectionNumbers = new HashSet<>();
@@ -713,30 +713,30 @@ public class ExamImportServiceImpl implements ExamImportService {
             int to = section.path("questionTo").asInt(0);
 
             if (sectionNumber <= 0 || !sectionNumbers.add(sectionNumber)) {
-                throw new BadRequestException("SectionNumber khÃ´ng há»£p lá»‡ hoáº·c bá»‹ trÃ¹ng: " + sectionNumber);
+                throw new BadRequestException("SectionNumber không hợp lệ hoặc bị trùng: " + sectionNumber);
             }
             if (from <= 0 || to <= 0 || from > to) {
-                throw new BadRequestException("Section " + sectionNumber + " cÃ³ range khÃ´ng há»£p lá»‡");
+                throw new BadRequestException("Section " + sectionNumber + " có range không hợp lệ");
             }
             if (previousTo > 0 && from != previousTo + 1) {
-                throw new BadRequestException("Range section khÃ´ng liÃªn tá»¥c táº¡i section " + sectionNumber + ": expected " + (previousTo + 1) + " nhÆ°ng nháº­n " + from);
+                throw new BadRequestException("Range section không liên tục tại section " + sectionNumber + ": expected " + (previousTo + 1) + " nhưng nhận " + from);
             }
 
             previousTo = to;
 
             JsonNode groups = section.path("groups");
             if (!groups.isArray() || groups.isEmpty()) {
-                throw new BadRequestException("Section " + sectionNumber + " khÃ´ng cÃ³ groups/questions");
+                throw new BadRequestException("Section " + sectionNumber + " không có groups/questions");
             }
 
             if (skill == Skill.READING) {
                 JsonNode passages = section.path("passages");
                 if (!passages.isArray() || passages.isEmpty()) {
-                    throw new BadRequestException("Reading section " + sectionNumber + " pháº£i cÃ³ Ã­t nháº¥t 1 passage");
+                    throw new BadRequestException("Reading section " + sectionNumber + " phải có ít nhất 1 passage");
                 }
                 for (JsonNode passage : passages) {
                     if (passage.path("content").asText("").isBlank()) {
-                        throw new BadRequestException("Reading section " + sectionNumber + " cÃ³ passage rá»—ng ná»™i dung");
+                        throw new BadRequestException("Reading section " + sectionNumber + " có passage rỗng nội dung");
                     }
                 }
             }
@@ -753,13 +753,13 @@ public class ExamImportServiceImpl implements ExamImportService {
                     String correctAnswer = question.path("correctAnswer").asText("").trim();
 
                     if (qn <= 0 || qn < from || qn > to) {
-                        throw new BadRequestException("CÃ¢u há»i " + qn + " náº±m ngoÃ i range cá»§a section " + sectionNumber);
+                        throw new BadRequestException("Câu hỏi " + qn + " nằm ngoài range của section " + sectionNumber);
                     }
                     if (!globalQuestions.add(qn)) {
-                        throw new BadRequestException("TrÃ¹ng questionNumber trong Excel: " + qn);
+                        throw new BadRequestException("Trùng questionNumber trong Excel: " + qn);
                     }
                     if ((skill == Skill.READING || skill == Skill.LISTENING) && correctAnswer.isBlank()) {
-                        throw new BadRequestException("CÃ¢u " + qn + " thiáº¿u correctAnswer");
+                        throw new BadRequestException("Câu " + qn + " thiếu correctAnswer");
                     }
 
                     if (skill == Skill.READING || skill == Skill.LISTENING) {
@@ -772,18 +772,18 @@ public class ExamImportServiceImpl implements ExamImportService {
 
             int expected = (to - from + 1);
             if (questionCountInSection != expected) {
-                throw new BadRequestException("Section " + sectionNumber + " thiáº¿u/thá»«a cÃ¢u há»i: expected " + expected + ", actual " + questionCountInSection);
+                throw new BadRequestException("Section " + sectionNumber + " thiếu/thừa câu hỏi: expected " + expected + ", actual " + questionCountInSection);
             }
         }
 
         String mode = examMeta.getOrDefault("mode", "PARTIAL").trim().toUpperCase(Locale.ROOT);
         if ("FULL".equals(mode) && (skill == Skill.READING || skill == Skill.LISTENING)) {
             if (totalQuestions != 40) {
-                throw new BadRequestException("FULL exam báº¯t buá»™c cÃ³ 40 cÃ¢u, hiá»‡n táº¡i: " + totalQuestions);
+                throw new BadRequestException("FULL exam bắt buộc có 40 câu, hiện tại: " + totalQuestions);
             }
             int expectedSections = (skill == Skill.LISTENING) ? 4 : 3;
             if (sectionNumbers.size() != expectedSections) {
-                throw new BadRequestException("FULL " + skill.name() + " cáº§n " + expectedSections + " sections");
+                throw new BadRequestException("FULL " + skill.name() + " cần " + expectedSections + " sections");
             }
         }
     }
@@ -804,10 +804,10 @@ public class ExamImportServiceImpl implements ExamImportService {
             boolean isCorrect = choice.path("isCorrect").asBoolean(false);
 
             if (text.isBlank()) {
-                throw new BadRequestException("Choice text bá»‹ rá»—ng á»Ÿ cÃ¢u " + questionNumber);
+                throw new BadRequestException("Choice text bị rỗng ở câu " + questionNumber);
             }
             if (!label.isBlank() && !labels.add(label)) {
-                throw new BadRequestException("Choice label bá»‹ trÃ¹ng á»Ÿ cÃ¢u " + questionNumber + ": " + label);
+                throw new BadRequestException("Choice label bị trùng ở câu " + questionNumber + ": " + label);
             }
             if (isCorrect) {
                 markedCorrectCount++;
@@ -819,19 +819,19 @@ public class ExamImportServiceImpl implements ExamImportService {
         }
 
         if (choices.size() < 2) {
-            throw new BadRequestException("CÃ¢u " + questionNumber + " pháº£i cÃ³ Ã­t nháº¥t 2 choices");
+            throw new BadRequestException("Câu " + questionNumber + " phải có ít nhất 2 choices");
         }
         if (markedCorrectCount == 0) {
-            throw new BadRequestException("CÃ¢u " + questionNumber + " chÆ°a cÃ³ choice nÃ o Ä‘Æ°á»£c Ä‘Ã¡nh dáº¥u isCorrect=true");
+            throw new BadRequestException("Câu " + questionNumber + " chưa có choice nào được đánh dấu isCorrect=true");
         }
         if (!correctAnswerFound) {
-            throw new BadRequestException("correctAnswer cá»§a cÃ¢u " + questionNumber + " khÃ´ng khá»›p label/text trong Choices");
+            throw new BadRequestException("correctAnswer của câu " + questionNumber + " không khớp label/text trong Choices");
         }
     }
 
     private Map<String, String> readKeyValueSheet(Sheet sheet) {
         if (sheet == null) {
-            throw new BadRequestException("Thiáº¿u sheet Exam");
+            throw new BadRequestException("Thiếu sheet Exam");
         }
         Map<String, String> result = new LinkedHashMap<>();
         forEachDataRow(sheet, row -> {

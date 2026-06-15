@@ -50,6 +50,15 @@ public class AttemptServiceImpl implements AttemptService {
             .findByUserIdAndExamIdAndStatus(userId, request.getExamId(), AttemptStatus.IN_PROGRESS)
             .orElse(null);
         if (existingAttempt != null) {
+            // Attempt cũ mở từ phiên trước có thể đã quá hạn → làm mới mốc bắt đầu để vẫn nộp được
+            // (FE cũng reset đồng hồ mỗi lần mở lại trang, nên đồng bộ lại cho khớp).
+            Integer dur = existingAttempt.getExam().getDuration();
+            long allowed = (dur == null ? 60 : dur) + 5L;
+            if (existingAttempt.getStartedAt() == null
+                    || java.time.LocalDateTime.now().isAfter(existingAttempt.getStartedAt().plusMinutes(allowed))) {
+                existingAttempt.setStartedAt(java.time.LocalDateTime.now());
+                attemptRepository.save(existingAttempt);
+            }
             return AttemptResponse.builder()
                 .id(existingAttempt.getId())
                 .examId(existingAttempt.getExam().getId())
@@ -146,9 +155,11 @@ public class AttemptServiceImpl implements AttemptService {
             throw new BadRequestException("Bài làm đã được nộp!");
         }
 
-        // Chống gian lận: Kiểm tra thời gian làm bài (Cộng thêm 5 phút bù trừ độ trễ mạng)
-        long allowedMinutes = attempt.getExam().getDuration() + 5L;
-        if (java.time.LocalDateTime.now().isAfter(attempt.getStartedAt().plusMinutes(allowedMinutes))) {
+        // Chống gian lận: Kiểm tra thời gian làm bài (null-safe + đệm rộng để không khoá nhầm người dùng).
+        Integer durationMin = attempt.getExam().getDuration();
+        long allowedMinutes = (durationMin == null ? 60 : durationMin) + 15L;
+        if (attempt.getStartedAt() != null
+                && java.time.LocalDateTime.now().isAfter(attempt.getStartedAt().plusMinutes(allowedMinutes))) {
             throw new BadRequestException("Đã quá thời gian làm bài, không thể nộp bài!");
         }
 

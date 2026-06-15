@@ -32,15 +32,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RedisService redisService; // âœ… ThÃªm - bá» RefreshTokenRepository
+    private final RedisService redisService; // ✅ Thêm - bỏ RefreshTokenRepository
 
     @Value("${app.jwt.expiration-ms:1800000}")
     private long accessTokenExpirationMs;
 
-    // ÄÄƒng kÃ½ báº±ng email
+    // Đăng ký bằng email
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng!");
+            throw new RuntimeException("Email đã được sử dụng!");
         }
 
         User user = User.builder()
@@ -66,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    // ÄÄƒng nháº­p
+    // Đăng nhập
     public LoginResponse login(LoginRequest request) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String accessToken  = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        // âœ… LÆ°u RefreshToken vÃ o Redis thay vÃ¬ DB
+        // ✅ Lưu RefreshToken vào Redis thay vì DB
         redisService.saveRefreshToken(user.getId(), refreshToken);
 
         return LoginResponse.builder()
@@ -91,26 +91,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    // LÃ m má»›i AccessToken
+    // Làm mới AccessToken
     public LoginResponse refreshToken(String refreshToken) {
-        // Láº¥y email tá»« token
+        // Lấy email từ token
         String email = jwtService.extractEmail(refreshToken);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User khÃ´ng tá»“n táº¡i!"));
+                .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
 
         if (Boolean.TRUE.equals(user.getIsLocked())) {
             throw new BadRequestException("Tài khoản đã bị khóa");
         }
 
-        // âœ… Verify token tá»« Redis
+        // ✅ Verify token từ Redis
         String storedToken = redisService.getRefreshToken(user.getId());
         if (storedToken == null || !storedToken.equals(refreshToken)) {
-            throw new RuntimeException("Refresh token khÃ´ng há»£p lá»‡!");
+            throw new RuntimeException("Refresh token không hợp lệ!");
         }
 
         if (!jwtService.verifyToken(refreshToken)) {
-            throw new RuntimeException("Refresh token Ä‘Ã£ háº¿t háº¡n!");
+            throw new RuntimeException("Refresh token đã hết hạn!");
         }
 
         String newAccessToken = jwtService.generateAccessToken(user);
@@ -124,17 +124,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    // ÄÄƒng xuáº¥t
+    // Đăng xuất
     public void logout(String refreshToken, String accessToken) {
         String email = jwtService.extractEmail(refreshToken);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User khÃ´ng tá»“n táº¡i!"));
+                .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
 
-        // âœ… Blacklist AccessToken
+        // ✅ Blacklist AccessToken
         redisService.blacklistToken(accessToken, accessTokenExpirationMs);
 
-        // âœ… XÃ³a RefreshToken khá»i Redis
+        // ✅ Xóa RefreshToken khỏi Redis
         redisService.deleteRefreshToken(user.getId());
     }
 }

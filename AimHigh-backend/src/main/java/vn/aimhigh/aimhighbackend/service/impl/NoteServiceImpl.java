@@ -33,14 +33,14 @@ public class NoteServiceImpl implements NoteService {
 
         String content = request.getContent() != null ? request.getContent().trim() : "";
         if (content.isEmpty()) {
-            throw new BadRequestException("Ná»™i dung note khÃ´ng Ä‘Æ°á»£c bá» trá»‘ng");
+            throw new BadRequestException("Nội dung note không được bỏ trống");
         }
 
         Question question = questionRepository.findById(request.getQuestionId())
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y question"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy question"));
 
         if (question.getExam() == null || !question.getExam().getId().equals(attempt.getExam().getId())) {
-            throw new BadRequestException("Question khÃ´ng thuá»™c Ä‘á» thi cá»§a attempt");
+            throw new BadRequestException("Question không thuộc đề thi của attempt");
         }
 
         Note note = Note.builder()
@@ -51,7 +51,7 @@ public class NoteServiceImpl implements NoteService {
                 .build();
 
         Note saved = noteRepository.save(note);
-        log.info("ÄÃ£ táº¡o note id={} cho attemptId={}, userId={}", saved.getId(), attemptId, userId);
+        log.info("Đã tạo note id={} cho attemptId={}, userId={}", saved.getId(), attemptId, userId);
         return toResponse(saved);
     }
 
@@ -66,32 +66,32 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     public void deleteNote(Long id, Long userId) {
         Note note = noteRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y note"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy note"));
         noteRepository.delete(note);
-        log.info("ÄÃ£ xoÃ¡ note id={} bá»Ÿi userId={}", id, userId);
+        log.info("Đã xoá note id={} bởi userId={}", id, userId);
     }
 
     @Transactional
     public NoteResponse updateNote(Long id, String content, Long userId) {
         Note note = noteRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y note"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy note"));
 
         String normalized = content == null ? "" : content.trim();
         if (normalized.isEmpty()) {
-            throw new BadRequestException("Ná»™i dung note khÃ´ng Ä‘Æ°á»£c bá» trá»‘ng");
+            throw new BadRequestException("Nội dung note không được bỏ trống");
         }
 
         note.setContent(normalized);
         Note saved = noteRepository.save(note);
-        log.info("ÄÃ£ cáº­p nháº­t note id={} bá»Ÿi userId={}", id, userId);
+        log.info("Đã cập nhật note id={} bởi userId={}", id, userId);
         return toResponse(saved);
     }
 
     private Attempt getOwnedAttempt(Long attemptId, Long userId) {
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y attempt"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy attempt"));
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n thao tÃ¡c trÃªn attempt nÃ y");
+            throw new ForbiddenException("Không có quyền thao tác trên attempt này");
         }
         return attempt;
     }

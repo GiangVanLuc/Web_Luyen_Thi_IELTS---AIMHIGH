@@ -34,9 +34,21 @@
               "correctAnswer": "FALSE",
               "explanation": "The passage says 'It is the world's only flightless parrot.'",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -46,9 +58,21 @@
               "correctAnswer": "FALSE",
               "explanation": "The passage says 'Kākāpō breed... but only in years when food is plentiful.'",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -58,9 +82,21 @@
               "correctAnswer": "FALSE",
               "explanation": "The passage states 'Males play no part in incubation or chick-rearing'.",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": true},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -70,9 +106,21 @@
               "correctAnswer": "NOT GIVEN",
               "explanation": "The text mentions both were threats but does not compare which was greater.",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": false},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": true}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": true
+                }
               ]
             },
             {
@@ -82,9 +130,21 @@
               "correctAnswer": "TRUE",
               "explanation": "The passage says 'predation by feral cats on Rakiura Island led to a rapid decline... As a result... population was evacuated to three island sanctuaries'.",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": true},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": true
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -94,9 +154,21 @@
               "correctAnswer": "TRUE",
               "explanation": "The passage mentions 'rescuing and hand-raising any failing chicks'.",
               "choices": [
-                {"label": "TRUE", "text": "TRUE", "isCorrect": true},
-                {"label": "FALSE", "text": "FALSE", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "TRUE",
+                  "text": "TRUE",
+                  "isCorrect": true
+                },
+                {
+                  "label": "FALSE",
+                  "text": "FALSE",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             }
           ]
@@ -186,7 +258,15 @@
           "questionFrom": 14,
           "questionTo": 18,
           "type": "MATCHING",
-          "matchOptions": ["A", "B", "C", "D", "E", "F", "G"],
+          "matchOptions": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+          ],
           "instruction": "Reading Passage 2 has seven paragraphs, A-G. Which paragraph contains the following information? Write the correct letter, A-G, in boxes 14-18 on your answer sheet.",
           "questions": [
             {
@@ -235,7 +315,7 @@
           "title": "Questions 19-23",
           "questionFrom": 19,
           "questionTo": 23,
-          "type": "MULTIPLE_CHOICE",
+          "type": "MATCHING",
           "instruction": "Look at the following statements and the list of people below. Match each statement with the correct person, A, B or C.",
           "questions": [
             {
@@ -243,60 +323,49 @@
               "questionText": "If a tree gets infected with Dutch elm disease, the damage rapidly becomes visible.",
               "points": 1,
               "correctAnswer": "B",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
-                {"label": "B", "text": "Karen Russell", "isCorrect": true},
-                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 20,
               "questionText": "It may be better to wait and see if the mature elms that have survived continue to flourish.",
               "points": 1,
               "correctAnswer": "A",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "Matt Elliot", "isCorrect": true},
-                {"label": "B", "text": "Karen Russell", "isCorrect": false},
-                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 21,
               "questionText": "There must be an explanation for the survival of some mature elms.",
               "points": 1,
               "correctAnswer": "B",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
-                {"label": "B", "text": "Karen Russell", "isCorrect": true},
-                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 22,
               "questionText": "We need to be aware that insects carrying Dutch elm disease are not very far away.",
               "points": 1,
               "correctAnswer": "C",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "Matt Elliot", "isCorrect": false},
-                {"label": "B", "text": "Karen Russell", "isCorrect": false},
-                {"label": "C", "text": "Peter Bourne", "isCorrect": true}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 23,
               "questionText": "You understand the effect Dutch elm disease has had when you see evidence of how prominent the tree once was.",
               "points": 1,
               "correctAnswer": "A",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "Matt Elliot", "isCorrect": true},
-                {"label": "B", "text": "Karen Russell", "isCorrect": false},
-                {"label": "C", "text": "Peter Bourne", "isCorrect": false}
-              ]
+              "explanation": ""
+            }
+          ],
+          "matchOptions": [
+            {
+              "letter": "A",
+              "text": "Matt Elliot"
+            },
+            {
+              "letter": "B",
+              "text": "Karen Russell"
+            },
+            {
+              "letter": "C",
+              "text": "Peter Bourne"
             }
           ]
         },
@@ -362,10 +431,26 @@
               "correctAnswer": "C",
               "explanation": "",
               "choices": [
-                {"label": "A", "text": "defining some commonly used terms.", "isCorrect": false},
-                {"label": "B", "text": "questioning a widely held assumption.", "isCorrect": false},
-                {"label": "C", "text": "mentioning a challenge faced by everyone.", "isCorrect": true},
-                {"label": "D", "text": "specifying a situation which makes us most anxious.", "isCorrect": false}
+                {
+                  "label": "A",
+                  "text": "defining some commonly used terms.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "B",
+                  "text": "questioning a widely held assumption.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "C",
+                  "text": "mentioning a challenge faced by everyone.",
+                  "isCorrect": true
+                },
+                {
+                  "label": "D",
+                  "text": "specifying a situation which makes us most anxious.",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -375,10 +460,26 @@
               "correctAnswer": "A",
               "explanation": "",
               "choices": [
-                {"label": "A", "text": "The regular changes of stress levels in their working lives make them ideal study subjects.", "isCorrect": true},
-                {"label": "B", "text": "The strategies they use to handle stress are of particular interest to researchers.", "isCorrect": false},
-                {"label": "C", "text": "The stressful nature of their job is typical of many public service professions.", "isCorrect": false},
-                {"label": "D", "text": "Their personalities make them especially well-suited to working under stress.", "isCorrect": false}
+                {
+                  "label": "A",
+                  "text": "The regular changes of stress levels in their working lives make them ideal study subjects.",
+                  "isCorrect": true
+                },
+                {
+                  "label": "B",
+                  "text": "The strategies they use to handle stress are of particular interest to researchers.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "C",
+                  "text": "The stressful nature of their job is typical of many public service professions.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "D",
+                  "text": "Their personalities make them especially well-suited to working under stress.",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -388,10 +489,26 @@
               "correctAnswer": "D",
               "explanation": "",
               "choices": [
-                {"label": "A", "text": "explaining their findings", "isCorrect": false},
-                {"label": "B", "text": "justifying their approach", "isCorrect": false},
-                {"label": "C", "text": "setting out their objectives", "isCorrect": false},
-                {"label": "D", "text": "describing their methodology", "isCorrect": true}
+                {
+                  "label": "A",
+                  "text": "explaining their findings",
+                  "isCorrect": false
+                },
+                {
+                  "label": "B",
+                  "text": "justifying their approach",
+                  "isCorrect": false
+                },
+                {
+                  "label": "C",
+                  "text": "setting out their objectives",
+                  "isCorrect": false
+                },
+                {
+                  "label": "D",
+                  "text": "describing their methodology",
+                  "isCorrect": true
+                }
               ]
             },
             {
@@ -401,10 +518,26 @@
               "correctAnswer": "C",
               "explanation": "",
               "choices": [
-                {"label": "A", "text": "enables people to respond more quickly to stressful situations.", "isCorrect": false},
-                {"label": "B", "text": "results in increased ability to control our levels of anxiety.", "isCorrect": false},
-                {"label": "C", "text": "produces heightened sensitivity to indications of external threats.", "isCorrect": true},
-                {"label": "D", "text": "is activated when there is a need to communicate a sense of danger.", "isCorrect": false}
+                {
+                  "label": "A",
+                  "text": "enables people to respond more quickly to stressful situations.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "B",
+                  "text": "results in increased ability to control our levels of anxiety.",
+                  "isCorrect": false
+                },
+                {
+                  "label": "C",
+                  "text": "produces heightened sensitivity to indications of external threats.",
+                  "isCorrect": true
+                },
+                {
+                  "label": "D",
+                  "text": "is activated when there is a need to communicate a sense of danger.",
+                  "isCorrect": false
+                }
               ]
             }
           ]
@@ -413,7 +546,7 @@
           "title": "Questions 31-35",
           "questionFrom": 31,
           "questionTo": 35,
-          "type": "MULTIPLE_CHOICE",
+          "type": "MATCHING",
           "instruction": "Complete each sentence with the correct ending, A-G.",
           "questions": [
             {
@@ -421,80 +554,65 @@
               "questionText": "At times when they were relaxed, the firefighters usually...",
               "points": 1,
               "correctAnswer": "B",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
-                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": true},
-                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
-                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
-                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
-                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
-                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 32,
               "questionText": "The researchers noted that when the firefighters were stressed, they...",
               "points": 1,
               "correctAnswer": "G",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
-                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
-                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
-                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
-                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
-                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
-                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": true}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 33,
               "questionText": "When the firefighters were told good news, they always...",
               "points": 1,
               "correctAnswer": "F",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
-                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
-                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
-                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
-                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
-                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": true},
-                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 34,
               "questionText": "The students' cortisol levels and heart rates were affected when the researchers...",
               "points": 1,
               "correctAnswer": "E",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
-                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
-                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
-                {"label": "D", "text": "were feeling under stress.", "isCorrect": false},
-                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": true},
-                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
-                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
-              ]
+              "explanation": ""
             },
             {
               "questionNumber": 35,
               "questionText": "In both experiments, negative information was processed better when the subjects...",
               "points": 1,
               "correctAnswer": "D",
-              "explanation": "",
-              "choices": [
-                {"label": "A", "text": "made them feel optimistic.", "isCorrect": false},
-                {"label": "B", "text": "took relatively little notice of bad news.", "isCorrect": false},
-                {"label": "C", "text": "responded to negative and positive information in the same way.", "isCorrect": false},
-                {"label": "D", "text": "were feeling under stress.", "isCorrect": true},
-                {"label": "E", "text": "put them in a stressful situation.", "isCorrect": false},
-                {"label": "F", "text": "behaved in a similar manner, regardless of the circumstances.", "isCorrect": false},
-                {"label": "G", "text": "thought it more likely that they would experience something bad.", "isCorrect": false}
-              ]
+              "explanation": ""
+            }
+          ],
+          "matchOptions": [
+            {
+              "letter": "A",
+              "text": "made them feel optimistic."
+            },
+            {
+              "letter": "B",
+              "text": "took relatively little notice of bad news."
+            },
+            {
+              "letter": "C",
+              "text": "responded to negative and positive information in the same way."
+            },
+            {
+              "letter": "D",
+              "text": "were feeling under stress."
+            },
+            {
+              "letter": "E",
+              "text": "put them in a stressful situation."
+            },
+            {
+              "letter": "F",
+              "text": "behaved in a similar manner, regardless of the circumstances."
+            },
+            {
+              "letter": "G",
+              "text": "thought it more likely that they would experience something bad."
             }
           ]
         },
@@ -512,9 +630,21 @@
               "correctAnswer": "YES",
               "explanation": "",
               "choices": [
-                {"label": "YES", "text": "YES", "isCorrect": true},
-                {"label": "NO", "text": "NO", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "YES",
+                  "text": "YES",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NO",
+                  "text": "NO",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -524,9 +654,21 @@
               "correctAnswer": "NOT GIVEN",
               "explanation": "",
               "choices": [
-                {"label": "YES", "text": "YES", "isCorrect": false},
-                {"label": "NO", "text": "NO", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": true}
+                {
+                  "label": "YES",
+                  "text": "YES",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NO",
+                  "text": "NO",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": true
+                }
               ]
             },
             {
@@ -536,9 +678,21 @@
               "correctAnswer": "NO",
               "explanation": "",
               "choices": [
-                {"label": "YES", "text": "YES", "isCorrect": false},
-                {"label": "NO", "text": "NO", "isCorrect": true},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "YES",
+                  "text": "YES",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NO",
+                  "text": "NO",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -548,9 +702,21 @@
               "correctAnswer": "YES",
               "explanation": "",
               "choices": [
-                {"label": "YES", "text": "YES", "isCorrect": true},
-                {"label": "NO", "text": "NO", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "YES",
+                  "text": "YES",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NO",
+                  "text": "NO",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             },
             {
@@ -560,9 +726,21 @@
               "correctAnswer": "YES",
               "explanation": "",
               "choices": [
-                {"label": "YES", "text": "YES", "isCorrect": true},
-                {"label": "NO", "text": "NO", "isCorrect": false},
-                {"label": "NOT GIVEN", "text": "NOT GIVEN", "isCorrect": false}
+                {
+                  "label": "YES",
+                  "text": "YES",
+                  "isCorrect": true
+                },
+                {
+                  "label": "NO",
+                  "text": "NO",
+                  "isCorrect": false
+                },
+                {
+                  "label": "NOT GIVEN",
+                  "text": "NOT GIVEN",
+                  "isCorrect": false
+                }
               ]
             }
           ]

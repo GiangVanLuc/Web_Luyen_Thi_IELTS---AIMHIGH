@@ -980,12 +980,27 @@
             const wrong = stats.total > 0
                 ? stats.wrong
                 : Math.max(0, total - correct - skipped);
+            // Bài làm 1 phần (chỉ 1 passage/section) thì KHÔNG quy ra band IELTS (band cần đủ 40 câu).
+            const fullCount = (result.skill === 'READING' || result.skill === 'LISTENING') ? 40 : 0;
+            const isPartial = fullCount > 0 && total > 0 && total < fullCount;
+            const accuracy = total > 0 ? correct / total : 0;
             const bandScore = Number(result.bandScore || 0);
-            const progressRatio = Math.max(0, Math.min(1, bandScore / 9));
-            const feedback = getBandFeedback(bandScore);
+            const progressRatio = isPartial
+                ? Math.max(0, Math.min(1, accuracy))
+                : Math.max(0, Math.min(1, bandScore / 9));
+            const feedback = isPartial
+                ? { label: `Luyện 1 phần • ${Math.round(accuracy * 100)}% chính xác`, color: '#0ea5e9', stars: Math.max(1, Math.round(accuracy * 5)) }
+                : getBandFeedback(bandScore);
 
             setText('resultTitle', result.examTitle || 'Kết quả bài thi');
-            setText('bandScore', bandScore.toFixed(1));
+            const subEl = document.querySelector('.yp-art-sub');
+            if (subEl) {
+                subEl.innerHTML = isPartial
+                    ? `<strong id="bandScore">${correct}/${total}</strong> câu đúng (luyện 1 phần)`
+                    : `Band <strong id="bandScore">${bandScore.toFixed(1)}</strong>/9.0`;
+            } else {
+                setText('bandScore', isPartial ? `${correct}/${total}` : bandScore.toFixed(1));
+            }
             setText('summaryCorrect', String(correct));
             setText('summaryTotal', String(total));
             setText('correctCount', correct);

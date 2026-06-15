@@ -47,7 +47,7 @@ public class HighlightServiceImpl implements HighlightService {
                 .build();
 
         Highlight saved = highlightRepository.save(highlight);
-        log.info("ÄÃ£ táº¡o highlight id={} cho attemptId={}, userId={}", saved.getId(), attemptId, userId);
+        log.info("Đã tạo highlight id={} cho attemptId={}, userId={}", saved.getId(), attemptId, userId);
         return toResponse(saved);
     }
 
@@ -72,46 +72,46 @@ public class HighlightServiceImpl implements HighlightService {
     @Transactional
     public void deleteHighlight(Long id, Long userId) {
         Highlight highlight = highlightRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y highlight"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy highlight"));
         highlightRepository.delete(highlight);
-        log.info("ÄÃ£ xoÃ¡ highlight id={} bá»Ÿi userId={}", id, userId);
+        log.info("Đã xoá highlight id={} bởi userId={}", id, userId);
     }
 
     @Transactional
     public HighlightResponse updateHighlightNote(Long id, String note, Long userId) {
         Highlight highlight = highlightRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y highlight"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy highlight"));
 
         highlight.setNote(normalizeNullableText(note));
         Highlight saved = highlightRepository.save(highlight);
-        log.info("ÄÃ£ cáº­p nháº­t note cho highlight id={} bá»Ÿi userId={}", id, userId);
+        log.info("Đã cập nhật note cho highlight id={} bởi userId={}", id, userId);
         return toResponse(saved);
     }
 
     private Attempt getOwnedAttempt(Long attemptId, Long userId) {
         Attempt attempt = attemptRepository.findById(attemptId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y attempt"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy attempt"));
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n thao tÃ¡c trÃªn attempt nÃ y");
+            throw new ForbiddenException("Không có quyền thao tác trên attempt này");
         }
         return attempt;
     }
 
     private ReadingPassage getPassageInExam(Long passageId, Long examId) {
         ReadingPassage passage = readingPassageRepository.findById(passageId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y passage"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy passage"));
         if (passage.getExam() == null || !passage.getExam().getId().equals(examId)) {
-            throw new BadRequestException("Passage khÃ´ng thuá»™c Ä‘á» thi cá»§a attempt");
+            throw new BadRequestException("Passage không thuộc đề thi của attempt");
         }
         return passage;
     }
 
     private void validateOffset(Integer startOffset, Integer endOffset) {
         if (startOffset == null || endOffset == null) {
-            throw new BadRequestException("StartOffset vÃ  EndOffset khÃ´ng Ä‘Æ°á»£c bá» trá»‘ng");
+            throw new BadRequestException("StartOffset và EndOffset không được bỏ trống");
         }
         if (startOffset < 0 || endOffset <= startOffset) {
-            throw new BadRequestException("Offset khÃ´ng há»£p lá»‡");
+            throw new BadRequestException("Offset không hợp lệ");
         }
     }
 

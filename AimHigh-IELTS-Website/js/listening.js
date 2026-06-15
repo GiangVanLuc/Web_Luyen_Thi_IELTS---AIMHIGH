@@ -515,8 +515,50 @@ function addReviewCorrectHint(questionNumber, anchorElement, answerText) {
     hint.textContent = `Đáp án đúng: ${answerText || 'Chưa cập nhật đáp án'}`;
 }
 
+// Tách chuỗi đáp án thành tập chữ cái (cho câu chọn-2): "A,E" / "AE" -> {A,E}
+function lettersOfAnswer(value) {
+    const set = new Set();
+    String(value || '').toUpperCase().replace(/[^A-I]/g, ' ').split(/\s+/).forEach(t => {
+        if (t.length >= 1) for (const ch of t) if (ch >= 'A' && ch <= 'I') set.add(ch);
+    });
+    return set;
+}
+
+// Review cho khối MCQ chọn-2 (mcq-multi): tick lại lựa chọn, tô đúng/sai, hiện đáp án đúng.
+function decorateMcqMultiReview(qNum, resultQuestion) {
+    const wrap = Array.from(document.querySelectorAll('.mcq-multi[data-qnums]'))
+        .find(w => String(w.dataset.qnums || '').split(',').map(Number).includes(Number(qNum)));
+    if (!wrap || wrap.dataset.reviewed === 'true') return !!wrap;
+    wrap.dataset.reviewed = 'true';
+
+    const correctSet = lettersOfAnswer(resolveCorrectAnswerForReview(resultQuestion));
+    const userSet = lettersOfAnswer(resultQuestion?.userAnswer);
+
+    wrap.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+        const val = String(box.value || '').trim().toUpperCase();
+        box.disabled = true;
+        box.checked = userSet.has(val);
+        const opt = box.closest('.mcq-multi-opt');
+        if (!opt) return;
+        if (correctSet.has(val)) opt.classList.add('review-correct-option');
+        if (userSet.has(val) && !correctSet.has(val)) opt.classList.add('review-wrong-option');
+    });
+
+    const badge = wrap.querySelector('.mcq-multi-badge');
+    if (badge) badge.classList.add(resultQuestion?.isCorrect ? 'review-correct' : 'review-wrong');
+
+    if (!wrap.querySelector('.review-correct-hint')) {
+        const hint = document.createElement('div');
+        hint.className = 'review-correct-hint';
+        hint.textContent = `Đáp án đúng: ${Array.from(correctSet).join(', ') || '(chưa cập nhật)'}`;
+        wrap.appendChild(hint);
+    }
+    return true;
+}
+
 function decorateReviewQuestion(questionNumber, resultQuestion) {
     const qNum = Number(questionNumber);
+    if (decorateMcqMultiReview(qNum, resultQuestion)) return;
     const questionContainer = getReviewQuestionContainer(qNum);
     if (!questionContainer) return;
 
@@ -622,6 +664,25 @@ function applyReviewMode(result) {
         decorateReviewQuestion(qNum, resultQuestion);
     });
 
+    // Bài làm 1 phần: ẩn các section không làm khỏi review.
+    const attemptedSecs = new Set();
+    [1, 2, 3, 4].forEach((s) => {
+        const r = SEC_CFG[s];
+        if (!r) return;
+        for (let q = r.from; q <= r.to; q++) {
+            if (reviewQuestionMap.has(q)) { attemptedSecs.add(s); break; }
+        }
+    });
+    if (attemptedSecs.size > 0 && attemptedSecs.size < 4) {
+        [1, 2, 3, 4].forEach((s) => {
+            if (attemptedSecs.has(s)) return;
+            const box = document.getElementById('secbox' + s);
+            if (box) box.style.display = 'none';
+            const block = document.getElementById('sec' + s);
+            if (block) block.style.display = 'none';
+        });
+    }
+
     const firstWrong = reviewQuestionOrder.find((qNum) => {
         const question = reviewQuestionMap.get(qNum);
         return question && !question.isSkipped && !question.isCorrect;
@@ -657,6 +718,7 @@ async function loadExam() {
         // --- Gọi API Backend lấy đề thi ---
         const apiRes = await getExamData(examId);
         examData = apiRes.data || apiRes;
+        normalizeExamShape(examData);
     } catch (err) {
         document.getElementById('qScroll').innerHTML =
             '<p style="padding:30px;color:#ef4444;">Không thể tải đề thi. Vui lòng thử lại.</p>';
@@ -756,6 +818,30 @@ async function loadExam() {
     document.addEventListener('keydown', onKey);
 }
 
+// Chuẩn hoá: nếu backend trả ExamDetailResponse dạng {parts:[...]} (đề dựng từ entity, không có examData JSON)
+// thì biến thành {sections:[{sectionNumber, audioUrl, groups:[{questions}]}]} để renderer dùng được.
+function normalizeExamShape(data) {
+    if (!data) return;
+    if (Array.isArray(data.sections) && data.sections.length) return;
+    const parts = Array.isArray(data.parts) ? data.parts : [];
+    if (!parts.length) return;
+    data.sections = parts.map((p, idx) => ({
+        sectionNumber: Number(p.partNumber) > 0 ? Number(p.partNumber) : (idx + 1),
+        label: p.title || ('Part ' + (idx + 1)),
+        audioUrl: p.audioUrl || null,
+        audioDuration: p.audioDuration || null,
+        groups: [{
+            groupTitle: p.title || '',
+            questions: (p.questions || []).map(q => ({
+                questionNumber: q.questionNumber,
+                questionText: q.questionText,
+                type: q.questionType,
+                choices: q.choices || undefined
+            }))
+        }]
+    }));
+}
+
 // ─── RENDER QUESTIONS ────────────────────────────────────────────────────────
 function renderQuestions() {
     const qScroll = document.getElementById('qScroll');
@@ -763,8 +849,9 @@ function renderQuestions() {
     questionIdMap = new Map();
     questionNumberMap = new Map();
 
-    (examData.sections || []).forEach(sec => {
-        const sn = sec.sectionNumber;
+    (examData.sections || []).forEach((sec, idx) => {
+        // Suy số section bền vững: ưu tiên sectionNumber, thiếu/không hợp lệ thì lấy theo thứ tự (idx+1).
+        const sn = Number(sec.sectionNumber) > 0 ? Number(sec.sectionNumber) : (idx + 1);
         if (isSingle && sn !== singleSec) return;
 
         const block = document.createElement('div');
@@ -813,22 +900,24 @@ function renderGroup(g, sec) {
             break;
 
         case 'TABLE_COMPLETION':
-            html += renderTableCompletion(g);
+            // Có cấu trúc bảng thì render bảng; nếu chỉ là câu hỏi phẳng (đề cũ gắn nhãn "table")
+            // thì fallback sang fill-block để không bị bảng rỗng.
+            if (Array.isArray(g.tableRows) && g.tableRows.length) html += renderTableCompletion(g);
+            else html += renderFillBlock(sourceQuestions, g);
             break;
 
         case 'SUMMARY_COMPLETION':
-            html += renderSummaryCompletion(g);
+            if (String(g.summaryTemplate || '').trim()) html += renderSummaryCompletion(g);
+            else html += renderFillBlock(sourceQuestions, g);
             break;
 
         case 'SUMMARY_WORDBANK':
-            html += renderSummaryWordbank(g, sourceQuestions);
+            if (String(g.summaryTemplate || '').trim()) html += renderSummaryWordbank(g, sourceQuestions);
+            else html += renderMatchingDrag(sourceQuestions, g, 'MATCHING', sec);
             break;
 
         case 'FILL_BLOCK':
-            html += `<div class="fill-block">`;
-            if (g.blockTitle) html += `<div class="fill-title">${eh(g.blockTitle)}</div>`;
-            sourceQuestions.forEach(q => { html += renderFillLine(q); });
-            html += `</div>`;
+            html += renderFillBlock(sourceQuestions, g);
             break;
 
         default:
@@ -943,7 +1032,19 @@ function renderFillLine(q) {
     const qn=q.questionNumber, w=q.inputWidth||100;
     const tpl=q.lineTemplate||q.questionText||`Question ${qn}: ___`;
     const inputHtml=`<span id="b${qn}" class="fb">${qn}</span> <input class="finp" id="q${qn}" placeholder="……" style="width:${w}px;" oninput="pa(${qn},this.value)">`;
-    return `<div class="fill-line">${tpl.replace('___',inputHtml)}</div>`;
+    // Hỗ trợ cả "___" (3 gạch) lẫn các chuỗi gạch dài hơn ("_______") thường gặp trong đề.
+    let line;
+    if (tpl.includes('___')) line = tpl.replace(/_{3,}/, inputHtml);
+    else line = `${eh(tpl)} ${inputHtml}`;
+    return `<div class="fill-line">${line}</div>`;
+}
+
+function renderFillBlock(sourceQuestions, g) {
+    let html = `<div class="fill-block">`;
+    if (g && g.blockTitle) html += `<div class="fill-title">${eh(g.blockTitle)}</div>`;
+    (sourceQuestions || []).forEach(q => { html += renderFillLine(q); });
+    html += `</div>`;
+    return html;
 }
 
 // ── MCQ chọn-2 (MULTIPLE_CHOICE_MULTI) ──────────────────────────────────────

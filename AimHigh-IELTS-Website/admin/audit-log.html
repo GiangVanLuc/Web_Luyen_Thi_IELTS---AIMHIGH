@@ -49,24 +49,38 @@
                 <div class="admin-card">
                     <div class="admin-card-header">
                         <div class="filter-bar">
-                            <select class="form-select"><option>Tất cả hành động</option><option>Đăng nhập</option><option>Cập nhật đề thi</option><option>Phân quyền</option></select>
-                            <select class="form-select"><option>Tất cả tài khoản</option><option>Super Admin</option><option>Content Admin</option><option>Reviewer</option></select>
-                            <input class="form-control" placeholder="Tìm theo mã sự kiện, IP...">
+                            <select class="form-select" id="filterAction">
+                                <option value="">Tất cả hành động</option>
+                                <option value="Đăng nhập">Đăng nhập</option>
+                                <option value="Đăng nhập thất bại">Đăng nhập thất bại</option>
+                                <option value="Tạo tài khoản">Tạo tài khoản</option>
+                                <option value="Sửa vai trò">Sửa vai trò</option>
+                                <option value="Khóa tài khoản">Khóa tài khoản</option>
+                                <option value="Cập nhật đề thi">Cập nhật đề thi</option>
+                            </select>
+                            <input class="form-control" id="filterAccount" placeholder="Tìm tài khoản (Email)...">
+                            <input class="form-control" id="filterSearch" placeholder="Tìm theo đối tượng, IP...">
                         </div>
-                        <button class="btn-admin-primary"><i class="bi bi-download"></i> Export Log</button>
+                        <button class="btn-admin-primary" onclick="exportAuditLog()"><i class="bi bi-download"></i> Export Log</button>
                     </div>
                     <div class="admin-table-wrapper">
                         <table class="admin-table">
                             <thead><tr><th>Thời gian</th><th>Tài khoản</th><th>Hành động</th><th>Đối tượng</th><th>IP</th><th>Kết quả</th></tr></thead>
-                            <tbody>
-                                <tr><td>02/04/2026 10:26:12</td><td>admin@aimhigh.edu</td><td>Sửa vai trò</td><td>User: reviewer_03</td><td>171.234.45.90</td><td><span class="status-badge published">Success</span></td></tr>
-                                <tr><td>02/04/2026 09:58:47</td><td>content01@aimhigh.edu</td><td>Cập nhật đề thi</td><td>Cambridge 18 - Test 1</td><td>171.234.45.90</td><td><span class="status-badge published">Success</span></td></tr>
-                                <tr><td>02/04/2026 09:12:33</td><td>reviewer02@aimhigh.edu</td><td>Đăng nhập</td><td>Admin Portal</td><td>113.190.12.8</td><td><span class="status-badge published">Success</span></td></tr>
-                                <tr><td>02/04/2026 08:44:05</td><td>unknown</td><td>Đăng nhập thất bại</td><td>Admin Portal</td><td>113.190.12.8</td><td><span class="status-badge archived">Denied</span></td></tr>
-                                <tr><td>01/04/2026 22:31:19</td><td>admin@aimhigh.edu</td><td>Đổi API key email</td><td>Setting: SMTP</td><td>42.118.220.19</td><td><span class="status-badge draft">Review</span></td></tr>
+                            <tbody id="auditLogTbody">
+                                <tr><td colspan="6" class="text-center">Đang tải dữ liệu...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls">
+                        <div class="text-muted" id="pageInfo">Hiển thị 0 kết quả</div>
+                        <div class="admin-pagination-btns">
+                            <button class="page-btn" id="btnPrevPage"><i class="bi bi-chevron-left"></i></button>
+                            <span id="currentPageDisplay" class="mx-2 fw-medium">1</span>
+                            <button class="page-btn" id="btnNextPage"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+
                 </div>
             </main>
         </div>
@@ -74,5 +88,114 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script>
+        let currentPage = 1;
+        const limit = 20;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAuditLogs();
+
+            document.getElementById('filterAction').addEventListener('change', () => { currentPage = 1; loadAuditLogs(); });
+            
+            let debounceTimer;
+            const debouncedLoad = () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => { currentPage = 1; loadAuditLogs(); }, 500);
+            };
+
+            document.getElementById('filterAccount').addEventListener('input', debouncedLoad);
+            document.getElementById('filterSearch').addEventListener('input', debouncedLoad);
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadAuditLogs();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadAuditLogs();
+            });
+        });
+
+        async function loadAuditLogs() {
+            const tbody = document.getElementById('auditLogTbody');
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Đang tải dữ liệu...</td></tr>';
+            
+            try {
+                const action = document.getElementById('filterAction').value;
+                const accountEmail = document.getElementById('filterAccount').value;
+                const search = document.getElementById('filterSearch').value;
+
+                const res = await adminGetAuditLogs({
+                    page: currentPage,
+                    limit: limit,
+                    action: action,
+                    accountEmail: accountEmail,
+                    search: search
+                });
+
+                if (res && res.content) {
+                    renderTable(res.content);
+                    
+                    document.getElementById('pageInfo').innerText = `Tổng cộng ${res.totalElements || res.content.length} kết quả`;
+                    document.getElementById('currentPageDisplay').innerText = currentPage;
+                    
+                    document.getElementById('btnPrevPage').disabled = res.first || currentPage === 1;
+                    document.getElementById('btnNextPage').disabled = res.last || res.content.length < limit;
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Không tải được dữ liệu</td></tr>';
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Lỗi: ${err.message || 'Server error'}</td></tr>`;
+            }
+        }
+
+        function renderTable(logs) {
+            const tbody = document.getElementById('auditLogTbody');
+            tbody.innerHTML = '';
+            
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Không tìm thấy nhật ký nào.</td></tr>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                
+                // Format date
+                const d = new Date(log.timestamp);
+                const timeStr = d.toLocaleString('vi-VN', { 
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+
+                let badgeClass = 'published'; // Success (green)
+                let resultText = log.result || 'Success';
+                
+                if (resultText.toLowerCase().includes('fail') || resultText.toLowerCase().includes('denied') || resultText.toLowerCase().includes('error')) {
+                    badgeClass = 'archived'; // Error (red)
+                } else if (resultText.toLowerCase().includes('review') || resultText.toLowerCase().includes('pending')) {
+                    badgeClass = 'draft'; // Warning/Review (yellow)
+                }
+
+                tr.innerHTML = `
+                    <td>${timeStr}</td>
+                    <td>${log.accountEmail || 'unknown'}</td>
+                    <td>${log.action || ''}</td>
+                    <td>${log.target || ''}</td>
+                    <td>${log.ipAddress || ''}</td>
+                    <td><span class="status-badge ${badgeClass}">${resultText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportAuditLog() {
+            alert('Tính năng Export đang được phát triển!');
+        }
+    </script>
 </body>
 </html>

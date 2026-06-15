@@ -63,9 +63,13 @@ body {
 
 button,
 input,
-select,
 textarea {
     font-family: var(--font-primary);
+}
+
+select {
+    /* Tránh lỗi render dấu tiếng Việt của Be Vietnam Pro trên thẻ select (Windows/Chrome) */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 a {

@@ -44,9 +44,9 @@ public class ResultServiceImpl implements ResultService {
         Attempt attempt = attemptRepository.findById(attemptId)
                 .orElseThrow(() -> new ResourceNotFoundException("không tìm thấy bài thi"));
                 
-        // Kiá»ƒm tra quyá»n (pháº£i lÃ  bÃ i cá»§a mÃ¬nh)
+        // Kiểm tra quyền (phải là bài của mình)
         if (!attempt.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("KhÃ´ng cÃ³ quyá»n xem Ä‘iá»ƒm cá»§a ngÆ°á»i khÃ¡c");
+            throw new ForbiddenException("Không có quyền xem điểm của người khác");
         }
 
         if (attempt.getStatus() == AttemptStatus.IN_PROGRESS) {
@@ -108,12 +108,26 @@ public class ResultServiceImpl implements ResultService {
                         .build());
     }
 
+    /**
+     * Một block (part/passage) được coi là "đã làm" nếu có ít nhất 1 câu thuộc block đó
+     * nằm trong danh sách câu đã nộp. Nhờ vậy nếu thí sinh chỉ làm 1 passage thì kết quả
+     * chỉ chấm/hiển thị đúng passage đó (không tính các passage không làm là sai/bỏ qua).
+     */
+    private boolean hasAnsweredQuestion(List<Question> questions, Map<Long, Answer> answerMap) {
+        if (questions == null) {
+            return false;
+        }
+        return questions.stream().anyMatch(q -> q != null && answerMap.containsKey(q.getId()));
+    }
+
             private List<ResultResponse.ResultPartResponse> buildPartResponses(
                 List<ListeningPart> parts,
                 Map<Long, Answer> answerMap,
                 Map<Integer, String> questionTypes
             ) {
-        return parts.stream().map(part -> {
+        return parts.stream()
+            .filter(part -> hasAnsweredQuestion(part.getQuestions(), answerMap))
+            .map(part -> {
                 List<ResultResponse.ResultQuestionResponse> questions = mapResultQuestions(part.getQuestions(), answerMap, questionTypes);
             int correct = (int) questions.stream().filter(q -> Boolean.TRUE.equals(q.getIsCorrect())).count();
             return ResultResponse.ResultPartResponse.builder()
@@ -131,7 +145,9 @@ public class ResultServiceImpl implements ResultService {
             Map<Long, Answer> answerMap,
             Map<Integer, String> questionTypes
         ) {
-        return passages.stream().map(passage -> {
+        return passages.stream()
+            .filter(passage -> hasAnsweredQuestion(passage.getQuestions(), answerMap))
+            .map(passage -> {
             List<ResultResponse.ResultQuestionResponse> questions = mapResultQuestions(passage.getQuestions(), answerMap, questionTypes);
             int correct = (int) questions.stream().filter(q -> Boolean.TRUE.equals(q.getIsCorrect())).count();
             Integer passageOrder = passage.getEffectivePassageOrderInSection() != null
@@ -250,7 +266,7 @@ public class ResultServiceImpl implements ResultService {
                 }
             }
         } catch (Exception e) {
-            log.warn("KhÃ´ng thá»ƒ parse question types tá»« examData", e);
+            log.warn("Không thể parse question types từ examData", e);
         }
 
         return types;
@@ -275,19 +291,19 @@ public class ResultServiceImpl implements ResultService {
         }
 
         if (isSkipped) {
-            return "Báº¡n Ä‘Ã£ bá» qua cÃ¢u nÃ y. ÄÃ¡p Ã¡n Ä‘Ãºng lÃ : " + nullSafe(q.getCorrectAnswer()) + ".";
+            return "Bạn đã bỏ qua câu này. Đáp án đúng là: " + nullSafe(q.getCorrectAnswer()) + ".";
         }
 
         if (isCorrect) {
-            return "Báº¡n tráº£ lá»i Ä‘Ãºng. ÄÃ¡p Ã¡n chuáº©n lÃ : " + nullSafe(q.getCorrectAnswer()) + ".";
+            return "Bạn trả lời đúng. Đáp án chuẩn là: " + nullSafe(q.getCorrectAnswer()) + ".";
         }
 
-        return "Báº¡n tráº£ lá»i \"" + nullSafe(userAnswer) + "\" nhÆ°ng Ä‘Ã¡p Ã¡n Ä‘Ãºng lÃ  \""
-                + nullSafe(q.getCorrectAnswer()) + "\". HÃ£y chÃº Ã½ tá»« khÃ³a vÃ  dáº¡ng cÃ¢u há»i.";
+        return "Bạn trả lời \"" + nullSafe(userAnswer) + "\" nhưng đáp án đúng là \""
+                + nullSafe(q.getCorrectAnswer()) + "\". Hãy chú ý từ khóa và dạng câu hỏi.";
     }
 
     private String nullSafe(String text) {
-        return text == null ? "(trá»‘ng)" : text;
+        return text == null ? "(trống)" : text;
     }
 }
 

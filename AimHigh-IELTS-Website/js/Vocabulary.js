@@ -283,7 +283,10 @@ async function syncUserVocabularyFromBackend() {
             const backendVocabId = Number(item?.id);
             const backendUserVocabularyId = Number(item?.userVocabularyId);
             const backendGroupId = Number(item?.groupId);
-            if (!Number.isFinite(backendVocabId) || backendVocabId <= 0) return;
+            
+            const isValidVocab = Number.isFinite(backendVocabId) && backendVocabId > 0;
+            const isValidCustom = Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0;
+            if (!isValidVocab && !isValidCustom) return;
 
             const targetGroup = getBackendGroupName(item);
             if (!groups.includes(targetGroup)) groups.push(targetGroup);
@@ -292,8 +295,8 @@ async function syncUserVocabularyFromBackend() {
             }
 
             const existing = data.find((w) =>
-                (Number.isFinite(backendUserVocabularyId) && Number(w?.backendUserVocabularyId) === backendUserVocabularyId)
-                || Number(w?.backendVocabId) === backendVocabId
+                (isValidCustom && Number(w?.backendUserVocabularyId) === backendUserVocabularyId)
+                || (isValidVocab && Number(w?.backendVocabId) === backendVocabId)
                 || (
                     String(w?.word || '').toLowerCase() === String(item?.word || '').toLowerCase()
                     && String(w?.group || '') === targetGroup
@@ -308,10 +311,8 @@ async function syncUserVocabularyFromBackend() {
                 existing.group = targetGroup;
                 existing.status = getBackendWordStatus(item);
                 existing.learnLevel = normalizeLearnLevel(item?.learnLevel);
-                existing.backendVocabId = backendVocabId;
-                existing.backendUserVocabularyId = Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0
-                    ? backendUserVocabularyId
-                    : existing.backendUserVocabularyId || null;
+                existing.backendVocabId = isValidVocab ? backendVocabId : null;
+                existing.backendUserVocabularyId = isValidCustom ? backendUserVocabularyId : existing.backendUserVocabularyId || null;
                 existing.backendGroupId = Number.isFinite(backendGroupId) && backendGroupId > 0
                     ? backendGroupId
                     : existing.backendGroupId || null;
@@ -330,8 +331,8 @@ async function syncUserVocabularyFromBackend() {
                 source: 'Đồng bộ backend',
                 status: getBackendWordStatus(item),
                 learnLevel: normalizeLearnLevel(item?.learnLevel),
-                backendVocabId,
-                backendUserVocabularyId: Number.isFinite(backendUserVocabularyId) && backendUserVocabularyId > 0 ? backendUserVocabularyId : null,
+                backendVocabId: isValidVocab ? backendVocabId : null,
+                backendUserVocabularyId: isValidCustom ? backendUserVocabularyId : null,
                 backendGroupId: Number.isFinite(backendGroupId) && backendGroupId > 0 ? backendGroupId : null,
                 addedAt: item?.savedAt || new Date().toISOString()
             }));

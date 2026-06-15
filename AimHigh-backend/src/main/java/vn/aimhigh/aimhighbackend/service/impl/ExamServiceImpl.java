@@ -32,16 +32,16 @@ import tools.jackson.databind.node.ObjectNode;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ExamServiceImpl implements ExamService {
-    private static final Pattern QUESTIONS_RANGE_PATTERN = Pattern.compile("(\\d+)\\s*[-â€“]\\s*(\\d+)");
+    private static final Pattern QUESTIONS_RANGE_PATTERN = Pattern.compile("(\\d+)\\s*[-–]\\s*(\\d+)");
 
     private final ExamRepository examRepository;
     private final ObjectMapper objectMapper;
 
     /**
-     * Láº¥y danh sÃ¡ch Ä‘á» thi theo Ä‘iá»u kiá»‡n
+     * Lấy danh sách đề thi theo điều kiện
      */
     public List<ExamSummaryResponse> getExams(Skill skill, ExamLevel level) {
-        log.info("Láº¥y danh sÃ¡ch Ä‘á» thi. Skill: {}, Level: {}", skill, level);
+        log.info("Lấy danh sách đề thi. Skill: {}, Level: {}", skill, level);
         List<Exam> exams;
         if (skill != null && level != null) {
             exams = examRepository.findBySkillAndLevelAndStatus(skill, level, ExamStatus.PUBLISHED);
@@ -113,7 +113,7 @@ public class ExamServiceImpl implements ExamService {
     @Transactional
     public ExamSummaryResponse updateAdminExam(Long id, JsonNode request) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đề thi"));
 
         if (request.hasNonNull("title")) {
             exam.setTitle(request.path("title").asText());
@@ -146,7 +146,7 @@ public class ExamServiceImpl implements ExamService {
     @Transactional
     public ExamSummaryResponse updateAdminExamStatus(Long id, String status) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đề thi"));
         applyStatus(exam, status);
         return toSummary(examRepository.save(exam));
     }
@@ -154,7 +154,7 @@ public class ExamServiceImpl implements ExamService {
     @Transactional
     public void deleteAdminExam(Long id) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á» thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đề thi"));
         examRepository.delete(exam);
     }
 
@@ -210,16 +210,16 @@ public class ExamServiceImpl implements ExamService {
 
     @Cacheable(value = "exams", key = "#examId")
     public Object getExamDetail(Long examId) {
-        log.info("Láº¥y chi tiáº¿t Ä‘á»  thi ID: {}", examId);
+        log.info("Lấy chi tiết đề thi ID: {}", examId);
         Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new ResourceNotFoundException("KhÃ´ng tÃ¬m tháº¥y Ä‘á»  thi"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đề thi"));
 
         if (exam.getExamData() != null) {
             try {
                 JsonNode root = objectMapper.readTree(exam.getExamData());
                 return enrichExamDataIfNeeded(exam, root);
             } catch (Exception e) {
-                log.error("Lá»—i parse examData", e);
+                log.error("Lỗi parse examData", e);
             }
         }
 
@@ -270,7 +270,7 @@ public class ExamServiceImpl implements ExamService {
                                 .text(c.getChoiceText())
                                 .build()
                 ).collect(Collectors.toList()))
-                // Cá»‘ tÃ¬nh KHÃ”NG MAP correctAnswer vÃ  explanation Ä‘á»ƒ chá»‘ng gian láº­n
+                // Cố tình KHÔNG MAP correctAnswer và explanation để chống gian lận
                 .build()
         ).collect(Collectors.toList());
     }
@@ -304,7 +304,7 @@ public class ExamServiceImpl implements ExamService {
                         .build());
             }
         } catch (Exception e) {
-            log.warn("KhÃ´ng parse Ä‘Æ°á»£c sections summary tá»« examData, examId={}", exam.getId(), e);
+            log.warn("Không parse được sections summary từ examData, examId={}", exam.getId(), e);
         }
 
         sections.sort(Comparator.comparingInt(s -> s.getSectionNumber() == null ? Integer.MAX_VALUE : s.getSectionNumber()));
@@ -409,7 +409,7 @@ public class ExamServiceImpl implements ExamService {
             return root;
         }
 
-        log.info("Enrich examData cho examId={} vÃ¬ payload thiáº¿u questions", exam.getId());
+        log.info("Enrich examData cho examId={} vì payload thiếu questions", exam.getId());
 
         ArrayNode enrichedSections = objectMapper.createArrayNode();
         for (JsonNode sectionNode : sectionsNode) {
